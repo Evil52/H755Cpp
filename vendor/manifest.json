@@ -343,5 +343,15 @@
     "path": "cmsis-device-h7/LICENSE.md",
     "sha256": "053a83960032ab6bbd2231a3b6300bde3b4e526dcf11a61394907c0bdaacd713",
     "commit": "277b283ad9ab79ea85ee42920e371b019d7defb0"
+  },
+  {
+    "path": "cmsis-device-h7/Source/Templates/gcc/startup_stm32h755xx.s",
+    "sha256": "25d7db807d571b69970966099b490580366d6b81e591944a25fbd11c9fa23e19",
+    "commit": "277b283ad9ab79ea85ee42920e371b019d7defb0"
+  },
+  {
+    "path": "cmsis-device-h7/Source/Templates/system_stm32h7xx_dualcore_boot_cm4_cm7.c",
+    "sha256": "de2ccd8a2ec3c82deff92f383e88b11b6d1569e3b605591b7132ef8a25aea1c1",
+    "commit": "277b283ad9ab79ea85ee42920e371b019d7defb0"
   }
 ]
