@@ -7,10 +7,14 @@ main, pushes to main, and explicit manual dispatch. It does not run on feature-b
 pushes: an open PR receives one run per synchronization, not an additional push run.
 New PR runs cancel obsolete PR runs; main runs are not cancelled by subsequent pushes.
 
-Main pushes run only CodeQL to update the default-branch security baseline. Tests,
-sanitizers, Semgrep, Cppcheck, Clang, workflow/secrets checks and their aggregate gate
-run in PRs/manual dispatches only. Direct main pushes therefore lack full validation;
-use a PR. This preserves the already approved PR #3 policy.
+A main push after merge runs only the three CodeQL analyses to update the
+default-branch security baseline. Host tests/sanitizers, Cppcheck, Clang analysis,
+Semgrep, Actionlint and Gitleaks run in PRs or an explicit manual dispatch only;
+they do not repeat after merge. CodeQL still compiles the portable C++ under tracing,
+but does not execute its tests. The aggregate Quality gate also runs only in PRs
+and manual dispatches, where every dependency must succeed; on main each CodeQL job
+reports its own result. Skipped PR-only jobs on main are expected, not test results.
+Direct main pushes therefore receive CodeQL analysis only; use a PR for full validation.
 Do not enable CodeQL default setup alongside this advanced workflow. There is no
 second Sonar/cloud workflow or automatic local Sonar schedule.
 
@@ -29,8 +33,8 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
   than an accidental duplicate test job. Inspect extractor diagnostics before declaring coverage.
 - Actionlint and redacted Gitleaks history scan. GitHub secret scanning/push protection
   remains independently enabled.
-- In PR/manual runs, Quality gate fails if a required job fails, is cancelled, or is
-  skipped. It is itself skipped on main pushes.
+- In PRs/manual dispatches, Quality gate fails if any required configured job fails,
+  is cancelled, or is skipped. It is skipped on main pushes along with PR-only checks.
 
 CodeQL's published language support currently lists through C++23, with GNU compiler
 extensions through GCC 16. This does not establish full C++26 contracts support.
