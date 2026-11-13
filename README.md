@@ -3,6 +3,11 @@
 Начальный проект проверки инструментария для Nucleo STM32H755:
 **CMake + bare metal + CMSIS**, C++26, без HAL/LL и RTOS.
 
+Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
+Выбрана архитектура своего драйвера + lwIP. MAC/DMA, lwIP netif, startup и
+работа с реальными кадрами ещё не реализованы; текущий компонент проходит
+unit/host-integration проверки и компилируется для M7.
+
 На этом этапе проект проверяет компиляторы и библиотеки. Прикладной прошивки,
 таблицы векторов и STM32 linker script пока нет. ELF в проверке линковки —
 технический тест runtime, его нельзя записывать на плату.
@@ -45,6 +50,11 @@ python3 tools/check_toolchain.py
 ```
 
 Host-проверка выполняется с ASan/UBSan и extensive hardening libc++.
+На GNU host используется libstdc++ с `_GLIBCXX_ASSERTIONS`. Группы MDIO:
+`ctest --preset host-debug -L unit --no-tests=error` и
+`ctest --preset host-debug -L integration --no-tests=error`.
+Подготовленный GitHub Actions workflow выполняет host-проверки; до запуска
+на GitHub его результат остаётся неподтверждённым. Target/HIL/e2e им не заменяются.
 Arm-проверки используют C++26 без standard decay, `-fcontracts`,
 `-fcontract-evaluation-semantic=enforce`, `_GLIBCXX_ASSERTIONS=1` и явные ABI-флаги.
 В Debug и Release проверяется компиляция `pre`, `post`, `contract_assert`, array/span.
