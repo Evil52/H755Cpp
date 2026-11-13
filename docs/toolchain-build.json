@@ -1,0 +1,255 @@
+{
+  "compiler": "GCC 16.2.0",
+  "target": "arm-none-eabi",
+  "host": "macOS arm64 / Apple Clang 17",
+  "runtime_profile": "Cortex-M7, Thumb, FPv5-D16, hard-float; multilib disabled",
+  "binutils": "2.47",
+  "newlib": "4.6.0.20260123",
+  "sources": [
+    {
+      "url": "https://ftp.gnu.org/gnu/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz",
+      "sha256": "e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e",
+      "checksum_source": "Homebrew formula API"
+    },
+    {
+      "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.47.tar.bz2",
+      "sha256": "3068128c75cda9f898ccb4211d360246e8e195ffcc9dfb655b23ae23a54800e8",
+      "checksum_source": "Homebrew formula API"
+    },
+    {
+      "url": "https://sourceware.org/pub/newlib/newlib-4.6.0.20260123.tar.gz",
+      "sha256": "6ff27e3bf022666f43f7802255be680eeff722ac181b1725d21e2e8318604ee3",
+      "checksum_source": "computed; HTTPS upstream source"
+    }
+  ],
+  "prerequisite_sha512": "3b684c9bcb9ede2b7e54d0ba4c9764bfa17c20d4f3000017c553b6f1e135b536949580ff37341680c25dc236cfe0ba1db8cfdfe619ce013656189ef0871b89f8  gmp-6.3.0.tar.bz2\n0176e50808dcc07afbf5bc3e38bf9b7b21918e5f194aa0bfd860d99b00c470630aef149776c4be814a61c44269c3a5b9a4b0b1c0fcd4c9feb1459d8466452da8  mpfr-4.2.2.tar.bz2\n4bab4ef6076f8c5dfdc99d810b51108ced61ea2942ba0c1c932d624360a5473df20d32b300fc76f2ba4aa2a97e1f275c9fd494a1ba9f07c4cb2ad7ceaeb1ae97  mpc-1.3.1.tar.gz\naab3bddbda96b801d0f56d2869f943157aad52a6f6e6a61745edd740234c635c38231af20bc3f1a08d416a5e973a90e18249078ed8e4ae2f1d5de57658738e95  isl-0.24.tar.bz2\ne2a58dde1cae3e6b79c03e7ef3d888f7577c1f4cba283b3b0f31123ceea8c33d7c9700e83de57104644de23e5f5c374868caa0e091f9c45edbbe87b98ee51c04  gettext-0.22.tar.gz\n",
+  "build_commands": [
+    {
+      "stage": "binutils-configure",
+      "args": [
+        "/private/tmp/h755-gcc16/src/binutils-2.47/configure",
+        "--target=arm-none-eabi",
+        "--prefix=/private/tmp/h755-gcc16/prefix",
+        "--disable-nls",
+        "--disable-multilib",
+        "--disable-werror",
+        "--disable-gdb",
+        "--disable-sim",
+        "--disable-gprofng",
+        "--without-debuginfod",
+        "--without-zstd",
+        "--with-system-zlib",
+        "--enable-deterministic-archives"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-binutils",
+      "started_utc": "2026-11-13T20:11:05.544718+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "binutils-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-binutils",
+      "started_utc": "2026-11-13T20:11:10.174123+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "binutils-install",
+      "args": [
+        "/usr/bin/make",
+        "install"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-binutils",
+      "started_utc": "2026-11-13T20:11:46.821463+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "gcc-configure",
+      "args": [
+        "/private/tmp/h755-gcc16/src/gcc-16.2.0/configure",
+        "--target=arm-none-eabi",
+        "--prefix=/private/tmp/h755-gcc16/prefix",
+        "--disable-nls",
+        "--disable-multilib",
+        "--disable-werror",
+        "--enable-languages=c,c++",
+        "--disable-bootstrap",
+        "--disable-shared",
+        "--disable-threads",
+        "--disable-libssp",
+        "--disable-libquadmath",
+        "--disable-libgomp",
+        "--disable-libatomic",
+        "--disable-libsanitizer",
+        "--disable-libstdcxx-pch",
+        "--disable-host-shared",
+        "--disable-plugin",
+        "--enable-checking=release",
+        "--with-newlib",
+        "--without-headers",
+        "--without-isl",
+        "--without-zstd",
+        "--with-system-zlib",
+        "--with-cpu=cortex-m7",
+        "--with-fpu=fpv5-d16",
+        "--with-float=hard",
+        "--with-mode=thumb"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:11:48.311866+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "gcc-compiler-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "all-gcc"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:11:51.453427+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "gcc-compiler-install",
+      "args": [
+        "/usr/bin/make",
+        "install-gcc"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:15:54.297308+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libgcc-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "all-target-libgcc"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:15:55.596400+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libgcc-install",
+      "args": [
+        "/usr/bin/make",
+        "install-target-libgcc"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:16:15.913228+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "newlib-configure",
+      "args": [
+        "/private/tmp/h755-gcc16/src/newlib-4.6.0.20260123/configure",
+        "--target=arm-none-eabi",
+        "--prefix=/private/tmp/h755-gcc16/prefix",
+        "--disable-nls",
+        "--disable-multilib",
+        "--disable-werror",
+        "--disable-newlib-supplied-syscalls",
+        "--enable-newlib-io-long-long",
+        "--enable-newlib-retargetable-locking"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib",
+      "started_utc": "2026-11-13T20:16:16.575408+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "newlib-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib",
+      "started_utc": "2026-11-13T20:16:19.364086+00:00",
+      "exit_code": 2
+    },
+    {
+      "stage": "newlib-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "INFO_DEPS="
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib",
+      "started_utc": "2026-11-13T20:18:10.312946+00:00",
+      "exit_code": 2
+    },
+    {
+      "stage": "newlib-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "all-target-newlib"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib",
+      "started_utc": "2026-11-13T20:19:25.852583+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libgloss-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "INFO_DEPS="
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib/arm-none-eabi/libgloss",
+      "started_utc": "2026-11-13T20:19:26.535663+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "newlib-install",
+      "args": [
+        "/usr/bin/make",
+        "install-target-newlib"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib",
+      "started_utc": "2026-11-13T20:19:27.184155+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libgloss-install",
+      "args": [
+        "/usr/bin/make",
+        "install",
+        "INFO_DEPS="
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-newlib/arm-none-eabi/libgloss",
+      "started_utc": "2026-11-13T20:19:28.284638+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libstdcpp-build",
+      "args": [
+        "/usr/bin/make",
+        "-j4",
+        "all-target-libstdc++-v3"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:19:28.548435+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "libstdcpp-install",
+      "args": [
+        "/usr/bin/make",
+        "install-target-libstdc++-v3"
+      ],
+      "cwd": "/private/tmp/h755-gcc16/build-gcc",
+      "started_utc": "2026-11-13T20:20:22.193001+00:00",
+      "exit_code": 0
+    }
+  ],
+  "notes": [
+    "Upstream source build, not an official Arm binary distribution",
+    "Optional libgloss Info documentation omitted because makeinfo is unavailable",
+    "No compiler regression suite or target hardware execution performed",
+    "M4 requires separate verified runtime or multilib build"
+  ]
+}

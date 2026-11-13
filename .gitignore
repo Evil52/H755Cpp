@@ -1,0 +1,11 @@
+.tools/
+build/
+CMakeUserPresets.json
+.DS_Store
+
+.reference/
+*.epub
+.env
+.env.*
+*.key
+*.pem

@@ -1,0 +1,30 @@
+{
+  "compiler_version": "16.2.0",
+  "target": "arm-none-eabi",
+  "compiler_sha256": "0810636a6e3ae134485998485b36ff86da9ad7a501c3c6f0be30a79596473343",
+  "runtime_profile": "Cortex-M7 Thumb, FPv5-D16, hard-float; single runtime variant",
+  "feature_macros": {
+    "__cpp_lib_contracts": "202502L",
+    "_GLIBCXX_ASSERTIONS": "1",
+    "__cplusplus": "202400L",
+    "__GLIBCXX__": "20260807",
+    "_GLIBCXX_RELEASE": "16",
+    "__ARM_ARCH": "7",
+    "__cpp_contracts": "202502L",
+    "__ARM_PCS_VFP": "1",
+    "__cpp_lib_replaceable_contract_violation_handler": "202603L"
+  },
+  "native_contracts_compile": true,
+  "native_contracts_link": true,
+  "object_undefined_symbols": [
+    "         U handle_contract_violation(std::contracts::contract_violation const&)",
+    "         U std::__glibcxx_assert_fail(char const*, int, char const*, char const*)",
+    "         U std::terminate()"
+  ],
+  "arm_attributes": "Attribute Section: aeabi\nFile Attributes\n  Tag_CPU_name: \"7E-M\"\n  Tag_CPU_arch: v7E-M\n  Tag_CPU_arch_profile: Microcontroller\n  Tag_THUMB_ISA_use: Thumb-2\n  Tag_FP_arch: FPv5/FP-D16 for ARMv8\n  Tag_ABI_PCS_wchar_t: 4\n  Tag_ABI_FP_denormal: Needed\n  Tag_ABI_FP_exceptions: Needed\n  Tag_ABI_FP_number_model: IEEE 754\n  Tag_ABI_align_needed: 8-byte\n  Tag_ABI_align_preserved: 8-byte, except leaf SP\n  Tag_ABI_enum_size: small\n  Tag_ABI_VFP_args: VFP registers\n  Tag_ABI_optimization_goals: Aggressive Debug\n  Tag_CPU_unaligned_access: v6\n",
+  "library_assertion_reference": true,
+  "target_runtime_execution": "not run",
+  "hardware_fault_action": "not verified",
+  "link_only_image": "compiler/runtime linkage fixture; not STM32 firmware, never flash",
+  "m4_runtime": "not provided by this single-variant runtime; requires separate verified build"
+}
