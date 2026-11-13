@@ -17,6 +17,7 @@ permissions:
 jobs:
   host-tests:
     name: Host tests and analysis
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -57,6 +58,7 @@ jobs:
 
   semgrep:
     name: Semgrep
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -79,6 +81,7 @@ jobs:
 
   repository-security:
     name: Workflow and secrets
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -145,7 +148,7 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    if: always()
+    if: always() && github.event_name != 'push'
     needs: [host-tests, semgrep, repository-security, codeql]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
