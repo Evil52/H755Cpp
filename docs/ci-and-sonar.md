@@ -7,8 +7,10 @@ main, pushes to main, and explicit manual dispatch. It does not run on feature-b
 pushes: an open PR receives one run per synchronization, not an additional push run.
 New PR runs cancel obsolete PR runs; main runs are not cancelled by subsequent pushes.
 
-A main run after merge is intentional verification of the integrated commit and
-updates the default-branch security baseline. It is separate from the PR candidate.
+Main pushes run only CodeQL to update the default-branch security baseline. Tests,
+sanitizers, Semgrep, Cppcheck, Clang, workflow/secrets checks and their aggregate gate
+run in PRs/manual dispatches only. Direct main pushes therefore lack full validation;
+use a PR. This preserves the already approved PR #3 policy.
 Do not enable CodeQL default setup alongside this advanced workflow. There is no
 second Sonar/cloud workflow or automatic local Sonar schedule.
 
@@ -27,7 +29,8 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
   than an accidental duplicate test job. Inspect extractor diagnostics before declaring coverage.
 - Actionlint and redacted Gitleaks history scan. GitHub secret scanning/push protection
   remains independently enabled.
-- Quality gate fails if any required configured job fails, is cancelled, or is skipped.
+- In PR/manual runs, Quality gate fails if a required job fails, is cancelled, or is
+  skipped. It is itself skipped on main pushes.
 
 CodeQL's published language support currently lists through C++23, with GNU compiler
 extensions through GCC 16. This does not establish full C++26 contracts support.
@@ -61,7 +64,11 @@ Alternatively supply SONAR_TOKEN through the process environment. Do not put cre
 in GitHub or committed files for this local workflow. The command accepts only a loopback
 server, activates CXX for this project, submits local project `h755cpp` (requiring analysis
 and project-creation permission if it does not exist),
-and runs the pinned official scanner image in the existing Sonar Docker network. Reports
+and runs the pinned official scanner image in the existing Sonar Docker network.
+The scanner uses https://sonarqube:9443 with a mounted PKCS#12 truststore.
+The TLS front shares the Sonar container network namespace and proxies only to
+127.0.0.1:9000; it publishes no host port. The helper API remains restricted to host
+loopback 9000. No certificate-verification bypass or insecure fallback is used. Reports
 are local under ignored `build/sonar/`. The source mount is read-only; tokens are passed
 via environment and redacted from saved logs. Nothing is uploaded to an external Sonar service.
 SCM blame and Git-ignore filtering are disabled for this local scan so Docker can analyze
@@ -71,12 +78,23 @@ directories are scanned; Git blame and new-code attribution are not established 
 Source exclusions are explicit: toolchain probes use native C++26 syntax outside established
 plugin support; Semgrep fixtures deliberately contain forbidden operations. Actual application
 files remain in scope. A quality gate result alone is not evidence of complete parsing,
-test coverage, commercial CFamily checks, or target behavior. Read scanner diagnostics
+test completeness, commercial CFamily checks, or target behavior. Read scanner diagnostics
 and verify CXX file/line metrics. External analyzer reports and coverage are not yet imported.
-The initial scan passed its quality gate and reported CXX lines, but warned about
-unresolved includes (including standard-library headers). Its source metrics and rules
-must not be presented as complete semantic C++ analysis.
-The first baseline returned no evaluated new-code gate conditions. It also reported
-`python:S5332` for HTTP inside the existing local Docker bridge; that finding remains
-visible. This helper intentionally targets the local server requested by the user,
-not a remote endpoint. A remote/shared deployment needs TLS and a separate credential policy.
+The initial source-only scan had unresolved include warnings and a local Docker-HTTP
+finding. The link/coverage work removed that finding with a real local TLS front, fixed
+critical Python-complexity findings and imported host/MCU/Python coverage. See
+[link monitor and coverage](link-monitor-and-coverage.md). No Sonar rule or gate was
+relaxed to obtain the passing result. Community CXX remains limited by its parser and
+installed rules; zero findings are not proof of absence of all vulnerabilities.
+
+TLS image: nginx@sha256:901e593c95dc85f5a729f5765516321366ef4ac401821431d408897e95287d0a.
+Configuration: security/sonar/nginx.conf. The local container is h755-sonar-tls, with
+network mode container:mcp-ozon-sonar-sonarqube-1, no published ports and read-only
+configuration/cert mounts. It can be stopped/started manually. Recreate it if the Sonar
+container is recreated. Existing Sonar/PostgreSQL containers were not restarted.
+The certificate SAN is sonarqube; the private key is local mode 600 and never committed.
+The scanner truststore contains the public certificate only and uses its documented
+standard password; it contains no private key or token. No Mac system trust settings
+were modified. Copy the public truststore to ignored build/sonar-trust/truststore.p12
+in each checkout. Certificate renewal/recreation is a local administrator operation.
+See [Sonar TLS documentation](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/scanners/scanner-environment/manage-tls-certificates).

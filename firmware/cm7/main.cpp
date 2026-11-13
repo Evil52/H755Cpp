@@ -1,4 +1,5 @@
 #include "h755/ethernet/cmsis_mdio.hpp"
+#include "h755/ethernet/lan8742.hpp"
 #include <contracts>
 #include <cstdint>
 #include <expected>
@@ -24,6 +25,8 @@ constexpr std::uint32_t green = 1U;
 }
 extern "C" {
 volatile Diagnostics g_bringup{};
+struct LinkDiagnostics { std::uint32_t state, samples, errors; };
+volatile LinkDiagnostics g_link{0xFFFFFFFFU,0U,0U};
 extern volatile const std::uint32_t cm4_parked;
 void SysTick_Handler() { ticks = ticks + 1U; }
 }
@@ -137,10 +140,36 @@ int main()
     const bool found = g_bringup.phy_address != 0xFFFFFFFFU;
     g_bringup.state = found ? 4U : 5U;
     GPIOB->BSRR = found ? red << 16 : red;
+    const auto phy = PhyAddress::from(found ? g_bringup.phy_address : 0U);
+    contract_assert(phy.has_value());
+    Lan8742LinkMonitor monitor{reader, *phy};
+    auto last_link = ticks;
+    bool active = false;
     auto last = ticks;
     bool lit = false;
     for (;;) {
         const auto now = ticks;
+        if (found && !active && now - last_link >= 250U) {
+            last_link = now;
+            active = monitor.begin(now,20U).has_value();
+        }
+        if (active) {
+            const auto link = monitor.poll(now);
+            if (!link) {
+                active = false;
+                g_link.state = 0xFFFFFFFFU;
+                g_link.errors = g_link.errors + 1U;
+                (void)reader.recover_after_idle();
+            } else if (link->has_value()) {
+                active = false;
+                g_link.state = static_cast<std::uint32_t>(**link);
+                g_link.samples = g_link.samples + 1U;
+            }
+        }
+#ifdef H755_TARGET_COVERAGE
+        extern void coverage_poll();
+        coverage_poll();
+#endif
         if (now - last >= 500U) {
             last = now;
             lit = !lit;

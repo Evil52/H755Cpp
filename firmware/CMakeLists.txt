@@ -36,3 +36,11 @@ foreach(image cm7_bringup cm4_park)
     COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${image}>
     VERBATIM)
 endforeach()
+
+option(H755_TARGET_COVERAGE "Instrument isolated target test firmware; never for release" OFF)
+if(H755_TARGET_COVERAGE)
+  target_sources(cm7_bringup PRIVATE cm7/coverage.cpp)
+  target_compile_definitions(cm7_bringup PRIVATE H755_TARGET_COVERAGE=1)
+  target_compile_options(cm7_bringup PRIVATE -fprofile-arcs -ftest-coverage -fprofile-info-section)
+  target_link_libraries(cm7_bringup PRIVATE gcov)
+endif()

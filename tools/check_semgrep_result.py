@@ -8,7 +8,8 @@ if report.get('errors'):
 paths = report.get('paths', {}).get('scanned', [])
 if not paths:
     raise SystemExit('Semgrep scanned no source files')
-required = {'include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp'}
+required = {'include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp',
+            'firmware/cm7/main.cpp', 'firmware/cm7/coverage.cpp'}
 normalized = {Path(path).as_posix().removeprefix('./') for path in paths}
 if not required.issubset(normalized):
     raise SystemExit(f'Missing expected Semgrep source coverage: {sorted(required - normalized)}')

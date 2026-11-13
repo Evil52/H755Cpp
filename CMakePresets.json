@@ -12,6 +12,12 @@
       }
     },
     {
+      "name": "host-coverage",
+      "inherits": "host-debug",
+      "binaryDir": "${sourceDir}/build/host-coverage",
+      "cacheVariables": {"H755_HOST_COVERAGE": "ON"}
+    },
+    {
       "name": "cm7-debug",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/cm7-debug",
@@ -27,6 +33,7 @@
   ],
   "buildPresets": [
     {"name": "host-debug", "configurePreset": "host-debug"},
+    {"name": "host-coverage", "configurePreset": "host-coverage"},
     {"name": "cm7-debug", "configurePreset": "cm7-debug"},
     {"name": "cm7-release", "configurePreset": "cm7-release"}
   ],

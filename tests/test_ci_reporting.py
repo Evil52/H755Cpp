@@ -16,7 +16,7 @@ class SemgrepReportingTests(unittest.TestCase):
             return subprocess.run([sys.executable, str(ROOT / 'tools/check_semgrep_result.py'), str(path)], capture_output=True).returncode
 
     def valid_report(self):
-        return {'paths': {'scanned': ['include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp']}, 'results': [], 'errors': []}
+        return {'paths': {'scanned': ['include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp', 'firmware/cm7/main.cpp', 'firmware/cm7/coverage.cpp']}, 'results': [], 'errors': []}
 
     def test_valid_source_coverage_passes(self):
         self.assertEqual(self.run_report(self.valid_report()), 0)
@@ -26,7 +26,7 @@ class SemgrepReportingTests(unittest.TestCase):
 
     def test_missing_driver_fails(self):
         report = self.valid_report()
-        report['paths']['scanned'].pop()
+        report['paths']['scanned'].remove('src/ethernet/cmsis_mdio.cpp')
         self.assertNotEqual(self.run_report(report), 0)
 
     def test_parser_error_fails(self):

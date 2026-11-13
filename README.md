@@ -4,6 +4,7 @@
 **CMake + bare metal + CMSIS**, C++26, без HAL/LL и RTOS.
 
 Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
+Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
 Выбрана архитектура своего драйвера + lwIP. MAC/DMA, lwIP netif, startup и
 работа с реальными кадрами ещё не реализованы; текущий компонент проходит
 unit/host-integration проверки и компилируется для M7.

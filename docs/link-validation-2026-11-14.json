@@ -1,0 +1,147 @@
+{
+  "date": "2026-11-14",
+  "runtime_source_sha256": {
+    "include/h755/ethernet/cmsis_mdio.hpp": "016e2f33dfc7cf3af45312967017bf9f1d4f9b2440773bfda7b6039788f3e01e",
+    "include/h755/ethernet/lan8742.hpp": "6dc7e86c865b49eaae1b85abb416c6357f3e2a2154bee57c9e316a1f4067e33a",
+    "include/h755/ethernet/mdio.hpp": "687418744ace5ee4c07d0a3be2d1372010535fdbfd51e562140ca36531720f15",
+    "src/ethernet/cmsis_mdio.cpp": "4f93abdf5d7d0555d5bbf378478a5f747e6936b444b631eca70cda799291026d",
+    "firmware/cm4/park.s": "06fb3fa2a421952b54a9cb6af80ef1a6a4a241cf9b794dcd21ad5f762aac3579",
+    "firmware/cm7/coverage.cpp": "c724133a3c8577b35e2a21f6a10d9969cc97ffe2729dd116e2d121908e539aab",
+    "firmware/cm7/main.cpp": "26dfa13c92ecbe254b22ca38d0656700cd182c4f5d3ccc0e6e3c781bedd6143c",
+    "tools/check_semgrep_result.py": "328b3830dc6f5727cb7b7afe506e06f1c6eb85641b92dc41030eda661be15130",
+    "tools/check_toolchain.py": "55b7896f40b0677b35b636d5b18580a6d2689e8d6b4f55bdd682456a268b1056",
+    "tools/coverage_report.py": "4296295e25cc9d4ec0542a816d476f119dd396963abd0934591d3630dcf0fddc",
+    "tools/sonar_local.py": "ffb7677c9542342d08be9d42331b3bbfc5e022caa0fd268fdc50ecc867c1c823"
+  },
+  "coverage": {
+    "files": {
+      "include/h755/ethernet/cmsis_mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 4,
+        "total": 4
+      },
+      "include/h755/ethernet/lan8742.hpp": {
+        "kind": "c-cpp",
+        "covered": 61,
+        "total": 64
+      },
+      "include/h755/ethernet/mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 60,
+        "total": 61
+      },
+      "src/ethernet/cmsis_mdio.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0
+      },
+      "firmware/cm4/park.s": {
+        "kind": "assembly-instructions",
+        "total": 9,
+        "covered": 9,
+        "executed_addresses": [
+          "0x08100040",
+          "0x08100042",
+          "0x08100046",
+          "0x08100048",
+          "0x0810004a",
+          "0x0810004e",
+          "0x08100050",
+          "0x08100054",
+          "0x08100056"
+        ],
+        "method": "OpenOCD hardware single-step; PC checked before each instruction",
+        "evidence": "build/flash-coverage.log"
+      },
+      "firmware/cm7/coverage.cpp": {
+        "kind": "c-cpp",
+        "covered": 15,
+        "total": 21
+      },
+      "firmware/cm7/main.cpp": {
+        "kind": "c-cpp",
+        "covered": 97,
+        "total": 119
+      },
+      "tools/check_semgrep_result.py": {
+        "kind": "python",
+        "covered": 16,
+        "total": 16
+      },
+      "tools/check_toolchain.py": {
+        "kind": "python",
+        "covered": 47,
+        "total": 47
+      },
+      "tools/coverage_report.py": {
+        "kind": "python",
+        "covered": 89,
+        "total": 89
+      },
+      "tools/sonar_local.py": {
+        "kind": "python",
+        "covered": 101,
+        "total": 101
+      }
+    },
+    "groups": {
+      "c-cpp": {
+        "covered": 237,
+        "total": 269,
+        "percent": 88.10408921933086
+      },
+      "python": {
+        "covered": 253,
+        "total": 253,
+        "percent": 100.0
+      }
+    },
+    "covered": 490,
+    "total": 522,
+    "percent": 93.86973180076629,
+    "unmeasured": [],
+    "passed": true
+  },
+  "sonar": {
+    "gate": "OK",
+    "issues": 0,
+    "bugs": 0,
+    "critical_or_blocker": 0,
+    "reported_coverage": 93.8,
+    "new_coverage": 91.4,
+    "cxx_ncloc": 410,
+    "scope": "Community CXX plus Cppcheck and imported host/MCU/Python reports; no proof of complete C++26 security semantics"
+  },
+  "tests": {
+    "ctest_groups": 5,
+    "python_tests": 28,
+    "host_sanitizers": "ASan/UBSan",
+    "target_builds": [
+      "GCC16.2 Debug",
+      "GCC16.2 Release",
+      "instrumented test image"
+    ]
+  },
+  "hardware": {
+    "link": "100/full",
+    "link_samples": 13,
+    "link_errors": 0,
+    "coverage_stream_bytes": 8150,
+    "asm_executed_instructions": 9,
+    "restored_image_source_commit": "6751b5f",
+    "restored_image_verified": true,
+    "new_noninstrumented_release_flashing": "not performed"
+  },
+  "sast": {
+    "cppcheck": "2.22.0; no unsuppressed findings; two documented vendor-only suppressions",
+    "semgrep": "1.185.0; 8 owned C++ targets; no parse errors/findings",
+    "actionlint": "passed"
+  },
+  "coverage_limits": [
+    "line coverage; not a branch/path completeness claim",
+    "test/probe fixtures, vendor and generated files are excluded",
+    "CMake/declarative configuration has no runtime line metric",
+    "header hits merge host and instrumented MCU; Release execution is separate"
+  ],
+  "sonar_transport": "TLS across Docker; verified public-certificate truststore; backend loopback only; no host TLS port"
+}

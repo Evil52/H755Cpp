@@ -9,6 +9,7 @@ cm4_parked = 0x38000000;
 SECTIONS {
   .isr_vector : { . = ALIGN(1024); KEEP(*(.isr_vector)) } > FLASH
   .text : { *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) . = ALIGN(4); } > FLASH
+  .gcov_info : { __gcov_info_start = .; KEEP(*(.gcov_info)) __gcov_info_end = .; } > FLASH
   .ARM.extab : { *(.ARM.extab*) } > FLASH
   .ARM.exidx : { __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; } > FLASH
   .preinit_array : { PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); } > FLASH
