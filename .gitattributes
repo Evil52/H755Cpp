@@ -1,0 +1,2 @@
+vendor/cmsis-core/** -whitespace
+vendor/cmsis-device-h7/** -whitespace
