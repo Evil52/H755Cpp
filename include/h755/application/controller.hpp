@@ -49,7 +49,7 @@ public:
             if (!active_) link_failure();
         }
         if (active_) poll_link(now);
-        if (now - last_heartbeat_ >= 500U) {
+        if (now - last_heartbeat_ >= 3000U) {
             last_heartbeat_ = now;
             lit_ = !lit_;
             board_.green(lit_);
