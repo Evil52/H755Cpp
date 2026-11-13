@@ -47,14 +47,14 @@ jobs:
           cppcheck --version
           cppcheck --std=c++23 --enable=warning,performance,portability \
             --error-exitcode=1 --suppress=missingIncludeSystem \
-            -Iinclude tests/mdio_tests.cpp tests/link_tests.cpp
+            -Iinclude tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp src/diagnostics.cpp src/timebase.cpp
       - name: Clang static analysis on portable application logic
         run: |
           clang-tidy-18 --version
           cmake -S . -B build/clang-analysis -G Ninja \
             -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
             -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
-          clang-tidy-18 -p build/clang-analysis tests/mdio_tests.cpp tests/link_tests.cpp
+          clang-tidy-18 -p build/clang-analysis tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp src/diagnostics.cpp src/timebase.cpp
 
   semgrep:
     name: Semgrep
@@ -76,7 +76,7 @@ jobs:
           mkdir -p build/security
           semgrep scan --config security/semgrep/embedded.yml --error --strict --metrics=off \
             --disable-version-check --json-output=build/security/semgrep.json \
-            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp
+            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp
           python tools/check_semgrep_result.py build/security/semgrep.json
 
   repository-security:

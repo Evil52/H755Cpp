@@ -25,6 +25,10 @@ Read the skill's `references/cmake-baremetal-cmsis.md`. Prepare a cross-toolchai
 
 C++26 must be required without CMake standard decay; verify individual library/contracts/hardening capabilities separately. The project uses an isolated upstream GCC 16.2.0 arm-none-eabi build at `.tools/arm-gcc-16.2.0-cm7`; the system GCC 10.3.1 remains unchanged. The installed runtime is a single Cortex-M7 Thumb/FPv5-D16/hard-float variant. C++26 native contracts compile and link with enforce; hardware execution and safe fault action are unverified. Library assertions are verified in generated code, but complete C++26 library-hardening conformance is not established. Do not link M4 firmware against this M7 runtime; add a separate verified runtime or multilib toolchain first. See README.md and docs/toolchain-validation.json.
 
+## MISRA C++ baseline
+
+Use the embedded skill MISRA reference and [project assessment](docs/misra-cpp-profile.md) for owned C++ work. Baseline: MISRA C++:2023 with TC1:2026; it targets C++17. Preserve the chosen C++26 profile, record newer features and checked rules separately, and never claim full MISRA compliance from generic scanner success. Findings need correction or documented disposition under the governing process; no blanket vendor or MMIO waiver. Full guideline assessment is pending authoritative guideline access and verified checker/manual coverage.
+
 ## Initial architecture policy
 
 Start with the smallest verified bring-up, normally Cortex-M7 alone for a first exercise, after establishing the actual boot state of Cortex-M4. This is a proposed starting architecture, not a claim that M4 is currently held or disabled. Do not change boot option bytes to enforce it automatically.
