@@ -59,3 +59,24 @@ committed/pushed after local checks despite incomplete MCU coverage. Only after 
 passes may the isolated coverage image run. The previously verified ordinary Release is
 then restored. Final acceptance still requires >80% coverage and a clean local Sonar gate;
 a green pre-hardware CI alone does not make this candidate a validated release.
+
+## Measured result
+
+Candidate d7ac19a passed all seven required PR CI jobs in run 43524451276 before
+programming. Its isolated instrumented M7 image then read LAN8742 ID 0007:c131,
+advanced heartbeat/link samples without MDIO/fault/monitor errors and reached
+100 Mbit/s full duplex. The prior verified 3836-byte ordinary Release was restored;
+all 2 MiB of Flash match its saved baseline exactly. M4 was not rewritten and
+option/boot configuration was unchanged. The refactored ordinary Release is built,
+but has not been deployed or accepted as the operational image.
+
+Merged fresh host/MCU coverage is 365/406 C/C++ lines (89.90%) and 260/260 Python
+lines (100%); no owned runtime source is unmeasured. The unchanged M4 trace covers
+9/9 instructions. Six CTest groups and 29 Python tests pass. Local Sonar gate is OK,
+with zero issues and 92.0% new-code coverage; its overall metric rounds to 93.8%.
+Semgrep parsed 23 C++ files without findings/errors; CodeQL reported zero results
+for C++, Python and Actions. See modular-validation-2026-11-14.json for hashes,
+scope, evidence and limitations. Coverage is a line metric, not a correctness proof.
+
+MISRA C++ baseline and the explicit C++26/compliance boundary are recorded in
+misra-cpp-profile.md. No claim of full MISRA or automotive certification is made.

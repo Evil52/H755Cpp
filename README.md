@@ -92,3 +92,5 @@ ARM attributes, символы contract handler и assert, а также лин�
 - [RM0399: STM32H745/755/747/757](https://www.st.com/resource/en/reference_manual/dm00176879-stm32h745-755-and-stm32h747-757-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf)
 - [AN5557: архитектура двух ядер](https://www.st.com/resource/en/application_note/dm00733995-stm32h745755-and-stm32h747757-lines-dualcore-architecture-stmicroelectronics.pdf)
 - [AN5617: межъядерное взаимодействие](https://www.st.com/resource/en/application_note/an5617-introduction-to-interprocessor-communications-for-stm32h745755-and-stm32h747757-mcus-stmicroelectronics.pdf)
+
+MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).

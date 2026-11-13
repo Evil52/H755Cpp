@@ -1,0 +1,353 @@
+{
+  "date": "2026-11-14",
+  "tested_commit": "d7ac19a96d7ef2953071d951fe599b44fcfb3707",
+  "tested_tree": "923487058418e8815bda2595559bcd3446692b92",
+  "pre_hardware_ci": "https://github.com/Evil52/H755Cpp/actions/runs/43524451276",
+  "runtime_source_sha256": {
+    "firmware/CMakeLists.txt": "971d0923a3358b4e386aea31493ec4f41302bb6bf84400bfeabe26e5ac6d6f4a",
+    "firmware/cm4/park.s": "06fb3fa2a421952b54a9cb6af80ef1a6a4a241cf9b794dcd21ad5f762aac3579",
+    "firmware/cm7/application.cpp": "744ebb0dbff00254d0c59bf576262e1843432ad4483e93eb758df72a2cfc24a7",
+    "firmware/cm7/application.hpp": "2fd772dee30c25956122d73d3f6f27950a1e1dca73afe3c1b749b5e7c3f32016",
+    "firmware/cm7/board.cpp": "111d574429bbcbfda9f395868ae0a06741ba462c49d52aa4d6ad91aeec137493",
+    "firmware/cm7/board.hpp": "e9bfcc2500d525749aba375dc7c98d6c768f02729559684d76bd429036cfd8e0",
+    "firmware/cm7/coverage.cpp": "c724133a3c8577b35e2a21f6a10d9969cc97ffe2729dd116e2d121908e539aab",
+    "firmware/cm7/fault.cpp": "21d84e4571e35aacbcdbb5a01d0734ab2f66f90ee42d9cb8f72bca3bae4b9f51",
+    "firmware/cm7/main.cpp": "1a63c919aa254bbebc391e6bc188c9a48c2623a9b88103dc0f4dc1e72e05d00f",
+    "firmware/cm7/processor.cpp": "d127c7b5dcf8b3070c29ab87657eef01b4ee80d89db2b1bc46972883d8ded270",
+    "include/h755/application/controller.hpp": "e2c3c5e2b4ea35b4e3c293054dc9459549c879603de1eb1c32cdbd0c18ca9924",
+    "include/h755/board/gpio.hpp": "8062fb9f6a405a868ae1df0b8f4560ce7aa93d5555f180e2ec2cd4cd580f7d06",
+    "include/h755/diagnostics.hpp": "87205130e75fce8ab08dc89578c309029fd087175e691f62d6853070a0b9f195",
+    "include/h755/ethernet/cmsis_mdio.hpp": "016e2f33dfc7cf3af45312967017bf9f1d4f9b2440773bfda7b6039788f3e01e",
+    "include/h755/ethernet/lan8742.hpp": "6dc7e86c865b49eaae1b85abb416c6357f3e2a2154bee57c9e316a1f4067e33a",
+    "include/h755/ethernet/mdio.hpp": "687418744ace5ee4c07d0a3be2d1372010535fdbfd51e562140ca36531720f15",
+    "include/h755/fault.hpp": "655ca28cb36ce84fa4a388d85ac5884b8e06d9b9f0c2d0a8d0b8c1c5e13da7b8",
+    "include/h755/platform/processor.hpp": "82c34cc48fb0c62393efb03bfff614b4ef108263a70694bb632eab2495bf043c",
+    "include/h755/timebase.hpp": "b7df6cf8aad36586546e9d8cb7a1a0978a04ff4b00776b119b38305a84a31cc2",
+    "src/diagnostics.cpp": "8158792159b7b3e47ac8999e8ae7bd0527647b1e2b151dff943de692a0501c68",
+    "src/ethernet/cmsis_mdio.cpp": "4f93abdf5d7d0555d5bbf378478a5f747e6936b444b631eca70cda799291026d",
+    "src/timebase.cpp": "ed40c71dfc0ae412580d0d9cbf2e62a7ab4d31f98881cfd97df092bf2a1c057a",
+    "tools/check_semgrep_result.py": "599c2d9f7d09a16fb5aa0395f427406ef0739af6ef2bfb5392dd5d2d713aaa76",
+    "tools/check_toolchain.py": "55b7896f40b0677b35b636d5b18580a6d2689e8d6b4f55bdd682456a268b1056",
+    "tools/coverage_report.py": "4c9b0bdc8429b70a7566a4a7b4e094634bc8e9f08a9e89b740053cc7ca64aa13",
+    "tools/probes/arm_cpp26.cpp": "24989f342e98f63d5463d8d0b5ee0ab86f1dc3a2f88b298a63ccafb277cfe38c",
+    "tools/probes/host_cpp26.cpp": "560e7b183b8851a171ff2fe2687f98bdced1f6d916fad9119976652dd2007f8d",
+    "tools/sonar-scanner-image.txt": "03c52a0567065675328cccebd50ae2add22edef01f47ddc013159d3d8db1ebb8",
+    "tools/sonar_local.py": "ffb7677c9542342d08be9d42331b3bbfc5e022caa0fd268fdc50ecc867c1c823"
+  },
+  "coverage": {
+    "files": {
+      "include/h755/application/controller.hpp": {
+        "kind": "c-cpp",
+        "covered": 93,
+        "total": 95
+      },
+      "include/h755/board/gpio.hpp": {
+        "kind": "c-cpp",
+        "covered": 25,
+        "total": 25
+      },
+      "include/h755/diagnostics.hpp": {
+        "kind": "c-cpp",
+        "covered": 2,
+        "total": 2
+      },
+      "include/h755/ethernet/cmsis_mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 4,
+        "total": 4
+      },
+      "include/h755/ethernet/lan8742.hpp": {
+        "kind": "c-cpp",
+        "covered": 61,
+        "total": 64
+      },
+      "include/h755/ethernet/mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 60,
+        "total": 61
+      },
+      "include/h755/fault.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/platform/processor.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/timebase.hpp": {
+        "kind": "c-cpp",
+        "covered": 2,
+        "total": 2
+      },
+      "src/diagnostics.cpp": {
+        "kind": "c-cpp",
+        "covered": 35,
+        "total": 37
+      },
+      "src/ethernet/cmsis_mdio.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0
+      },
+      "src/timebase.cpp": {
+        "kind": "c-cpp",
+        "covered": 23,
+        "total": 24
+      },
+      "firmware/cm4/park.s": {
+        "kind": "assembly-instructions",
+        "total": 9,
+        "covered": 9,
+        "executed_addresses": [
+          "0x08100040",
+          "0x08100042",
+          "0x08100046",
+          "0x08100048",
+          "0x0810004a",
+          "0x0810004e",
+          "0x08100050",
+          "0x08100054",
+          "0x08100056"
+        ],
+        "method": "OpenOCD hardware single-step; PC checked before each instruction",
+        "evidence": "build/hardware/2026-11-14-link-coverage/flash-coverage.log; identical source and image SHA verified"
+      },
+      "firmware/cm7/application.cpp": {
+        "kind": "c-cpp",
+        "covered": 5,
+        "total": 5
+      },
+      "firmware/cm7/application.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/board.cpp": {
+        "kind": "c-cpp",
+        "covered": 24,
+        "total": 30
+      },
+      "firmware/cm7/board.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/coverage.cpp": {
+        "kind": "c-cpp",
+        "covered": 15,
+        "total": 21
+      },
+      "firmware/cm7/fault.cpp": {
+        "kind": "c-cpp",
+        "covered": 1,
+        "total": 16
+      },
+      "firmware/cm7/main.cpp": {
+        "kind": "c-cpp",
+        "covered": 9,
+        "total": 9
+      },
+      "firmware/cm7/processor.cpp": {
+        "kind": "c-cpp",
+        "covered": 6,
+        "total": 11
+      },
+      "tools/check_semgrep_result.py": {
+        "kind": "python",
+        "covered": 16,
+        "total": 16
+      },
+      "tools/check_toolchain.py": {
+        "kind": "python",
+        "covered": 47,
+        "total": 47
+      },
+      "tools/coverage_report.py": {
+        "kind": "python",
+        "covered": 96,
+        "total": 96
+      },
+      "tools/sonar_local.py": {
+        "kind": "python",
+        "covered": 101,
+        "total": 101
+      }
+    },
+    "groups": {
+      "c-cpp": {
+        "covered": 365,
+        "total": 406,
+        "percent": 89.90147783251231
+      },
+      "python": {
+        "covered": 260,
+        "total": 260,
+        "percent": 100.0
+      }
+    },
+    "covered": 625,
+    "total": 666,
+    "percent": 93.84384384384384,
+    "unmeasured": [],
+    "passed": true
+  },
+  "sonar": {
+    "gate": "OK",
+    "issues": 0,
+    "bugs": 0,
+    "critical_or_blocker": 0,
+    "reported_coverage": 93.8,
+    "new_coverage": 92.0,
+    "scope": "Community CXX source analysis plus imported reports; no proof of complete C++26 support or absence of vulnerabilities"
+  },
+  "tests": {
+    "ctest_groups": 6,
+    "python_tests": 29,
+    "host_sanitizers": "ASan/UBSan",
+    "target_builds": [
+      "GCC16.2 Debug",
+      "GCC16.2 Release",
+      "GCC16.2 Debug H755_TARGET_COVERAGE=ON"
+    ]
+  },
+  "sast": {
+    "cppcheck": "2.22.0; zero unsuppressed findings; two exact vendor-only suppressions",
+    "semgrep": "1.185.0; 23 owned C++ files; zero findings and parse errors",
+    "codeql": [
+      {
+        "category": "/language:c-cpp",
+        "results": 0,
+        "queries": 95,
+        "tested_pr_merge": "a55c2d70f9c84111eb6f25d57f58c45726169d10"
+      },
+      {
+        "category": "/language:actions",
+        "results": 0,
+        "queries": 23,
+        "tested_pr_merge": "a55c2d70f9c84111eb6f25d57f58c45726169d10"
+      },
+      {
+        "category": "/language:python",
+        "results": 0,
+        "queries": 50,
+        "tested_pr_merge": "a55c2d70f9c84111eb6f25d57f58c45726169d10"
+      }
+    ],
+    "actionlint": "passed"
+  },
+  "hardware": {
+    "commit": "d7ac19a96d7ef2953071d951fe599b44fcfb3707",
+    "ci_run": 43524451276,
+    "temporary_flash_and_restore_verified": true,
+    "full_2MiB_flash_restored_identically": true,
+    "options_changed": false,
+    "m4_rewritten": false,
+    "limits": [
+      "Initial verify_image against a running target reported CRC algorithm errors; complete preflight Flash readback instead matched the verified baseline. Subsequent M7 verification ran halted.",
+      "Instrumented build measures execution; it is not exact ordinary Release acceptance.",
+      "No MAC/DMA/lwIP packets; no power-cycle or cable-reconnect test in this run.",
+      "First instrumented link sample was negotiating; final sample reached 100/full."
+    ],
+    "flash-coverage": {
+      "diag_a": [
+        1211577653,
+        4,
+        4,
+        64000000,
+        0,
+        7,
+        49457,
+        0,
+        0,
+        1346458187
+      ],
+      "diag_b": [
+        1211577653,
+        4,
+        6,
+        64000000,
+        0,
+        7,
+        49457,
+        0,
+        0,
+        1346458187
+      ],
+      "link_a": [
+        0,
+        9,
+        0
+      ],
+      "link_b": [
+        5,
+        12,
+        0
+      ],
+      "heartbeat_advanced": true,
+      "link_samples_advanced": true,
+      "final_link": "100 Mbit/s full duplex"
+    },
+    "restore-release": {
+      "diag_a": [
+        1211577653,
+        4,
+        4,
+        64000000,
+        0,
+        7,
+        49457,
+        0,
+        0,
+        1346458187
+      ],
+      "diag_b": [
+        1211577653,
+        4,
+        6,
+        64000000,
+        0,
+        7,
+        49457,
+        0,
+        0,
+        1346458187
+      ],
+      "link_a": [
+        5,
+        9,
+        0
+      ],
+      "link_b": [
+        5,
+        12,
+        0
+      ],
+      "heartbeat_advanced": true,
+      "link_samples_advanced": true,
+      "final_link": "100 Mbit/s full duplex"
+    },
+    "stream_bytes": 11723,
+    "restored_full_flash_sha256": "b06ebf9ac273ac2a7c9a590438c467e87487aab05d7a131c54c991ae0fef5e35"
+  },
+  "images": {
+    "coverage_m7_bin_sha256": "b44ef0520ff3a90e4f74681cc5d031d135be1173391206292f20e10ef4927ade",
+    "restored_m7_bin_sha256": "90ae17a6922543940c9f147fe2462a766484268dd0da43193ace9990c2db87e4",
+    "unchanged_m4_bin_sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd",
+    "refactored_release_bin_sha256": "01503b6b18701577d0ac04106fbb32c9a8748ce657252bf251ded5bb2d3559c1"
+  },
+  "acceptance_limits": [
+    "Line coverage, not branch/path completeness or proof of absence of UB/vulnerabilities.",
+    "Owned runtime C/C++ and Python counted; assembly checked separately. Tests/probes, unmodified vendor source and generated files outside runtime metric.",
+    "Declaration-only headers have source-SHA-checked zero-executable reviews; executable firmware is not excluded.",
+    "Unchanged M4 instruction trace reused only with matching source/binary SHA; no old M7 coverage reused.",
+    "Ordinary refactored Release built but not deployed; previous working Release restored after instrumented HIL.",
+    "Native target contract violation/safe-output test remains unverified.",
+    "MISRA policy established; complete rule assessment and compliance claim remain pending. No ISO 26262 certification claim."
+  ]
+}
