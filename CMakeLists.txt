@@ -35,7 +35,8 @@ if(CMAKE_CROSSCOMPILING)
     -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard
     -ffreestanding -fno-exceptions -fno-rtti -fstack-usage
     -fcontracts -fcontract-evaluation-semantic=enforce)
-  message(STATUS "Toolchain checks only: no firmware image or hardware operation is configured")
+  add_subdirectory(firmware)
+  message(STATUS "Firmware images enabled; build/test never flash or reset hardware")
 else()
   include(CTest)
   option(H755_HOST_SANITIZERS "Run host checks with ASan and UBSan" ON)
