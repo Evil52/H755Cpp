@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    name: Host tests and analysis
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 ninja-build cppcheck clang-tidy-18
+          python3 -m venv /tmp/h755-ci-tools
+          /tmp/h755-ci-tools/bin/pip install cmake==3.31.6
+          echo /tmp/h755-ci-tools/bin >> "$GITHUB_PATH"
+      - name: Configure
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: cmake --preset host-debug
+      - name: Build
+        run: cmake --build --preset host-debug --parallel 2
+      - name: Unit and host integration with ASan/UBSan
+        run: |
+          ctest --preset host-debug --no-tests=error
+          python3 -m unittest discover -s tests -p 'test_*.py'
+      - name: Cppcheck on portable application logic
+        run: |
+          cppcheck --version
+          cppcheck --std=c++23 --enable=warning,performance,portability \
+            --error-exitcode=1 --suppress=missingIncludeSystem \
+            -Iinclude tests/mdio_tests.cpp
+      - name: Clang static analysis on portable application logic
+        run: |
+          clang-tidy-18 --version
+          clang-tidy-18 -p build/host-debug --extra-arg=-std=c++2c tests/mdio_tests.cpp
+
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - run: python -m pip install semgrep==1.185.0
+      - name: Test project rules
+        run: semgrep --test security/semgrep
+      - name: Scan owned application code
+        run: |
+          mkdir -p build/security
+          semgrep scan --config security/semgrep/embedded.yml --error --strict --metrics=off \
+            --disable-version-check --json-output=build/security/semgrep.json \
+            include src tests/mdio_tests.cpp
+          python tools/check_semgrep_result.py build/security/semgrep.json
+
+  repository-security:
+    name: Workflow and secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install pinned scanners
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+          go install github.com/zricethezav/gitleaks/v8@v8.30.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - name: Validate GitHub Actions
+        run: actionlint -color
+      - name: Scan committed history for secrets
+        run: gitleaks git --redact --no-banner .
+
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: c-cpp
+            build-mode: manual
+          - language: python
+            build-mode: none
+          - language: actions
+            build-mode: none
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install C++ extraction tools
+        if: matrix.language == 'c-cpp'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 ninja-build
+          python3 -m venv /tmp/h755-codeql-tools
+          /tmp/h755-codeql-tools/bin/pip install cmake==3.31.6
+          echo /tmp/h755-codeql-tools/bin >> "$GITHUB_PATH"
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended
+          config-file: .github/codeql-config.yml
+      - name: Build portable C++ under CodeQL tracing
+        if: matrix.language == 'c-cpp'
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: |
+          cmake --preset host-debug
+          cmake --build --preset host-debug --parallel 2
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066
+        with:
+          category: /language:${{ matrix.language }}
+
+  quality-gate:
+    name: Quality gate
+    if: always()
+    needs: [host-tests, semgrep, repository-security, codeql]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require all configured checks
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          results = json.loads(os.environ['RESULTS'])
+          failed = {name: item['result'] for name, item in results.items() if item['result'] != 'success'}
+          if failed:
+              print('Required checks did not succeed:', failed)
+              sys.exit(1)
+          print('All configured CI checks passed. Target/HIL and local Sonar are separate gates.')
+          PY
