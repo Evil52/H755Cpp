@@ -70,3 +70,18 @@ violation handling and physical LED visibility remain separate acceptance eviden
 Host tests and Debug/Release builds do not establish hardware acceptance. Record exact
 image hashes, flash verification, unchanged option bytes/unaffected sectors, observed
 PHY IDs, advancing heartbeat and M4 PC in the hardware report after programming.
+
+## Recorded hardware result
+
+[2026-11-14 report](hardware-2026-11-14.json): Release source commit 6751b5f was
+programmed and verified on the connected board. Both binaries match the full Flash
+readback, sectors 1..7 in both banks and option/boot configuration are unchanged.
+PHY address 0 returned 0x0007/0xC131, state 4, with zero MDIO errors/faults. Heartbeat
+advanced 69 to 70 and GPIOB ODR changed 1 to 0; M4 PC was 0x08100050 in Park_Idle.
+These are debugger observations; optical LED confirmation and power-cycle behavior
+remain separate. Flash backups and full logs stay local under ignored build/hardware.
+
+Validation: three CTest groups under host ASan/UBSan, five Python reporting tests,
+Debug/Release target builds, vendor SHA256 verification, Semgrep project rules on five
+owned files including firmware/cm7/main.cpp, and Gitleaks passed. Target firmware
+was not analyzed by host-only CodeQL/Clang, and CI for these new commits has not run.
