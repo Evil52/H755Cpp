@@ -47,11 +47,10 @@
     "m4_marker": "0x5041524b",
     "m4_pc": "0x08100050"
   },
-  "physical_led_confirmation": "pending user observation",
+  "physical_led_confirmation": "User confirmed on 2026-11-14: green LD1 blinking approximately once per second; red LD3 off",
   "limits": [
     "no Ethernet frames, lwIP or ping",
     "no power-cycle acceptance yet",
-    "contract violation fault action not exercised",
-    "GPIO readback is not optical LED verification"
+    "contract violation fault action not exercised"
   ]
 }

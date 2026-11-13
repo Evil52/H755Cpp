@@ -78,8 +78,9 @@ programmed and verified on the connected board. Both binaries match the full Fla
 readback, sectors 1..7 in both banks and option/boot configuration are unchanged.
 PHY address 0 returned 0x0007/0xC131, state 4, with zero MDIO errors/faults. Heartbeat
 advanced 69 to 70 and GPIOB ODR changed 1 to 0; M4 PC was 0x08100050 in Park_Idle.
-These are debugger observations; optical LED confirmation and power-cycle behavior
-remain separate. Flash backups and full logs stay local under ignored build/hardware.
+The user separately confirmed visible green LD1 blinking approximately once per second
+and red LD3 off on 2026-11-14. Power-cycle behavior remains unverified. Flash backups
+and full logs stay local under ignored build/hardware.
 
 Validation: three CTest groups under host ASan/UBSan, five Python reporting tests,
 Debug/Release target builds, vendor SHA256 verification, Semgrep project rules on five
