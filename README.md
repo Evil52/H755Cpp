@@ -4,13 +4,15 @@
 **CMake + bare metal + CMSIS**, C++26, без HAL/LL и RTOS.
 
 Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
+Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
 Выбрана архитектура своего драйвера + lwIP. MAC/DMA, lwIP netif, startup и
 работа с реальными кадрами ещё не реализованы; текущий компонент проходит
 unit/host-integration проверки и компилируется для M7.
 
-На этом этапе проект проверяет компиляторы и библиотеки. Прикладной прошивки,
-таблицы векторов и STM32 linker script пока нет. ELF в проверке линковки —
-технический тест runtime, его нельзя записывать на плату.
+Для первого аппаратного запуска добавлены [M7 LED + PHY ID и M4 parking](docs/m7-bringup.md):
+startup, linker scripts и отдельные ELF/BIN/HEX для обоих ядер. Ethernet-кадры пока
+не передаются. `build/toolchain-checks/link_only.elf` остаётся техническим тестом
+линковки runtime; его нельзя записывать на плату.
 
 ## Установленный компилятор
 

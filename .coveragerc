@@ -1,0 +1,9 @@
+[run]
+source = tools
+branch = True
+relative_files = True
+patch = subprocess
+data_file = build/python-coverage/.coverage
+omit = tools/probes/*
+[report]
+show_missing = True

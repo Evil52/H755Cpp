@@ -12,3 +12,5 @@ CMakeUserPresets.json
 __pycache__/
 *.pyc
 .scannerwork/
+
+*.p12

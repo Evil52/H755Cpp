@@ -1,0 +1,56 @@
+{
+  "cm7_bringup": {
+    "base": "0x8000000",
+    "initial_sp": "0x24080000",
+    "reset": "0x8000299",
+    "size": 2616,
+    "bin_sha256": "0232a9d00eb95aa7d23a76b38153fd53104ad9b66c28cadc6ab935612de31a91",
+    "elf_sha256": "7968cefeb1600f963d2f390f110f8a14c2c73cdaf21ca935d37abe5bbe753be6"
+  },
+  "cm4_park": {
+    "base": "0x8100000",
+    "initial_sp": "0x38010000",
+    "reset": "0x8100041",
+    "size": 92,
+    "bin_sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd",
+    "elf_sha256": "3175665a1fdff6acd7ea6d4ce4a0e689a55c8b3ae43b7373bda0480cad661e6b"
+  },
+  "source_commit": "6751b5f",
+  "board": "user-identified NUCLEO-H755ZI-Q; PCB revision not physically verified",
+  "mcu_idcode": "0x20036450",
+  "backup_sha256": "d7d7117783d958270a39a56bb1d0c1580d74e1cbfc41c6d2857b454e34e15716",
+  "after_flash_sha256": "fa21808848829f4b5a09d3871c2564fa2afafc6dae27991af0e312d22f152e81",
+  "flash_readback": "both image binaries match; sectors 1..7 of both banks unchanged",
+  "options": "0x1bc6aaf0 unchanged",
+  "boot": [
+    "0x00010001",
+    "0x08000000",
+    "0x08101ff0",
+    "0x00001000"
+  ],
+  "observed": {
+    "hclk_hz": 64000000,
+    "phy_address": 0,
+    "id1": "0x0007",
+    "id2": "0xc131",
+    "state": 4,
+    "heartbeat": [
+      69,
+      70
+    ],
+    "gpio_b_odr": [
+      1,
+      0
+    ],
+    "mdio_errors": 0,
+    "fault": 0,
+    "m4_marker": "0x5041524b",
+    "m4_pc": "0x08100050"
+  },
+  "physical_led_confirmation": "User confirmed on 2026-11-14: green LD1 blinking approximately once per second; red LD3 off",
+  "limits": [
+    "no Ethernet frames, lwIP or ping",
+    "no power-cycle acceptance yet",
+    "contract violation fault action not exercised"
+  ]
+}

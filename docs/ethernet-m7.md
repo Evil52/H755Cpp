@@ -39,15 +39,16 @@ and instantiate the transport. Test expectations include an independent exact co
 range boundaries, timeout latching, busy rejection, tick wrap, and one-time result delivery.
 
 `mdio_register_integration` uses fake registers. It checks cooperating software components,
-not Ethernet electrical timing, real PHY access, DMA, or board-level integration. No firmware
-has been flashed and no packets/ping/e2e scenario have been verified.
+not Ethernet electrical timing or DMA. The first [hardware bring-up](m7-bringup.md)
+verified PHY identifiers and LED heartbeat. [Link monitoring](link-monitor-and-coverage.md)
+adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
 
 ## Remaining milestones
 
 1. Verify exact Nucleo/MCU revision, jumpers and clock/power/boot state; implement board startup,
    linker map, timebase and RMII clock/pin bring-up. Read and record PHY identifiers on hardware.
-2. Add PHY reset/write/autonegotiation and link-state handling with bounded deadlines. Link-status
-   latch behavior requires the documented register-read sequence.
+2. Read-only link-state handling and its documented BMSR latch sequence are implemented.
+   PHY reset/write/autonegotiation control remains to be added with bounded deadlines.
 3. Specify DMA descriptor ownership and bounded rings, D2-accessible buffers, cache-line alignment,
    barriers and cache/MPU strategy; test ring wrap, starvation and error recovery before live traffic.
 4. Pin and audit upstream lwIP, add a `NO_SYS=1` port, one main-loop owner, static pools, and a
@@ -56,8 +57,9 @@ has been flashed and no packets/ping/e2e scenario have been verified.
    E2E must observe actual external traffic/results from the exact identified firmware image.
 
 Public source publication and hardware flashing are separate authorized operations.
-Host CI proves neither target compilation nor hardware operation; SonarQube, Semgrep,
-CodeQL, fuzzing and HIL have not yet been run for this initial application module.
+Host CI proves neither target compilation nor hardware operation. See the dated hardware
+report and link/coverage guide for local evidence; MAC/DMA, fuzzing and full-network HIL
+remain separate gates.
 
 ## Primary references
 

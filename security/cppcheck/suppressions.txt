@@ -1,0 +1,5 @@
+// Unused CMSIS __cmsis_start compares linker-defined section boundaries.
+// ST startup performs initialization instead; nm confirms this helper is absent.
+// Keep both exact upstream lines visible here; no owned-code suppression.
+comparePointers:vendor/cmsis-core/Include/m-profile/cmsis_gcc_m.h:66
+comparePointers:vendor/cmsis-core/Include/m-profile/cmsis_gcc_m.h:72

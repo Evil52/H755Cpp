@@ -5,7 +5,7 @@
   Selected Core Include files; license: `cmsis-core/LICENSE`.
 - ST CMSIS-Device H7 v1.10.8: commit `277b283ad9ab79ea85ee42920e371b019d7defb0`.
   Source: https://github.com/STMicroelectronics/cmsis-device-h7/tree/277b283ad9ab79ea85ee42920e371b019d7defb0
-  Selected device-selection, H755, and system declaration headers; license: `cmsis-device-h7/LICENSE.md`.
+  Selected device-selection, H755, system declaration headers, H755 GCC startup and dual-core system source; license: `cmsis-device-h7/LICENSE.md`.
 
 Files are unmodified. `manifest.json` records per-file SHA256 and source commit.
 No HAL/LL or RTOS implementation is included. Current target checks compile the
