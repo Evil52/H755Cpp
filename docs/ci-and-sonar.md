@@ -16,6 +16,9 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
 
 - Host build, warnings as errors, unit and mocked-register integration, ASan/UBSan.
 - Cppcheck and Clang static analysis of portable MDIO code via its host test translation unit.
+  Clang 18 uses its own CMake compilation database and libc++ 18: GCC module-scanning
+  flags and GCC 14's standard-library feature gates are incompatible with this analyzer.
+  C++26 remains required; this is a second host library, not target-runtime analysis.
 - Semgrep CE with pinned CLI, versioned local rules, rule fixtures, strict parse/error
   handling, and explicit nonempty expected-file coverage checks. These project policy
   rules are not a comprehensive security ruleset or a lifetime proof.

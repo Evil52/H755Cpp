@@ -26,7 +26,7 @@ jobs:
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-14 ninja-build cppcheck clang-tidy-18
+          sudo apt-get install -y g++-14 ninja-build cppcheck clang-18 clang-tidy-18 libc++-18-dev libc++abi-18-dev
           python3 -m venv /tmp/h755-ci-tools
           /tmp/h755-ci-tools/bin/pip install cmake==3.31.6
           echo /tmp/h755-ci-tools/bin >> "$GITHUB_PATH"
@@ -50,7 +50,10 @@ jobs:
       - name: Clang static analysis on portable application logic
         run: |
           clang-tidy-18 --version
-          clang-tidy-18 -p build/host-debug --extra-arg=-std=c++2c tests/mdio_tests.cpp
+          cmake -S . -B build/clang-analysis -G Ninja \
+            -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
+          clang-tidy-18 -p build/clang-analysis tests/mdio_tests.cpp
 
   semgrep:
     name: Semgrep
