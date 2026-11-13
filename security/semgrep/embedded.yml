@@ -1,0 +1,27 @@
+rules:
+  - id: h755-no-heap-allocation
+    languages: [cpp]
+    message: Firmware application allocation requires an explicit reviewed ownership and capacity policy.
+    severity: ERROR
+    pattern-either:
+      - patterns:
+          - pattern-either:
+              - pattern: new $TYPE(...)
+              - pattern: new $TYPE[$SIZE]
+          - pattern-regex: '\bnew\b'
+      - pattern: malloc(...)
+      - pattern: calloc(...)
+      - pattern: realloc(...)
+  - id: h755-no-reinterpret-cast
+    languages: [cpp]
+    message: Isolate representation conversions in a reviewed hardware or serialization boundary.
+    severity: ERROR
+    pattern: reinterpret_cast<$TYPE>($VALUE)
+  - id: h755-no-unchecked-c-buffer-copy
+    languages: [cpp]
+    message: Use a bounded validated protocol/byte interface instead of unbounded C string operations.
+    severity: ERROR
+    pattern-either:
+      - pattern: strcpy(...)
+      - pattern: strcat(...)
+      - pattern: sprintf(...)

@@ -1,0 +1,6 @@
+name: H755Cpp security
+paths-ignore:
+  - vendor/**
+  - build/**
+  - .tools/**
+  - security/semgrep/**

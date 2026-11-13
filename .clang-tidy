@@ -1,0 +1,4 @@
+Checks: '-*,clang-analyzer-*,bugprone-use-after-move,bugprone-sizeof-expression,bugprone-narrowing-conversions,portability-*'
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*include/h755/.*'
+SystemHeaders: false
