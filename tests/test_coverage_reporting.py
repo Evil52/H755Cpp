@@ -1,5 +1,6 @@
 import contextlib
 import gzip
+import hashlib
 import importlib.util
 import io
 import json
@@ -39,3 +40,15 @@ class CoverageTests(unittest.TestCase):
             root=Path(directory);(root/'firmware').mkdir();(root/'firmware/a.s').write_text('wfe')
             self.assertFalse(module.report(root,{}, {})['passed'])
             self.assertIn('firmware/a.s',module.report(root,{}, {})['unmeasured'])
+
+    def test_declaration_review_is_invalidated_by_source_change(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'include').mkdir()
+            header=root/'include/port.hpp';header.write_text('void port();')
+            declarations={'include/port.hpp':{'sha256':hashlib.sha256(header.read_bytes()).hexdigest(),'reason':'declarations only'}}
+            result=module.report(root,{}, {},declarations)
+            self.assertNotIn('include/port.hpp',result['unmeasured'])
+            self.assertEqual(result['files']['include/port.hpp']['total'],0)
+            header.write_text('void port() {}')
+            self.assertIn('include/port.hpp',module.report(root,{}, {},declarations)['unmeasured'])

@@ -8,7 +8,10 @@ add_library(cm7_startup OBJECT
 target_include_directories(cm7_startup SYSTEM PRIVATE ${device_includes})
 target_compile_definitions(cm7_startup PRIVATE STM32H755xx CORE_CM7 USE_PWR_DIRECT_SMPS_SUPPLY)
 target_compile_options(cm7_startup PRIVATE ${cm7_arch} -ffreestanding -ffunction-sections -fdata-sections)
-add_executable(cm7_bringup cm7/main.cpp $<TARGET_OBJECTS:cm7_startup>)
+add_executable(cm7_bringup
+  cm7/main.cpp cm7/application.cpp cm7/board.cpp cm7/fault.cpp cm7/processor.cpp
+  ${PROJECT_SOURCE_DIR}/src/diagnostics.cpp ${PROJECT_SOURCE_DIR}/src/timebase.cpp
+  $<TARGET_OBJECTS:cm7_startup>)
 set_target_properties(cm7_bringup PROPERTIES SUFFIX .elf)
 h755_cpp26(cm7_bringup)
 target_include_directories(cm7_bringup PRIVATE ${PROJECT_SOURCE_DIR}/include)

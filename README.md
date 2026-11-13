@@ -3,6 +3,8 @@
 Начальный проект проверки инструментария для Nucleo STM32H755:
 **CMake + bare metal + CMSIS**, C++26, без HAL/LL и RTOS.
 
+[Модули CM7 и владение зависимостями](docs/cm7-architecture.md).
+
 Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
 Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
 Выбрана архитектура своего драйвера + lwIP. MAC/DMA, lwIP netif, startup и

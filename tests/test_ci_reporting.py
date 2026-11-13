@@ -16,7 +16,7 @@ class SemgrepReportingTests(unittest.TestCase):
             return subprocess.run([sys.executable, str(ROOT / 'tools/check_semgrep_result.py'), str(path)], capture_output=True).returncode
 
     def valid_report(self):
-        return {'paths': {'scanned': ['include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp', 'firmware/cm7/main.cpp', 'firmware/cm7/coverage.cpp']}, 'results': [], 'errors': []}
+        return {'paths': {'scanned': ['include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp', 'firmware/cm7/main.cpp', 'firmware/cm7/coverage.cpp', 'firmware/cm7/board.cpp', 'firmware/cm7/fault.cpp', 'firmware/cm7/processor.cpp', 'src/diagnostics.cpp', 'src/timebase.cpp', 'include/h755/application/controller.hpp']}, 'results': [], 'errors': []}
 
     def test_valid_source_coverage_passes(self):
         self.assertEqual(self.run_report(self.valid_report()), 0)

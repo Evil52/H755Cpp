@@ -1,5 +1,6 @@
 import argparse
 import gzip
+import hashlib
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -51,7 +52,7 @@ def inventory(root):
                 yield path
 
 
-def measure_source(root,path,lines,assembly):
+def measure_source(root,path,lines,assembly,declarations=None):
     name=path.relative_to(root).as_posix()
     if path.suffix=='.s':
         measured=assembly.get(name,{})
@@ -60,7 +61,11 @@ def measure_source(root,path,lines,assembly):
     measured=lines.get(name,{})
     body=[s.strip() for s in path.read_text().splitlines() if s.strip() and not s.lstrip().startswith('#')]
     instantiation_only=bool(body) and all(s.startswith('template class ') and s.endswith(';') for s in body)
-    return {'kind':'python' if path.suffix=='.py' else 'c-cpp','covered':sum(measured.values()),'total':len(measured)},bool(measured) or instantiation_only
+    reviewed=(declarations or {}).get(name,{})
+    declaration_only=reviewed.get('sha256')==hashlib.sha256(path.read_bytes()).hexdigest() and bool(reviewed.get('reason'))
+    result={'kind':'python' if path.suffix=='.py' else 'c-cpp','covered':sum(measured.values()),'total':len(measured)}
+    if declaration_only and not measured: result['zero_executable_reason']=reviewed['reason']
+    return result,bool(measured) or instantiation_only or declaration_only
 
 
 def language_total(files,kind):
@@ -69,11 +74,11 @@ def language_total(files,kind):
     return {'covered':covered,'total':total,'percent':100*covered/total if total else 0}
 
 
-def report(root, lines, assembly):
+def report(root, lines, assembly, declarations=None):
     files={};missing=[]
     for path in inventory(root):
         name=path.relative_to(root).as_posix()
-        measured,complete=measure_source(root,path,lines,assembly)
+        measured,complete=measure_source(root,path,lines,assembly,declarations)
         files[name]=measured
         if not complete: missing.append(name)
     groups={kind:language_total(files,kind) for kind in ['c-cpp','python']}
@@ -102,10 +107,12 @@ def main(argv=None):
     parser.add_argument('--python',type=Path,required=True)
     parser.add_argument('--assembly',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--declarations',type=Path)
     args=parser.parse_args(argv)
     root=args.root.resolve()
     lines=collect(root,args.lcov,args.gcov,args.python)
-    result=report(root,lines,json.loads(args.assembly.read_text()))
+    declarations=json.loads(args.declarations.read_text()) if args.declarations else {}
+    result=report(root,lines,json.loads(args.assembly.read_text()),declarations)
     write_reports(args.output,result,lines)
     print(json.dumps(result,indent=2))
     if not result['passed']: raise SystemExit('Coverage gate failed: every runtime language must exceed 80%; no unmeasured owned source allowed')
