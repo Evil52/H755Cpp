@@ -102,3 +102,26 @@ Primary references:
   https://www.st.com/resource/en/reference_manual/dm00176879-stm32h745-755-and-stm32h747-757-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf
 
 Local Sonar acceptance also rejects parser errors even when scanner exit and the server gate succeed. The strict CXX mode and log guard preserve this check; initialized members are declared separately for the installed parser, with no source exclusions.
+
+## Hardware result, 2026-11-14
+
+CI run 43598418757 passed before source 2daa8e9 was programmed. The ordinary Release
+read back identically; all Flash outside M7 sector0, M4 and option/boot state were
+preserved. Connected startup reached ready with BMCR0x1000, BMSR0x782D and special
+status0x1058 (100/full). Actual cable removal published down while heartbeat and
+polling continued. A same-image restart with no cable reached bounded waiting_link;
+returning the cable without RESET recovered ready with one PHY attempt and no new
+reset. Fault/MDIO/monitor error counters remained zero in nominal observations.
+
+The user then completely cycled power with no OpenOCD session active. Green heartbeat
+and red-off were independently confirmed before debug-clock changes. Standard
+Cortex-M attach could not read CPUID with DBGMCU_CR0; raw AP0 reads were invalid too.
+AP2 read the correct device ID and debug state. Temporarily enabling only debug clocks
+and D1/D2 Sleep debug access (0x00600009), without CPU halt/reset or application/PHY
+initialization, allowed valid readback: heartbeat had already reached168, PHY was ready,
+and loadable Flash bytes matched. DBGMCU_CR was restored exactly to0. This is an
+observation-tool constraint; do not embed debug-power bits in ordinary firmware or
+claim an unmodified debug connection. See phy-control-hardware-2026-11-14.json.
+
+These observations accept the selected PHY milestone, not complete Ethernet packet
+transport, electrical/timing qualification, MISRA compliance or product certification.

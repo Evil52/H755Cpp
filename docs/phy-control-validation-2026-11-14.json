@@ -272,8 +272,8 @@
     "stack_usage_note": "main .su is a static frame estimate, not measured worst-case stack usage"
   },
   "hardware": {
-    "new_phy_firmware_programmed": false,
-    "acceptance": "pending authorization and post-CI HIL; do not merge as hardware-accepted",
+    "new_phy_firmware_programmed": true,
+    "acceptance": "Required selected HIL scenarios passed; see phy-control-hardware-2026-11-14.json",
     "prior_verified_release": "a6793cd; local backup build/hardware/2026-11-14-led-3000ms-release",
     "required_scenarios": [
       "connected startup: g_phy ready/error0/attempts1/completed1; captured BMCR AN enabled with reset/restart/loopback/powerdown/isolation clear; BMSR live link and AN complete; mode matches current g_link",
@@ -283,9 +283,9 @@
       "exact image Flash readback; unchanged M4, option bytes and boot configuration; recovery available"
     ],
     "limits": [
-      "No MAC/DMA frames, lwIP or ping implemented",
-      "Read simulated PHY/register tests are host evidence, not electrical proof",
-      "Standalone cold power-on without debugger and physical cable tests remain unperformed for this candidate"
+      "No MAC/DMA/lwIP/ping",
+      "Debug-clock/Sleep access had to be temporarily enabled for cold readback and was restored; no CPU reset or programming used for that observation",
+      "No exhaustive hardware fault, power-corner, timing or resource qualification"
     ]
   }
 }

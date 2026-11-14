@@ -1,0 +1,268 @@
+{
+  "date": "2026-11-14",
+  "tested_source_commit": "2daa8e9f04a2d93f9f1a2e0b412812a858d125fb",
+  "ci_before_first_write": "https://github.com/Evil52/H755Cpp/actions/runs/43598418757",
+  "board": "NUCLEO-H755ZI-Q; silicon DBGMCU IDCODE0x20036450",
+  "image_sha256": {
+    "cm7_bringup.bin": "c618cf74d1deb33b013e6c5d535aa6eeb7f18855a73be108733b01ec76149faa",
+    "cm7_bringup.elf": "d1d9236c213b722c955d7d58c3335cdcf95d8eab6ad6eabeb0651bf0239dea81",
+    "cm4_park.bin": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+  },
+  "flash": {
+    "m7_programmed": true,
+    "m4_rewritten": false,
+    "readback_matches_selected_image": true,
+    "outside_m7_sector0_unchanged": true,
+    "option_or_boot_changed": false,
+    "before_sha256": "7ea374b74e8c47d1e9ce4ae39e50ebefd4401a21c051b439753c85eefa92cd2e",
+    "after_sha256": "9663bbddad1e3c94dbcbd85e4ee3e72d664628d68316a5e916daf2d93d4ad852",
+    "backup_and_rollback": "Local full2MiB backup and previously verified LED Release preserved; no rollback was needed"
+  },
+  "connected_startup": {
+    "state": "ready",
+    "phy_attempts": 1,
+    "phy_completed": 1,
+    "phy_error": 0,
+    "bmcr": "0x1000",
+    "bmsr": "0x782d",
+    "resolved": "0x1058",
+    "link": "100/full",
+    "heartbeat_advanced": true,
+    "fault_mdio_link_errors": 0
+  },
+  "physical_cable_loss": {
+    "physical_action": "user unplugged Ethernet only",
+    "link_down": true,
+    "heartbeat_advanced": true,
+    "link_polling_advanced": true,
+    "phy_attempts_unchanged": 1,
+    "fault_mdio_link_errors": 0,
+    "diag_first": [
+      1211577653,
+      4,
+      62,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "diag_last": [
+      1211577653,
+      4,
+      63,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "link_first": [
+      0,
+      743,
+      0
+    ],
+    "link_last": [
+      0,
+      758,
+      0
+    ]
+  },
+  "startup_without_cable": {
+    "operation": "same-image reset with Ethernet unplugged",
+    "state": "waiting_link",
+    "expected_negotiation_timeout": 6,
+    "phy_attempts": 1,
+    "completed": 0,
+    "heartbeat_advanced": true,
+    "link_polling_advanced": true,
+    "fault_mdio_link_errors": 0,
+    "red_gpio_off": true,
+    "phy_first": [
+      5,
+      6,
+      1,
+      0,
+      4096,
+      30729,
+      0
+    ],
+    "phy_last": [
+      5,
+      6,
+      1,
+      0,
+      4096,
+      30729,
+      0
+    ],
+    "diag_first": [
+      1211577653,
+      4,
+      2,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "diag_last": [
+      1211577653,
+      4,
+      3,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "link_first": [
+      0,
+      5,
+      0
+    ],
+    "link_last": [
+      0,
+      20,
+      0
+    ]
+  },
+  "cable_return_without_reset": {
+    "physical_action": "user returned cable without reset",
+    "late_cable_recovery": true,
+    "phy_state": "ready",
+    "phy_error": 0,
+    "phy_attempts": 1,
+    "phy_completed": 1,
+    "heartbeat_advanced": true,
+    "fault_mdio_link_errors": 0,
+    "link_state": 5,
+    "startup_snapshot_retained": [
+      4096,
+      30729,
+      0
+    ],
+    "diag_first": [
+      1211577653,
+      4,
+      79,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "diag_last": [
+      1211577653,
+      4,
+      80,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "link_first": [
+      5,
+      931,
+      0
+    ],
+    "link_last": [
+      5,
+      945,
+      0
+    ]
+  },
+  "standalone_cold_start": {
+    "physical_action": "user confirmed full power-off/on with Ethernet and wait before attach",
+    "user_visual_observation_before_debug_clock_change": "green LED3s on/off; red off",
+    "cold_boot_passed": true,
+    "no_openocd_session_during_power_on": true,
+    "read_method": "mem_ap AP2/AP0; temporary DBGMCU debug-clock/Sleep enable only; no CPU reset/halt, firmware or MDIO writes",
+    "debug_before": 0,
+    "debug_temporary": 6291465,
+    "debug_restored": 0,
+    "firmware_loadable_sha256": "c618cf74d1deb33b013e6c5d535aa6eeb7f18855a73be108733b01ec76149faa",
+    "phy_first": [
+      3,
+      0,
+      1,
+      1,
+      4096,
+      30765,
+      4184
+    ],
+    "phy_last": [
+      3,
+      0,
+      1,
+      1,
+      4096,
+      30765,
+      4184
+    ],
+    "diag_first": [
+      1211577653,
+      4,
+      168,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "diag_last": [
+      1211577653,
+      4,
+      169,
+      64000000,
+      0,
+      7,
+      49457,
+      0,
+      0,
+      1346458187
+    ],
+    "link_first": [
+      5,
+      2012,
+      0
+    ],
+    "link_last": [
+      5,
+      2027,
+      0
+    ],
+    "heartbeat_already_advanced_at_first_ram_read": 168,
+    "fault_mdio_link_errors": 0,
+    "debug_transport_limits": "Initial USB opens failed; Cortex-M CPUID/raw AP0 reads were invalid with DBGMCU_CR0. Valid RAM/Flash readback followed temporary debug-clock/Sleep enable. The prior DBG setting0 was restored; no application/peripheral initialization was performed by the observer.",
+    "timing_corroboration": {
+      "nominal_seconds_represented_by_first_heartbeat": 504,
+      "seconds_between_first_core_examination_log_and_last_cold_read_log": 395.86317777633667,
+      "interpretation": "Heartbeat count corroborates execution before the first core examination attempt; log timing is not calibrated waveform evidence."
+    }
+  },
+  "acceptance": "selected PHY-management scenarios passed on the exact ordinary Release",
+  "post_test_state": "new ordinary Release remains programmed and running; Ethernet connected; debug control restored to0",
+  "remaining_limits": [
+    "No MAC/DMA frames, lwIP, IP or ping implemented",
+    "No waveform/logic-analyzer measurement or worst-case latency/stack proof",
+    "No brownout/long-duration/load/fault-injection hardware campaign",
+    "Host/target line coverage is not branch/path completeness or absence-of-UB/security proof",
+    "Community CXX has limited compiler/standard-header context; no full MISRA or ISO26262 claim"
+  ]
+}

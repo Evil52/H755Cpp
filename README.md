@@ -77,7 +77,7 @@ ARM attributes, символы contract handler и assert, а также лин�
 - Host-тест не проверяет native contracts GCC и поведение ARM runtime на устройстве.
 - Действие обработчика при нарушении контракта, безопасные выходы, старт обоих ядер,
   кеш/DMA и физическое поведение платы ещё не проверены.
-- Ни production-готовность, ни полноценная прошивка этим каркасом не заявляются.
+- Минимальная прошивка M7 и управление PHY проверены на плате; полный Ethernet-стек и production-готовность ещё не заявляются.
 
 ## Дальше
 
@@ -95,4 +95,4 @@ ARM attributes, символы contract handler и assert, а также лин�
 
 MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).
 
-Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Аппаратная проверка новой управляющей последовательности остаётся отдельным этапом.
+Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Результаты: [аппаратные проверки PHY](docs/phy-control-hardware-2026-11-14.json).

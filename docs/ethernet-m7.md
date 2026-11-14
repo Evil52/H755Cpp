@@ -48,7 +48,7 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
 1. Verify exact Nucleo/MCU revision, jumpers and clock/power/boot state; implement board startup,
    linker map, timebase and MDIO/RMII clock bring-up. PHY identifiers and link have been observed on hardware; full TX/RX packet-pin acceptance remains in the MAC/DMA milestone.
 2. Read-only link-state handling and its documented BMSR latch sequence are implemented.
-   [PHY reset/write/autonegotiation control](phy-control.md) is implemented and host-tested with bounded deadlines; new physical acceptance remains pending.
+   [PHY reset/write/autonegotiation control](phy-control.md) is implemented and host-tested with bounded deadlines; [selected hardware acceptance](phy-control-hardware-2026-11-14.json) passed, including cable loss, late insertion and standalone cold start.
 3. Complete and verify the RMII TX/RX pin configuration (MDIO/clock bring-up alone does not prove the packet interface). Specify DMA descriptor ownership and bounded rings, D2-accessible buffers, cache-line alignment,
    barriers and cache/MPU strategy; test ring wrap, starvation and error recovery before live traffic.
 4. Pin and audit upstream lwIP, add a `NO_SYS=1` port, one main-loop owner, static pools, and a
