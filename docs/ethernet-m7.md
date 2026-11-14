@@ -59,10 +59,10 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
 For this project's next Ethernet milestone, complete PR checks and merge first,
 then build a traceable immutable firmware artifact from the merged `main` commit.
 Download and verify that artifact before flashing the board; perform Flash readback
-and MAC/DMA HIL against those exact bytes. The current CI does not yet produce that
-artifact, so the next MAC/DMA image is not flashable under this policy until the
-artifact job exists and succeeds. Pre-merge programming is reserved for an explicitly
-authorized, backed-up experiment and never counts as release deployment.
+and MAC/DMA HIL against those exact bytes. The artifact job must complete and its
+pinned toolchain must be verified before the next MAC/DMA image is flashable; see
+[artifact procedure](firmware-artifacts.md). Pre-merge programming is reserved for a
+separately authorized, backed-up experiment and never counts as release deployment.
 
 Public source publication and hardware flashing are separate authorized operations.
 Host CI proves neither target compilation nor hardware operation. See the dated hardware

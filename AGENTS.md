@@ -77,9 +77,8 @@ whose artifact job or required checks are absent remains unflashable; no substit
 local `.bin` should be silently promoted. HIL then decides whether that artifact may
 be released to production devices. Never publish a production-ready claim before HIL.
 
-The current GitHub workflow has full PR checks and main-push CodeQL only; it does not
-yet build/upload an M7 firmware artifact using the pinned GCC 16.2 runtime. Implement
-and verify that artifact job and its toolchain supply before the next Ethernet flash.
+The artifact workflow and its pinned toolchain supply must be observed green after
+merge before the next Ethernet flash. See [artifact procedure](docs/firmware-artifacts.md).
 Do not present existing locally built USB/PHY binaries as CI release artifacts.
 
 ## USB async candidate
