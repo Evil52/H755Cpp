@@ -1,0 +1,44 @@
+--- a/src/portable/synopsys/dwc2/dwc2_common.c
++++ b/src/portable/synopsys/dwc2/dwc2_common.c
+@@ -39,2 +39 @@
+-  while (!(dwc2->grstctl & GRSTCTL_AHBIDL)) {
+-  }
++  h755_usb_wait(&dwc2->grstctl, GRSTCTL_AHBIDL, GRSTCTL_AHBIDL);
+@@ -49 +48 @@
+-    while (dwc2->grstctl & GRSTCTL_CSRST) {}
++    h755_usb_wait(&dwc2->grstctl, GRSTCTL_CSRST, 0);
+@@ -53 +52 @@
+-    while (!(dwc2->grstctl & GRSTCTL_CSRST_DONE)) {}
++    h755_usb_wait(&dwc2->grstctl, GRSTCTL_CSRST_DONE, GRSTCTL_CSRST_DONE);
+@@ -57 +56 @@
+-  while (!(dwc2->grstctl & GRSTCTL_AHBIDL)) {} // wait for AHB master IDLE
++  h755_usb_wait(&dwc2->grstctl, GRSTCTL_AHBIDL, GRSTCTL_AHBIDL); // wait for AHB master IDLE
+--- a/src/portable/synopsys/dwc2/dwc2_common.h
++++ b/src/portable/synopsys/dwc2/dwc2_common.h
+@@ -102 +102 @@
+-  while (0 != (dwc2->grstctl & GRSTCTL_TXFFLSH_Msk)) {}
++  h755_usb_wait(&dwc2->grstctl, GRSTCTL_TXFFLSH_Msk, 0);
+@@ -108 +108 @@
+-  while (0 != (dwc2->grstctl & GRSTCTL_RXFFLSH_Msk)) {}
++  h755_usb_wait(&dwc2->grstctl, GRSTCTL_RXFFLSH_Msk, 0);
+--- a/src/portable/synopsys/dwc2/dcd_dwc2.c
++++ b/src/portable/synopsys/dwc2/dcd_dwc2.c
+@@ -322 +322 @@
+-      while ((dep->diepint & DIEPINT_INEPNE) == 0) {}
++      h755_usb_wait(&dep->diepint, DIEPINT_INEPNE, DIEPINT_INEPNE);
+@@ -326 +326 @@
+-      while ((dep->diepint & DIEPINT_EPDISD_Msk) == 0) {}
++      h755_usb_wait(&dep->diepint, DIEPINT_EPDISD_Msk, DIEPINT_EPDISD_Msk);
+@@ -344 +344 @@
+-      while ((dwc2->gintsts & GINTSTS_BOUTNAKEFF_Msk) == 0) {}
++      h755_usb_wait(&dwc2->gintsts, GINTSTS_BOUTNAKEFF_Msk, GINTSTS_BOUTNAKEFF_Msk);
+@@ -348 +348 @@
+-      while ((dep->doepint & DOEPINT_EPDISD_Msk) == 0) {}
++      h755_usb_wait(&dep->doepint, DOEPINT_EPDISD_Msk, DOEPINT_EPDISD_Msk);
+@@ -1256,3 +1256,3 @@
+-    do {
+-      handle_rxflvl_irq(rhport); // read all packets
+-    } while(dwc2->gintsts & GINTSTS_RXFLVL);
++    for (uint32_t packets = 0; packets < 4 && (dwc2->gintsts & GINTSTS_RXFLVL); ++packets) {
++      handle_rxflvl_irq(rhport);
++    }

@@ -1,0 +1,21 @@
+{
+    "clang-format.executable": "${workspaceRoot}/.tools/clang-format/18.1.8/clang-format",
+    "clang-format.style": "file",
+    "clang-format.fallbackStyle": "none",
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false
+    }
+}

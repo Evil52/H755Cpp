@@ -96,3 +96,7 @@ ARM attributes, символы contract handler и assert, а также лин�
 MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).
 
 Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Результаты: [аппаратные проверки PHY](docs/phy-control-hardware-2026-11-14.json).
+
+USB CDC на Intel async: [архитектура, API, сборка и границы проверки](docs/usb-async.md).
+Кандидат включается отдельными presets `cm7-usb-debug` / `cm7-usb-release`;
+обычный `cm7-release` оставляет USB выключенным. USB на CN13 пока не проверен на плате.

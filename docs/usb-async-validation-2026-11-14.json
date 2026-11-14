@@ -1,0 +1,477 @@
+{
+  "date": "2026-11-14",
+  "base_commit": "4443314e7e7acaf2a88baf9b5923df7d6acbe5cb",
+  "milestone": "USB Device CDC-ACM binary echo, Intel sender/receiver async, bare metal CMSIS; software candidate only",
+  "runtime_source_sha256": {
+    "include/h755/application/controller.hpp": "9dc4b900d4c3ae970279d327deab543b191ac5444abbe125db900e85ec612747",
+    "include/h755/async/context.hpp": "c20f922a0fa6c6475fd83ff9e7bea0365870f2ca6798858c6a9ee2223e0c78b9",
+    "include/h755/board/gpio.hpp": "8062fb9f6a405a868ae1df0b8f4560ce7aa93d5555f180e2ec2cd4cd580f7d06",
+    "include/h755/diagnostics.hpp": "2e85f0186ea2ce9234cf36d45e4bf985f74dc643ff3f8eec66e45174dad2469c",
+    "include/h755/ethernet/cmsis_mdio.hpp": "0f2447598857a2a26d27c52d076f374d18d3965b7e4e2b215bebb5103204c7b3",
+    "include/h755/ethernet/lan8742.hpp": "26ab593e5e7ec287f8b0a4a1d0463a164451da350ac32929cc1bd2251e24b892",
+    "include/h755/ethernet/mdio.hpp": "7d9433147fc04802a00e58eb077415cd8b2ad457f39158806b25bbd64f7ce854",
+    "include/h755/ethernet/phy_control.hpp": "caf0cd9313e9262234ff8b2f3d31caf835858ec496b5ec81741a889403da6b5c",
+    "include/h755/fault.hpp": "d9b22c18b41182fc7804687c6a42a2d41c7fa234c4884d4c52864c50d1607512",
+    "include/h755/platform/processor.hpp": "82c34cc48fb0c62393efb03bfff614b4ef108263a70694bb632eab2495bf043c",
+    "include/h755/timebase.hpp": "b7df6cf8aad36586546e9d8cb7a1a0978a04ff4b00776b119b38305a84a31cc2",
+    "include/h755/usb/cdc.hpp": "a550b43a339c8527a605042b3a54097f205f113c27dafa7e94aa8ee789dc4195",
+    "include/h755/usb/echo.hpp": "11ad67e8bfffdc219b268830ad1d8c8e2655625ac58322f01e1f74971d806497",
+    "include/h755/usb/startup.hpp": "6e9a17584c970fce6e5614da954c9d6e05da299e64ae13d40a7b8fc37a70d682",
+    "include/h755/usb/tinyusb_port.hpp": "b91ecaededdfb3331c2ece6cddd13c17638cd7a6989e377e2b7f2ba249887239",
+    "src/diagnostics.cpp": "beb542c897cfcff0e8143d1912aec3c3e990ddfefb30423446a34826b0284748",
+    "src/ethernet/cmsis_mdio.cpp": "6f232a792a2c52a1e72f6a6dee0ccb1d0d585ab7627287a0158128c8a34e1320",
+    "src/timebase.cpp": "ed40c71dfc0ae412580d0d9cbf2e62a7ab4d31f98881cfd97df092bf2a1c057a",
+    "src/usb/descriptors.cpp": "742d089dd0ac558276ca9e8c7e97d0f40d5f9badbafbe5d65172e92daebf8009",
+    "src/usb/tinyusb_port.cpp": "21d12464f609e8fa36874666defcc7a9dfeb16b0558107ae22259b5a57c860c4",
+    "src/usb/tusb_config.h": "32d06ed11c0717771fe5e67491777b32647dd501fbe6f60402eb4acf91445938",
+    "firmware/cm4/park.s": "06fb3fa2a421952b54a9cb6af80ef1a6a4a241cf9b794dcd21ad5f762aac3579",
+    "firmware/cm7/application.cpp": "625acf26f447062ae1dcea96a6db6df26f4ddeea4348b7f5f76ce2627247fe7a",
+    "firmware/cm7/application.hpp": "68b03cbe3182614bf41dfe814de55c6577ac5741778d9e8f528c6b7840812305",
+    "firmware/cm7/board.cpp": "26f09f62846de81310d797e3e84f9fd7de58d7cef28023e616a9a1c7849fabd5",
+    "firmware/cm7/board.hpp": "e9bfcc2500d525749aba375dc7c98d6c768f02729559684d76bd429036cfd8e0",
+    "firmware/cm7/coverage.cpp": "e1d8cde77f2ee690f6ee882870c1faba52921544041976041ed78c5f365c2c41",
+    "firmware/cm7/fault.cpp": "83039f7fa55f2e469e3dcba1ae05bfccd11e1fadd9b01a797dec3b0576d36895",
+    "firmware/cm7/main.cpp": "e8177ef75e972f387ad3debafc1e76268f901ed6d41fdbfd275316bf894cf11a",
+    "firmware/cm7/processor.cpp": "1cb143e42469dd1146b23961f71b0debff7ef29b4990eda47e7b829f4c8dc12c",
+    "firmware/cm7/usb/platform.cpp": "10a18e02ca94cc5287608ca051414beffee55ccd59ee9a8a4251205f376ffe07",
+    "firmware/cm7/usb/runtime.cpp": "44a5080040dd510cb98cec75e27fed753b166373d35aae3faf5d819f8bcf2b5b",
+    "firmware/cm7/usb/runtime.hpp": "c715e7b78a73892aa9e0f437b8b4aac8192d3ab069db24eeb12d821377b46468",
+    "tools/check_semgrep_result.py": "bcbcf44c2b4639289068451fdd3ddcb8d743bab6074a5e84953b9a8c29e496c9",
+    "tools/check_toolchain.py": "55b7896f40b0677b35b636d5b18580a6d2689e8d6b4f55bdd682456a268b1056",
+    "tools/coverage_report.py": "2ab21f60f2ef687e2cdbbae7d729f908a5e298974a4f2b8b03d7ace2a4aa5067",
+    "tools/sonar_local.py": "d0eada9a6ded9dbb68986bc57a21c683657dd60b0ec354bf818964623804e037"
+  },
+  "build_inputs_sha256": {
+    "CMakeLists.txt": "fd136e1c78cc713c89c9cf57f92f48b5edfb9d3c54a19221baed01be5b80ff28",
+    "CMakePresets.json": "0d76abec732a41be83a8cf239778d1a3e73eb65dca38d299875448d3b5791bc2",
+    "firmware/CMakeLists.txt": "dd3979af9060bf2165905f9d62e626a1b49abe760397c5010d44a12f1f0cb1c1",
+    "cmake/usb.cmake": "16556d009658aaa5393c49d608f655a7c02c4aea5ddaacbb839f9dabaf5714a4",
+    "cmake/verify_usb_vendor.cmake": "038ba4e79fec16b9dc8b58fd5a70770615c855e2af8b1a71c9e8b41f8ac72ff0",
+    "cmake/toolchains/arm-gcc16.cmake": "46f9559b77e8670074b9cb5c7542d9f931e112712c85ce48d6171fa936f21711",
+    "cmake/linker/cm7.ld": "0d505204c03f67d4397887aaee24b1f729aa9b88f7a1a4125ded800729ccc179",
+    "sonar-project.properties": "3fe0c1102c5c3884b752082a4f082ba9cb1ede1991b8bdd81dc39010cb3328ed",
+    "coverage/declarations.json": "3f053fa3be0e516574a56bcd0174bd370d84ea8b6869b15c94ae46e103e779d6",
+    "vendor/usb-async-manifest.json": "3dec04f9406ead242926e05c74726d7f4bab04e72763568f07decfa7a2502583",
+    "vendor/tinyusb-h755-bounded-waits.patch": "dcd67076e4ebc9054eb8a813fd7e97fbd25b9187c03ff174568a7959507421d4",
+    "vendor/stdx-gcc16-compat.patch": "0a31e25297a69a4fed112695a6599fdcffa4b4e0e5abf812f87c2fc4f3543222",
+    "vendor/async-gcc16-compat.patch": "9681e99cc0c801a5c47eafaf613972f0cea80ff90c7c8cd40d0d5a7bf42eed1a",
+    ".github/workflows/ci.yml": "6c4e7abe93fd668a384c7dc1a04febf3dd76a774fadd5b55e0a0599016f54524"
+  },
+  "coverage": {
+    "files": {
+      "include/h755/application/controller.hpp": {
+        "kind": "c-cpp",
+        "covered": 131,
+        "total": 140
+      },
+      "include/h755/async/context.hpp": {
+        "kind": "c-cpp",
+        "covered": 4,
+        "total": 7
+      },
+      "include/h755/board/gpio.hpp": {
+        "kind": "c-cpp",
+        "covered": 25,
+        "total": 25
+      },
+      "include/h755/diagnostics.hpp": {
+        "kind": "c-cpp",
+        "covered": 1,
+        "total": 1
+      },
+      "include/h755/ethernet/cmsis_mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 5
+      },
+      "include/h755/ethernet/lan8742.hpp": {
+        "kind": "c-cpp",
+        "covered": 64,
+        "total": 71
+      },
+      "include/h755/ethernet/mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 76,
+        "total": 82
+      },
+      "include/h755/ethernet/phy_control.hpp": {
+        "kind": "c-cpp",
+        "covered": 120,
+        "total": 130
+      },
+      "include/h755/fault.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/platform/processor.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/timebase.hpp": {
+        "kind": "c-cpp",
+        "covered": 2,
+        "total": 2
+      },
+      "include/h755/usb/cdc.hpp": {
+        "kind": "c-cpp",
+        "covered": 201,
+        "total": 212
+      },
+      "include/h755/usb/echo.hpp": {
+        "kind": "c-cpp",
+        "covered": 12,
+        "total": 13
+      },
+      "include/h755/usb/startup.hpp": {
+        "kind": "c-cpp",
+        "covered": 55,
+        "total": 56
+      },
+      "include/h755/usb/tinyusb_port.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "src/diagnostics.cpp": {
+        "kind": "c-cpp",
+        "covered": 58,
+        "total": 68
+      },
+      "src/ethernet/cmsis_mdio.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0
+      },
+      "src/timebase.cpp": {
+        "kind": "c-cpp",
+        "covered": 23,
+        "total": 24
+      },
+      "src/usb/descriptors.cpp": {
+        "kind": "c-cpp",
+        "covered": 37,
+        "total": 37
+      },
+      "src/usb/tinyusb_port.cpp": {
+        "kind": "c-cpp",
+        "covered": 55,
+        "total": 55
+      },
+      "src/usb/tusb_config.h": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 1
+      },
+      "firmware/cm4/park.s": {
+        "kind": "assembly-instructions",
+        "total": 9,
+        "covered": 9,
+        "executed_addresses": [
+          "0x08100040",
+          "0x08100042",
+          "0x08100046",
+          "0x08100048",
+          "0x0810004a",
+          "0x0810004e",
+          "0x08100050",
+          "0x08100054",
+          "0x08100056"
+        ],
+        "method": "OpenOCD hardware single-step; PC checked before each instruction",
+        "evidence": "build/flash-coverage.log"
+      },
+      "firmware/cm7/application.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 9
+      },
+      "firmware/cm7/application.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/board.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 32
+      },
+      "firmware/cm7/board.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/coverage.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 26
+      },
+      "firmware/cm7/fault.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 22
+      },
+      "firmware/cm7/main.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 9
+      },
+      "firmware/cm7/processor.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 16
+      },
+      "firmware/cm7/usb/platform.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 30
+      },
+      "firmware/cm7/usb/runtime.cpp": {
+        "kind": "c-cpp",
+        "covered": 67,
+        "total": 83
+      },
+      "firmware/cm7/usb/runtime.hpp": {
+        "kind": "c-cpp",
+        "covered": 3,
+        "total": 6
+      },
+      "tools/check_semgrep_result.py": {
+        "kind": "python",
+        "covered": 16,
+        "total": 16
+      },
+      "tools/check_toolchain.py": {
+        "kind": "python",
+        "covered": 47,
+        "total": 47
+      },
+      "tools/coverage_report.py": {
+        "kind": "python",
+        "covered": 96,
+        "total": 96
+      },
+      "tools/sonar_local.py": {
+        "kind": "python",
+        "covered": 104,
+        "total": 104
+      }
+    },
+    "groups": {
+      "c-cpp": {
+        "covered": 934,
+        "total": 1162,
+        "percent": 80.37865748709122
+      },
+      "python": {
+        "covered": 263,
+        "total": 263,
+        "percent": 100.0
+      }
+    },
+    "covered": 1197,
+    "total": 1425,
+    "percent": 84.0,
+    "unmeasured": [],
+    "passed": true
+  },
+  "coverage_method": {
+    "host": "fresh executable-specific LLVM profiles, merged by source line; no mismatched-data warnings",
+    "target": "fresh GCC MCU zero-hit inventory; new hardware execution is not claimed",
+    "historical_reuse": {
+      "retained_source_sha_identical": [
+        "include/h755/board/gpio.hpp",
+        "include/h755/timebase.hpp",
+        "src/timebase.cpp"
+      ],
+      "zero_target_inventory": "fresh compiler notes only; no new target execution claimed"
+    },
+    "assembly": "unchanged M4 source/image and prior9/9 instruction trace; matching image SHA verified"
+  },
+  "tests": {
+    "ctest_groups": 10,
+    "python": 32,
+    "sanitizers": "ASan/UBSan; real TinyUSB core/EP0/CDC/FIFO and production Runtime, substituted DCD/platform, real Timebase logic",
+    "behavioral_red": [
+      "USB read must suspend before poll",
+      "DTR close/reopen must invalidate prior session",
+      "executable .h files must not escape inventory"
+    ],
+    "fault_tests": "controlled host child processes for clock timeout, stuck register, missing clock binding and abort hook; not MCU fault-path acceptance"
+  },
+  "analysis": {
+    "clang_static_analyzer": [
+      {
+        "file": "src/usb/descriptors.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "src/usb/tinyusb_port.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "tests/usb_async_tests.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "tests/usb_stack_tests.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "tests/usb_host_simulator.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "tests/usb_runtime_tests.cpp",
+        "exit": 0,
+        "findings": 0
+      },
+      {
+        "file": "firmware/cm7/usb/runtime.cpp",
+        "exit": 0,
+        "findings": 0
+      }
+    ],
+    "semgrep": {
+      "files": 41,
+      "findings": 0,
+      "parser_errors": 0,
+      "reviewed_exception": "single aligned CMSIS USB device-register cast, scoped rule annotation in platform.cpp"
+    },
+    "cppcheck": {
+      "supported_portable_scope": "passed,0findings",
+      "usb_scope": "not established: parser rejects Intel stdx constructs; failed experimental logs retained, no blanket parser suppression",
+      "usb_compensation": "real compiler checks,Clang Static Analyzer,Semgrep,host tests; CI CodeQL pending"
+    },
+    "gitleaks": "full prospective Git payload passed; no secret allowlist",
+    "actionlint": "passed",
+    "vendor_integrity": "all SHA verified by CMake at configure; isolated tamper case rejected; package contains only OS-none headers; zero-context patch applicability checked with --unidiff-zero"
+  },
+  "sonar": {
+    "gate": "OK",
+    "issues": 0,
+    "blocking_issues": 0,
+    "parser_errors": 0,
+    "include_warnings": 663,
+    "scope": "Community CXX source analysis plus imported reports; no proof of complete C++26 support or absence of vulnerabilities",
+    "metrics": [
+      {
+        "metric": "coverage",
+        "value": "84.5",
+        "bestValue": false
+      },
+      {
+        "metric": "ncloc_language_distribution",
+        "value": "cxx=1848;py=297"
+      },
+      {
+        "metric": "ncloc",
+        "value": "2145"
+      },
+      {
+        "metric": "violations",
+        "value": "0",
+        "bestValue": true
+      },
+      {
+        "metric": "files",
+        "value": "36"
+      }
+    ]
+  },
+  "builds": {
+    "cm7-usb-debug": {
+      "artifacts": {
+        "cm7_bringup.bin": {
+          "bytes": 81484,
+          "sha256": "25d5640730b700f0fc6644f1abb984735f97e8d584ed884cae9f8ab568f6d737"
+        },
+        "cm7_bringup.elf": {
+          "bytes": 6344540,
+          "sha256": "f7d2b748d84774dc59cf81df8bf3e4665dc0e445825dab32cd835434d29225bf"
+        },
+        "cm4_park.bin": {
+          "bytes": 92,
+          "sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+        }
+      },
+      "allocation_symbols": "none (placement new allowed)",
+      "owned_cpp_flags_verified": true
+    },
+    "cm7-usb-release": {
+      "artifacts": {
+        "cm7_bringup.bin": {
+          "bytes": 30472,
+          "sha256": "a1da89f604a8a86fa7e6727520e9054a0df621dc66e1f329f85c2a8fc9f584d6"
+        },
+        "cm7_bringup.elf": {
+          "bytes": 65904,
+          "sha256": "f2821026bb5f4d510f81194bb525e695aa4b76155bca96d5b3288dce0c49d314"
+        },
+        "cm4_park.bin": {
+          "bytes": 92,
+          "sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+        }
+      },
+      "allocation_symbols": "none (placement new allowed)",
+      "owned_cpp_flags_verified": true
+    },
+    "cm7-release": {
+      "artifacts": {
+        "cm7_bringup.bin": {
+          "bytes": 7076,
+          "sha256": "590f87836aed26be7f1e9242b07a409dc112bf59d0320c24def5d32f741c1fd5"
+        },
+        "cm7_bringup.elf": {
+          "bytes": 26904,
+          "sha256": "644e382af74d1379a2491eef1055866ffdc6faa8b5ca7d780572f7aacdbdb4a1"
+        },
+        "cm4_park.bin": {
+          "bytes": 92,
+          "sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+        }
+      },
+      "allocation_symbols": "none (placement new allowed)",
+      "owned_cpp_flags_verified": true,
+      "difference_from_accepted_phy_image": {
+        "byte_offsets": [
+          7056,
+          7060
+        ],
+        "reason": ".data .Lsrc_loc0 processor.cpp contract line7->8 and column5->9 after formatting; rebuilt image is not claimed as newly hardware-accepted"
+      }
+    }
+  },
+  "publication": {
+    "local_branch": "work/usb-async",
+    "github_ci": "not run for USB candidate",
+    "codeql": "pending candidate CI",
+    "prior_phy_pr": "#7 remains open; no automatic merge performed"
+  },
+  "hardware": {
+    "usb_firmware_programmed": false,
+    "usb_enumeration_or_COM_exchange_verified": false,
+    "board_write_or_reset_performed_by_this_task": false,
+    "prior_accepted_release_backup": "build/hardware/2026-11-14-phy-control-candidate; preserved",
+    "required_next_gate": "candidate CI, scoped flash authorization, exact-image HIL; see usb-async.md"
+  },
+  "limits": [
+    "No actual CN13 electrical/clock/USB acceptance yet",
+    "No USB conformance/fuzz/soak or measured worst-case IRQ/stack/timing campaign",
+    "No generic P2300 stop-token propagation; manual operation cancellation only",
+    "CXX preprocessor context and Cppcheck USB coverage are limited",
+    "Intel upstream marks library work in progress; only selected operations tested",
+    "No full MISRA/automotive/absence-of-UB/security certification claim"
+  ]
+}

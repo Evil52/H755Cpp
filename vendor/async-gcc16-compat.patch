@@ -1,0 +1,7 @@
+--- a/include/async/repeat.hpp
++++ b/include/async/repeat.hpp
+@@ -47,2 +47,2 @@
+-constexpr auto never_stop = [](auto &&...) { return false; };
+-constexpr auto no_loop_fn = [](auto &&...) {};
++inline constexpr auto never_stop = [](auto &&...) { return false; };
++inline constexpr auto no_loop_fn = [](auto &&...) {};

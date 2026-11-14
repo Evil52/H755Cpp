@@ -48,7 +48,7 @@ def collect(root, lcov_paths, gcov_paths, python_path):
 def inventory(root):
     for directory in ['include','src','firmware','tools']:
         for path in sorted((root/directory).rglob('*')):
-            if path.suffix in {'.hpp','.cpp','.c','.py','.s'} and 'probes' not in path.parts:
+            if path.suffix in {'.hpp','.h','.cpp','.c','.py','.s'} and 'probes' not in path.parts:
                 yield path
 
 

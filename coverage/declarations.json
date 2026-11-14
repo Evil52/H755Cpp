@@ -1,6 +1,6 @@
 {
   "include/h755/fault.hpp": {
-    "sha256": "655ca28cb36ce84fa4a388d85ac5884b8e06d9b9f0c2d0a8d0b8c1c5e13da7b8",
+    "sha256": "d9b22c18b41182fc7804687c6a42a2d41c7fa234c4884d4c52864c50d1607512",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "include/h755/platform/processor.hpp": {
@@ -8,11 +8,19 @@
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/application.hpp": {
-    "sha256": "861822bcc6b4e8a379882c056005c5865ef89c3314d9006349bff7e2716a3746",
+    "sha256": "68b03cbe3182614bf41dfe814de55c6577ac5741778d9e8f528c6b7840812305",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/board.hpp": {
     "sha256": "e9bfcc2500d525749aba375dc7c98d6c768f02729559684d76bd429036cfd8e0",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+  },
+  "include/h755/usb/tinyusb_port.hpp": {
+    "sha256": "b91ecaededdfb3331c2ece6cddd13c17638cd7a6989e377e2b7f2ba249887239",
+    "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+  },
+  "src/usb/tusb_config.h": {
+    "sha256": "32d06ed11c0717771fe5e67491777b32647dd501fbe6f60402eb4acf91445938",
+    "reason": "Compile-time configuration macros and C ABI declarations only; no executable statements. Included in successful target compilation."
   }
 }

@@ -42,7 +42,7 @@ jobs:
         run: |
           ctest --preset host-debug --no-tests=error
           python3 -m unittest discover -s tests -p 'test_*.py'
-      - name: Cppcheck on portable application logic
+      - name: Cppcheck on supported portable application logic
         run: |
           cppcheck --version
           cppcheck --std=c++23 --enable=warning,performance,portability \
@@ -54,7 +54,7 @@ jobs:
           cmake -S . -B build/clang-analysis -G Ninja \
             -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
             -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
-          clang-tidy-18 -p build/clang-analysis tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp src/diagnostics.cpp src/timebase.cpp
+          clang-tidy-18 -p build/clang-analysis firmware/cm7/usb/runtime.cpp tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp src/diagnostics.cpp src/timebase.cpp src/usb/descriptors.cpp src/usb/tinyusb_port.cpp
 
   semgrep:
     name: Semgrep
@@ -76,7 +76,7 @@ jobs:
           mkdir -p build/security
           semgrep scan --config security/semgrep/embedded.yml --error --strict --metrics=off \
             --disable-version-check --json-output=build/security/semgrep.json \
-            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp
+            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp
           python tools/check_semgrep_result.py build/security/semgrep.json
 
   repository-security:

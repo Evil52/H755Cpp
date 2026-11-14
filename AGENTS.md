@@ -33,7 +33,9 @@ Use the embedded skill MISRA reference and [project assessment](docs/misra-cpp-p
 
 Start with the smallest verified bring-up, normally Cortex-M7 alone for a first exercise, after establishing the actual boot state of Cortex-M4. This is a proposed starting architecture, not a claim that M4 is currently held or disabled. Do not change boot option bytes to enforce it automatically.
 
-Keep application state/time logic independent of registers, drivers, and startup. Use narrow typed adapters/facades, explicit dependency injection at startup, and enum class state machines where useful. Add queues, polymorphism, RTOS, or second-core work only for demonstrated requirements.
+Keep application state/time logic independent of registers, drivers, and startup. Use narrow typed adapters/facades and explicit dependency injection at startup. For history-dependent startup, asynchronous transactions, PHY/MAC/DMA lifecycle and recovery, use explicit `enum class` state machines with named transition/dispatch functions and fixed storage. Define initial states, events, guards, permitted transitions, bounded actions, deadlines, and failure/recovery behavior. Keep one owning execution context; specify any ISR/core handoff and buffer ownership. Independent flags remain valid for orthogonal facts; do not encode mutually exclusive phases as flag combinations. Stateless helpers do not need a machine. Add queues, polymorphism, RTOS, frameworks or second-core work only for demonstrated requirements.
+
+Follow the skill's state-machine policy in `references/design-patterns.md`. Test specified transitions and rejected/late/duplicate events, timeout boundaries/rollover, recovery and transition side effects. Keep multi-phase transition tables in design documentation; line coverage does not replace transition coverage.
 
 Before dual-core or DMA operation document:
 
@@ -49,6 +51,17 @@ Use ST AN5557 for dual-core architecture, AN5617 for communication, and AN4839 f
 Initial inspection on 2026-11-14 found this folder empty and an ST-LINK V3 visible on USB. This does not identify the target MCU/revision or prove SWD communication, firmware build, flashing, or physical behavior. The user identifies the board as Nucleo H755ZI; confirm exact board suffix/revision and MCU marking before selecting startup, power/clock, and pin configuration.
 
 Current milestone: M7 bring-up, PHY identity/link observation and bounded MDIO read/write plus LAN8742 reset/AN have passed the selected hardware scenarios; see docs/phy-control.md and docs/phy-control-hardware-2026-11-14.json. MAC/DMA frames and lwIP are not implemented. The next bounded task is full RMII TX/RX pin verification and MAC/DMA ownership, memory/cache strategy and bounded rings before external packet traffic. Target builds and host checks still do not establish hardware behavior or production readiness.
+
+## USB async candidate
+
+The user selected USB Device CDC on CN13. Use the explicit `cm7-usb-debug`/`cm7-usb-release`
+presets; ordinary `cm7-release` keeps USB disabled. The implementation uses pinned TinyUSB
+OS-none/CDC/DWC2 and Intel sender/receiver composition, owned CMSIS platform setup, a clock
+startup FSM and epoch/deadline-aware IO. See docs/usb-async.md for ownership, partial-write,
+cancellation, analyzer/dependency limits and remaining CI/HIL gates. All async continuations
+are main-loop-only; do not call them from ISR/M4 or replace the injected concurrency policy
+with a claim of multicore protection. Programming this new candidate needs its own green
+pre-flash CI and authorization; PHY acceptance is not USB acceptance.
 
 ## Testing workflow
 

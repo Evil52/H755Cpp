@@ -52,3 +52,13 @@ class CoverageTests(unittest.TestCase):
             self.assertEqual(result['files']['include/port.hpp']['total'],0)
             header.write_text('void port() {}')
             self.assertIn('include/port.hpp',module.report(root,{}, {},declarations)['unmeasured'])
+
+    def test_c_header_cannot_escape_runtime_inventory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'include').mkdir()
+            header=root/'include/native.h'
+            header.write_text('inline int answer(){return 42;}')
+            self.assertIn('include/native.h',module.report(root,{}, {})['unmeasured'])
+            result=module.report(root,{'include/native.h':{1:True}}, {})
+            self.assertEqual(result['files']['include/native.h']['covered'],1)
