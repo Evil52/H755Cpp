@@ -244,9 +244,10 @@
     "bugs": 0,
     "critical_or_blocker": 0,
     "parser_errors": 0,
-    "new_coverage": 87.5,
+    "new_coverage": 87.6,
     "preprocessor_include_warnings": 93,
-    "scope": "Community CXX grammar/metrics plus imported Cppcheck and coverage. Missing compiler/standard include context and C++26 semantic blind spots remain; not full semantic/security proof."
+    "scope": "Community CXX grammar/metrics plus imported Cppcheck and coverage. Missing compiler/standard include context and C++26 semantic blind spots remain; not full semantic/security proof.",
+    "reported_coverage": 88.8
   },
   "sast": {
     "cppcheck": "2.22.0; no unsuppressed findings; two existing exact vendor suppressions",
