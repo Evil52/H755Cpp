@@ -5,6 +5,19 @@ namespace h755::ethernet {
 enum class LinkState { down, negotiating, mb10_half, mb10_full, mb100_half, mb100_full };
 enum class LinkError { busy, invalid_timeout, no_request, transport, invalid_status };
 
+inline std::expected<LinkState, LinkError> decode_lan8742_mode(std::uint16_t value) noexcept
+{
+    if (value == 0xFFFFU) return std::unexpected{LinkError::invalid_status};
+    if ((value & 0x1000U) == 0U) return LinkState::negotiating;
+    switch (value & 0x1CU) {
+    case 0x04U: return LinkState::mb10_half;
+    case 0x14U: return LinkState::mb10_full;
+    case 0x08U: return LinkState::mb100_half;
+    case 0x18U: return LinkState::mb100_full;
+    default: return std::unexpected{LinkError::invalid_status};
+    }
+}
+
 template<class Mdio>
 class Lan8742LinkMonitor {
 public:
@@ -41,13 +54,11 @@ public:
                 : ((value & 0x100U) != 0U ? LinkState::mb10_full : LinkState::mb10_half);
             return advance(Step::verify, 1U, now);
         case Step::resolved:
-            if ((value & 0x1000U) == 0U) return finish(LinkState::negotiating);
-            switch (value & 0x1CU) {
-            case 0x04U: mode_ = LinkState::mb10_half; break;
-            case 0x14U: mode_ = LinkState::mb10_full; break;
-            case 0x08U: mode_ = LinkState::mb100_half; break;
-            case 0x18U: mode_ = LinkState::mb100_full; break;
-            default: return fail(LinkError::invalid_status);
+            {
+                const auto resolved = decode_lan8742_mode(value);
+                if (!resolved) return fail(LinkError::invalid_status);
+                if (*resolved == LinkState::negotiating) return finish(*resolved);
+                mode_ = *resolved;
             }
             return advance(Step::verify, 1U, now);
         case Step::verify:

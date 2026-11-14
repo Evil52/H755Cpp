@@ -2,6 +2,7 @@ import argparse
 import base64
 import json
 import os
+import re
 from pathlib import Path
 import shlex
 import subprocess
@@ -81,6 +82,8 @@ def scan(project,args,token,output):
     (output/'scanner.log').write_text(log)
     print(log)
     if result.returncode: raise SystemExit(result.returncode)
+    if re.search(r'Source code parser:\s*[1-9]\d*\s+syntax error|Unable to parse file:|skip declaration:',log):
+        raise RuntimeError('Sonar CXX parser rejected source; analysis incomplete, commit/push is not allowed')
 
 
 def fetch_issues(api):

@@ -42,46 +42,44 @@ private:
     std::uint32_t bits_;
 };
 
-enum class MdioError { busy, invalid_timeout, timeout, no_request, recovery_required };
+enum class MdioError { busy, invalid_timeout, timeout, no_request, recovery_required, wrong_operation };
 
 template<class Registers>
-class MdioReader {
+class MdioTransport {
 public:
-    MdioReader(Registers& registers, MdioClock clock) noexcept
+    MdioTransport(Registers& registers, MdioClock clock) noexcept
         : registers_{registers}, clock_{clock} {}
-    MdioReader(const MdioReader&) = delete;
-    MdioReader& operator=(const MdioReader&) = delete;
+    MdioTransport(const MdioTransport&) = delete;
+    MdioTransport& operator=(const MdioTransport&) = delete;
 
     std::expected<void, MdioError> begin(PhyAddress phy, RegisterAddress reg,
                                        std::uint32_t now, std::uint32_t timeout) noexcept
     {
-        if (timeout == 0 || timeout > 0x7FFFFFFFU)
-            return std::unexpected{MdioError::invalid_timeout};
-        if (state_ == State::fault) return std::unexpected{MdioError::recovery_required};
-        if (state_ == State::waiting || (registers_.read_address() & busy_bit) != 0U)
-            return std::unexpected{MdioError::busy};
-        started_ = now;
-        timeout_ = timeout;
-        state_ = State::waiting;
-        registers_.write_address((static_cast<std::uint32_t>(phy.value()) << 21U)
-            | (static_cast<std::uint32_t>(reg.value()) << 16U)
-            | clock_.bits() | read_command | busy_bit);
+        if (auto ready = prepare(now, timeout); !ready) return ready;
+        state_ = State::reading;
+        registers_.write_address(command(phy, reg) | read_command);
+        return {};
+    }
+    std::expected<void, MdioError> begin_write(PhyAddress phy, RegisterAddress reg, std::uint16_t value,
+                                             std::uint32_t now, std::uint32_t timeout) noexcept
+    {
+        if (auto ready = prepare(now, timeout); !ready) return ready;
+        state_ = State::writing;
+        // MACMDIODR must be staged before setting MB; neither register may change while busy.
+        registers_.write_data(value);
+        registers_.write_address(command(phy, reg) | write_command);
         return {};
     }
     std::expected<std::optional<std::uint16_t>, MdioError> poll(std::uint32_t now) noexcept
     {
-        if (state_ == State::idle) return std::unexpected{MdioError::no_request};
-        if (state_ == State::fault) return std::unexpected{MdioError::recovery_required};
-        if ((registers_.read_address() & busy_bit) == 0U) {
-            state_ = State::idle;
-            return static_cast<std::uint16_t>(registers_.read_data() & 0xFFFFU);
-        }
-        // Unsigned elapsed time crosses tick rollover; polling must not miss a full cycle.
-        if (static_cast<std::uint32_t>(now - started_) >= timeout_) {
-            state_ = State::fault;
-            return std::unexpected{MdioError::timeout};
-        }
-        return std::optional<std::uint16_t>{};
+        const auto complete = completion(State::reading, now);
+        if (!complete) return std::unexpected{complete.error()};
+        if (!*complete) return std::optional<std::uint16_t>{};
+        return static_cast<std::uint16_t>(registers_.read_data() & 0xFFFFU);
+    }
+    std::expected<bool, MdioError> poll_write(std::uint32_t now) noexcept
+    {
+        return completion(State::writing, now);
     }
     std::expected<void, MdioError> recover_after_idle() noexcept
     {
@@ -92,14 +90,46 @@ public:
         return {};
     }
 private:
+    enum class State { idle, reading, writing, fault };
+    std::expected<void, MdioError> prepare(std::uint32_t now, std::uint32_t timeout) noexcept
+    {
+        if (timeout == 0U || timeout > 0x7FFFFFFFU) return std::unexpected{MdioError::invalid_timeout};
+        if (state_ == State::fault) return std::unexpected{MdioError::recovery_required};
+        if (state_ != State::idle || (registers_.read_address() & busy_bit) != 0U)
+            return std::unexpected{MdioError::busy};
+        started_ = now;
+        timeout_ = timeout;
+        return {};
+    }
+    std::uint32_t command(PhyAddress phy, RegisterAddress reg) const noexcept
+    {
+        return (static_cast<std::uint32_t>(phy.value()) << 21U)
+            | (static_cast<std::uint32_t>(reg.value()) << 16U) | clock_.bits() | busy_bit;
+    }
+    std::expected<bool, MdioError> completion(State expected, std::uint32_t now) noexcept
+    {
+        if (state_ == State::idle) return std::unexpected{MdioError::no_request};
+        if (state_ == State::fault) return std::unexpected{MdioError::recovery_required};
+        if (state_ != expected) return std::unexpected{MdioError::wrong_operation};
+        if ((registers_.read_address() & busy_bit) == 0U) {
+            state_ = State::idle;
+            return true;
+        }
+        // Elapsed time crosses rollover; the caller must not miss a complete tick cycle.
+        if (static_cast<std::uint32_t>(now - started_) >= timeout_) {
+            state_ = State::fault;
+            return std::unexpected{MdioError::timeout};
+        }
+        return false;
+    }
     Registers& registers_;
     MdioClock clock_;
-    enum class State { idle, waiting, fault };
     State state_{State::idle};
     std::uint32_t started_{};
     std::uint32_t timeout_{};
     static constexpr std::uint32_t busy_bit = 1U;
     static constexpr std::uint32_t read_command = 0xCU;
+    static constexpr std::uint32_t write_command = 0x4U;
 };
 
 constexpr bool is_lan8742a(std::uint16_t id1, std::uint16_t id2) noexcept

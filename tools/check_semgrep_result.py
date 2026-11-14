@@ -8,7 +8,7 @@ if report.get('errors'):
 paths = report.get('paths', {}).get('scanned', [])
 if not paths:
     raise SystemExit('Semgrep scanned no source files')
-required = {'include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp',
+required = {'include/h755/ethernet/phy_control.hpp', 'include/h755/ethernet/mdio.hpp', 'src/ethernet/cmsis_mdio.cpp', 'include/h755/ethernet/lan8742.hpp',
             'firmware/cm7/main.cpp', 'firmware/cm7/coverage.cpp',
             'firmware/cm7/board.cpp', 'firmware/cm7/fault.cpp', 'firmware/cm7/processor.cpp',
             'src/diagnostics.cpp', 'src/timebase.cpp', 'include/h755/application/controller.hpp'}
