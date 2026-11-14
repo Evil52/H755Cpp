@@ -91,10 +91,14 @@ void happy_path()
     check(!f.app.start(), "cannot initialize running owner twice");
     f.advance(260);
     check(f.link.state == 5 && f.link.samples == 1 && f.link.errors == 0, "link monitor integrates with application");
-    f.advance(240);
-    check(f.boot.heartbeat == 1 && f.board.green_led, "heartbeat and LED after 500ms");
-    f.advance(500);
-    check(f.boot.heartbeat == 2 && !f.board.green_led, "next heartbeat turns LED off");
+    f.advance(2739);
+    check(f.boot.heartbeat == 0 && !f.board.green_led, "LED stays off through 2999ms");
+    f.advance(1);
+    check(f.boot.heartbeat == 1 && f.board.green_led, "heartbeat and LED at 3000ms");
+    f.advance(2999);
+    check(f.boot.heartbeat == 1 && f.board.green_led, "LED stays on until next 3000ms boundary");
+    f.advance(1);
+    check(f.boot.heartbeat == 2 && !f.board.green_led, "next heartbeat turns LED off at 6000ms");
 }
 void startup_errors()
 {
@@ -110,7 +114,7 @@ void startup_errors()
     check(absent_phy.app.start().has_value(), "missing PHY is an expected external outcome");
     check(absent_phy.boot.state == 5 && absent_phy.board.red_led, "missing PHY is visible");
     const auto writes = absent_phy.registers.writes;
-    absent_phy.advance(1000);
+    absent_phy.advance(6000);
     check(absent_phy.registers.writes == writes && absent_phy.boot.heartbeat == 2, "missing PHY cannot stop heartbeat or issue invalid MDIO");
     Fixture timeout; timeout.registers.hold_after_write = true;
     check(timeout.app.start().has_value(), "MDIO timeout does not masquerade as a CPU fault");
@@ -129,10 +133,13 @@ void runtime_errors_and_rollover()
     busy.registers.hold = true;
     busy.advance(250);
     check(busy.link.state == 0xFFFFFFFFU && busy.link.errors >= 1U, "begin failure must invalidate stale link-up");
-    Fixture wrapped; wrapped.clock.tick = 0xFFFFFF80U;
-    check(wrapped.app.start().has_value(), "startup elapsed time crosses rollover");
-    wrapped.advance(500);
-    check(wrapped.boot.heartbeat == 1, "heartbeat survives rollover");
+    Fixture wrapped; wrapped.clock.tick = 0xFFFFF800U;
+    check(wrapped.app.start().has_value(), "rollover probe starts");
+    wrapped.advance(2999);
+    check(wrapped.boot.heartbeat == 0 && !wrapped.board.green_led, "rollover cannot trigger heartbeat early");
+    wrapped.advance(1);
+    check(wrapped.boot.heartbeat == 1 && wrapped.board.green_led && wrapped.clock.tick < 3000U,
+          "3000ms heartbeat crosses counter rollover");
 }
 std::uint32_t tick_cycles{};
 unsigned tick_stops{};
