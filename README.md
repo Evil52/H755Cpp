@@ -94,3 +94,5 @@ ARM attributes, символы contract handler и assert, а также лин�
 - [AN5617: межъядерное взаимодействие](https://www.st.com/resource/en/application_note/an5617-introduction-to-interprocessor-communications-for-stm32h745755-and-stm32h747757-mcus-stmicroelectronics.pdf)
 
 MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).
+
+Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Аппаратная проверка новой управляющей последовательности остаётся отдельным этапом.

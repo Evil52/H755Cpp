@@ -18,7 +18,7 @@ sonar=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sonar)
 
 class SonarTests(unittest.TestCase):
-    def execute(self,args=(),overrides=None,scanner_code=0,env=None,http_error=False):
+    def execute(self,args=(),overrides=None,scanner_code=0,env=None,http_error=False,scanner_output="fixture-token scanner log"):
         overrides=overrides or {}
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
@@ -38,7 +38,7 @@ class SonarTests(unittest.TestCase):
             (root/'build/coverage').mkdir(parents=True)
             (root/'build/coverage/sonar.xml').write_text('<coverage version="1"/>')
             output=io.StringIO()
-            with patch.dict(os.environ,{'SONAR_TOKEN':'fixture-token'} if env is None else env,clear=True),patch.object(sonar.urllib.request,'urlopen',side_effect=response),patch.object(sonar.subprocess,'run',return_value=subprocess.CompletedProcess([],scanner_code,'fixture-token scanner log')) as docker,contextlib.redirect_stdout(output):
+            with patch.dict(os.environ,{'SONAR_TOKEN':'fixture-token'} if env is None else env,clear=True),patch.object(sonar.urllib.request,'urlopen',side_effect=response),patch.object(sonar.subprocess,'run',return_value=subprocess.CompletedProcess([],scanner_code,scanner_output)) as docker,contextlib.redirect_stdout(output):
                 actual=list(args)
                 if "--env-file" in actual:
                     index=actual.index("--env-file")+1
@@ -65,6 +65,14 @@ class SonarTests(unittest.TestCase):
         with self.assertRaisesRegex(SystemExit,'HTTP 403'):self.execute(http_error=True)
     def test_scanner_failure(self):
         with self.assertRaises(SystemExit):self.execute(scanner_code=2)
+    def test_parser_error_blocks_green_gate(self):
+        for message in ['Source code parser: 9 syntax error(s) detected.',
+                        'ERROR Unable to parse file: /usr/src/include/phy.hpp',
+                        'DEBUG [phy.hpp:4]: skip declaration: class Phy {']:
+            with self.subTest(message=message),self.assertRaisesRegex(SystemExit,'parser rejected'):
+                self.execute(scanner_output=message)
+    def test_zero_parser_errors_allowed(self):
+        self.execute(scanner_output='Source code parser: 0 syntax error(s) detected.')
     def test_no_cpp_metrics(self):
         key='measures/component?component=h755cpp&metricKeys=ncloc,ncloc_language_distribution,files,violations,coverage'
         with self.assertRaises(SystemExit):self.execute(overrides={key:{'component':{'measures':[]}}})

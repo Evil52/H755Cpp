@@ -7,13 +7,13 @@ Use an owned CMSIS register-level MAC/DMA/PHY driver with upstream lwIP in bare-
 to M4 is a separate resource/IPC/runtime decision. Avoid a global singleton: inject
 the peripheral adapter into a noncopyable transport owner and keep protocol logic testable.
 
-## First implemented milestone: Clause 22 MDIO read transport
+## Clause 22 MDIO transport
 
 - Distinct checked PHY/register address types reject values above 31 without truncation.
 - HCLK-to-MDIO selection follows STM32H7 divider ranges and rejects zero or HCLK above
   the selected H755 profile's 240 MHz limit. Very low HCLK values are accepted by the
   encoder; the caller must choose a transaction deadline suitable for actual MDC frequency.
-- Nonblocking `begin`/`poll` with one outstanding read, no allocation and no busy-wait loop.
+- Nonblocking `begin`/`poll` reads and `begin_write`/`poll_write` writes share one outstanding operation, with no allocation or busy-wait loop. See [PHY control](phy-control.md) for staging, verification and startup sequencing.
 - Timestamps are unsigned 32-bit ticks supplied by one monotonic timebase. Timeouts must
   be nonzero and at most `0x7FFFFFFF`; polling must occur before a complete tick cycle is missed.
 - A completed hardware operation wins when observed, including a late poll. A still-busy
@@ -46,10 +46,10 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
 ## Remaining milestones
 
 1. Verify exact Nucleo/MCU revision, jumpers and clock/power/boot state; implement board startup,
-   linker map, timebase and RMII clock/pin bring-up. Read and record PHY identifiers on hardware.
+   linker map, timebase and MDIO/RMII clock bring-up. PHY identifiers and link have been observed on hardware; full TX/RX packet-pin acceptance remains in the MAC/DMA milestone.
 2. Read-only link-state handling and its documented BMSR latch sequence are implemented.
-   PHY reset/write/autonegotiation control remains to be added with bounded deadlines.
-3. Specify DMA descriptor ownership and bounded rings, D2-accessible buffers, cache-line alignment,
+   [PHY reset/write/autonegotiation control](phy-control.md) is implemented and host-tested with bounded deadlines; new physical acceptance remains pending.
+3. Complete and verify the RMII TX/RX pin configuration (MDIO/clock bring-up alone does not prove the packet interface). Specify DMA descriptor ownership and bounded rings, D2-accessible buffers, cache-line alignment,
    barriers and cache/MPU strategy; test ring wrap, starvation and error recovery before live traffic.
 4. Pin and audit upstream lwIP, add a `NO_SYS=1` port, one main-loop owner, static pools, and a
    bounded netif adapter. `STABLE-2_2_1_RELEASE` is a candidate tag, not yet an integrated dependency.

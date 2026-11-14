@@ -12,6 +12,7 @@ public:
     CmsisMdioRegisters& operator=(const CmsisMdioRegisters&) = delete;
     std::uint32_t read_address() const noexcept { return peripheral_.MACMDIOAR; }
     std::uint32_t read_data() const noexcept { return peripheral_.MACMDIODR; }
+    void write_data(std::uint16_t value) noexcept { peripheral_.MACMDIODR = value; }
     void write_address(std::uint32_t value) noexcept { peripheral_.MACMDIOAR = value; }
 private:
     ETH_TypeDef& peripheral_;
@@ -20,6 +21,8 @@ private:
 static_assert(ETH_MACMDIOAR_PA_Pos == 21U);
 static_assert(ETH_MACMDIOAR_RDA_Pos == 16U);
 static_assert(ETH_MACMDIOAR_MOC_RD == 0xCU);
+static_assert(ETH_MACMDIOAR_MOC_WR == 0x4U);
+static_assert(ETH_MACMDIODR_MD == 0xFFFFU);
 static_assert(ETH_MACMDIOAR_MB == 1U);
 static_assert(ETH_MACMDIOAR_CR_DIV16 == 0x200U);
 static_assert(ETH_MACMDIOAR_CR_DIV26 == 0x300U);

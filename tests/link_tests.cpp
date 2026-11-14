@@ -79,7 +79,7 @@ void real_transport()
         std::uint32_t read_data() const { return data; }
         void write_address(std::uint32_t word) { check(writes<commands.size(),"bounded commands");commands[writes++]=word;address=word; }
     } registers;
-    MdioReader reader{registers,*MdioClock::from_hclk(64'000'000)};
+    MdioTransport reader{registers,*MdioClock::from_hclk(64'000'000)};
     Lan8742LinkMonitor monitor{reader,*PhyAddress::from(0)};
     check(monitor.begin(0,20).has_value(),"real MDIO begins");
     const auto pending=monitor.poll(0);
