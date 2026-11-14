@@ -1,0 +1,120 @@
+{
+  "source_commit": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+  "ci_run": 43611665262,
+  "board": "NUCLEO-H755ZI-Q, STLINK 002A00154142500820353451",
+  "image_sha256": "a1da89f604a8a86fa7e6727520e9054a0df621dc66e1f329f85c2a8fc9f584d6",
+  "programmed_and_full_flash_readback_verified": true,
+  "previous_flash_sha256": "9663bbddad1e3c94dbcbd85e4ee3e72d664628d68316a5e916daf2d93d4ad852",
+  "current_flash_sha256": "6cbda6f588f90d6016b16920b8accd3339785ba3c61ed09e442675ba56124aef",
+  "outside_m7_sector0_unchanged": true,
+  "options_status": "0x1bc6aaf0, unchanged",
+  "flash_boot7_4": "0x1ff00800 0x1ff00800 0x10000810 0x10000810, unchanged",
+  "m4_image_unchanged": true,
+  "usb_startup": "running (enum value 2)",
+  "usb_error": 0,
+  "ethernet_link": "cold snapshot waiting_link; later ready 100/full with connected cable",
+  "first_attempt": "aborted on false comparison of clock-gated SYSCFG user shadow after reset; full Flash rollback matched backup; repeated with FLASH_BOOT7/4 check",
+  "remaining": [
+    "electrical clock/CRS, worst-case interrupt latency and stack resource measurement",
+    "USB conformance/fuzz/soak beyond bounded CDC echo",
+    "Ethernet MAC/DMA and lwIP integration is a separate milestone"
+  ],
+  "host_usb_enumeration": {
+    "manufacturer": "H755Cpp",
+    "product": "H755 Async CDC",
+    "vid_pid": "CAFE:4001",
+    "port": "/dev/cu.usbmodem12401",
+    "distinct_from_stlink_port": true
+  },
+  "binary_echo_passed_bytes": [
+    1,
+    63,
+    64,
+    65,
+    257,
+    1024
+  ],
+  "dtr_close_reopen_passed": true,
+  "software_reset_reenumeration_and_echo_passed": true,
+  "cn13_disconnect": {
+    "host_device_disappeared": true,
+    "host_serial_port_disappeared": true,
+    "usb_startup": "running",
+    "usb_error": 0,
+    "reported_cdc_state": "suspended; later replug and echo recovered",
+    "heartbeat": "continued"
+  },
+  "cn13_replug_without_reset": {
+    "host_reenumerated": true,
+    "binary_echo_passed_bytes": [
+      1,
+      63,
+      64,
+      65,
+      257,
+      1024
+    ],
+    "usb_startup": "running",
+    "usb_error": 0,
+    "cdc_state_after_port_close": "configured",
+    "heartbeat": "continued"
+  },
+  "date": "2026-11-15",
+  "cold_power_cycle": {
+    "user_confirmed_order": "CN13 off, CN1 off, wait 5 s, CN1 on, wait 10 s, CN13 on; no RESET",
+    "before_debugger": "Mac enumerated CAFE:4001 and binary echo passed 1,63,64,65,257,1024 bytes",
+    "debug_clock_control_before_after": "0x0",
+    "usb_error_state_startup": [
+      0,
+      1,
+      2
+    ],
+    "heartbeat_counter_before_after": [
+      17,
+      18
+    ],
+    "green_led_gpio_before_after": [
+      1,
+      0
+    ],
+    "red_led_off": true,
+    "m4_marker": "0x5041524b",
+    "option_status": "0x1bc6aaf0",
+    "flash_boot7_4": [
+      "0x1ff00800",
+      "0x1ff00800",
+      "0x10000810",
+      "0x10000810"
+    ],
+    "phy_state": "waiting_link; cable status not independently established"
+  },
+  "evidence_logs": [
+    "build/hardware/2026-11-14-usb-async/program-2.log",
+    "build/hardware/2026-11-14-usb-async/observe-cold.log",
+    "build/hardware/2026-11-14-usb-async/observe-cable-out.log",
+    "build/hardware/2026-11-14-usb-async/observe-cable-return.log",
+    "build/hardware/2026-11-14-usb-async/soft-reset.log",
+    "build/hardware/2026-11-14-usb-async/observe-ethernet-connected.log"
+  ],
+  "ethernet_with_usb": {
+    "user_reported_cable_connected": true,
+    "phy_state": "ready",
+    "phy_error": 0,
+    "phy_startup_attempts": 1,
+    "link_mode": "100 Mbps full duplex",
+    "link_samples_before_after": [
+      1205,
+      1210
+    ],
+    "link_error": 0,
+    "usb_error_state_startup": [
+      0,
+      1,
+      2
+    ],
+    "evidence_log": "build/hardware/2026-11-14-usb-async/observe-ethernet-connected.log",
+    "limit": "PHY link status only; MAC/DMA frames and IP not implemented"
+  },
+  "pre_hil_documentation_commit": "011612bc51921ceeae647cc866008ce3ae83ed4d",
+  "initial_usb_state": "offline (no CN13 cable visible)"
+}

@@ -80,3 +80,5 @@ scope, evidence and limitations. Coverage is a line metric, not a correctness pr
 
 MISRA C++ baseline and the explicit C++26/compliance boundary are recorded in
 misra-cpp-profile.md. No claim of full MISRA or automotive certification is made.
+
+The next PHY-management layer is described in [LAN8742 startup control](phy-control.md): one MDIO read/write owner, asynchronous reset/AN, passive late-cable recovery, and separate g_phy diagnostics. Historical validation above predates that layer and is not its hardware acceptance.

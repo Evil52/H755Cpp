@@ -31,19 +31,32 @@ struct Board {
 struct Registers {
     std::uint32_t address{}, data{}, writes{};
     unsigned phy{3};
-    bool hold{}, hold_after_write{};
+    bool hold{}, hold_after_write{}, hold_phy_write{}, stuck_reset{};
+    bool link_available{true};
+    std::uint16_t control{0x1000};
+    unsigned phy_writes{};
+    void write_data(std::uint16_t value) { data = value; }
     std::uint32_t read_address()
     {
         if ((address & 1U) != 0U && !hold) {
             const auto device = (address >> 21U) & 31U;
             const auto reg = (address >> 16U) & 31U;
+            if ((address & 0xCU) == 4U) {
+                if (device == phy && reg == 0) {
+                    ++phy_writes;
+                    control = static_cast<std::uint16_t>(data);
+                    if (!stuck_reset) control = 0x1000;
+                }
+                address &= ~1U;
+                return address;
+            }
             data = 0xFFFFU;
             if (device == phy) {
                 switch (reg) {
                 case 2: data = 7; break;
                 case 3: data = 0xC131; break;
-                case 1: data = 4; break;
-                case 0: data = 0x1000; break;
+                case 1: data = link_available ? 0x24U : 0U; break;
+                case 0: data = control; break;
                 case 31: data = 0x1018; break;
                 default: break;
                 }
@@ -57,17 +70,18 @@ struct Registers {
     {
         address = word;
         writes += 1U;
-        if (hold_after_write) hold = true;
+        if (hold_after_write || (hold_phy_write && (word & 0xCU) == 4U)) hold = true;
     }
 };
 struct Fixture {
     Clock clock;
     Board board{clock};
     Registers registers;
-    h755::ethernet::MdioReader<Registers> reader{registers, *h755::ethernet::MdioClock::from_hclk(64'000'000)};
+    h755::ethernet::MdioTransport<Registers> reader{registers, *h755::ethernet::MdioClock::from_hclk(64'000'000)};
     volatile h755::BringupDiagnostics boot{};
     volatile h755::LinkDiagnostics link{0xFFFFFFFFU, 0, 0};
-    h755::Diagnostics diagnostics{boot, link};
+    volatile h755::PhyDiagnostics phy{};
+    h755::Diagnostics diagnostics{boot, link, phy};
     h755::Application<Board, Clock, decltype(reader)> app{board, clock, reader, diagnostics};
     void advance(std::uint32_t milliseconds)
     {
@@ -99,6 +113,41 @@ void happy_path()
     check(f.boot.heartbeat == 1 && f.board.green_led, "LED stays on until next 3000ms boundary");
     f.advance(1);
     check(f.boot.heartbeat == 2 && !f.board.green_led, "next heartbeat turns LED off at 6000ms");
+}
+void phy_management()
+{
+    Fixture healthy;
+    check(healthy.app.start().has_value(), "managed application starts");
+    check(healthy.phy.attempts == 1 && healthy.phy.completed == 0, "PHY control begins after discovery");
+    healthy.advance(260);
+    check(healthy.phy.state == static_cast<std::uint32_t>(h755::ethernet::PhyState::ready)
+          && healthy.phy.error == 0 && healthy.phy.completed == 1 && healthy.registers.phy_writes == 2,
+          "startup reset and negotiation finish before link monitoring");
+    check(healthy.phy.startup_bmcr == 0x1000 && healthy.phy.startup_bmsr == 0x24
+          && healthy.phy.startup_mode == 0x1018, "startup readback is available without debugger MDIO writes");
+    const auto writes = healthy.registers.phy_writes;
+    healthy.registers.link_available = false; healthy.advance(260);
+    check(healthy.link.state == 0, "cable removal publishes link down");
+    healthy.registers.link_available = true; healthy.advance(260);
+    check(healthy.link.state == 5 && healthy.registers.phy_writes == writes, "cable reconnect is observed without repeated PHY resets");
+    Fixture absent; absent.registers.link_available = false;
+    check(absent.app.start().has_value(), "unplugged startup is not a CPU fault"); absent.advance(5300);
+    check(absent.phy.state == static_cast<std::uint32_t>(h755::ethernet::PhyState::waiting_link)
+          && absent.phy.error == static_cast<std::uint32_t>(h755::ethernet::PhyError::negotiation_timeout)
+          && absent.boot.heartbeat == 1 && !absent.board.red_led, "bounded initial negotiation falls back to passive link observation");
+    const auto prior = absent.registers.phy_writes; absent.registers.link_available = true; absent.advance(260);
+    check(absent.phy.completed == 1 && absent.phy.error == 0 && absent.link.state == 5
+          && absent.registers.phy_writes == prior, "late cable insertion recovers without resetting or blocking heartbeat");
+    Fixture stuck; stuck.registers.stuck_reset = true;
+    check(stuck.app.start().has_value(), "stuck PHY does not fail application startup"); stuck.advance(700);
+    check(stuck.phy.error == static_cast<std::uint32_t>(h755::ethernet::PhyError::reset_timeout)
+          && stuck.board.red_led && stuck.link.state == 0xFFFFFFFFU, "failed reset remains visible and never publishes up");
+    const auto commands = stuck.registers.writes; stuck.advance(6000);
+    check(stuck.boot.heartbeat == 2 && stuck.registers.writes == commands, "faulted PHY is not repeatedly reset while heartbeat runs");
+    Fixture transport; transport.registers.hold_phy_write = true;
+    check(transport.app.start().has_value(), "management transport fault is recoverable application state"); transport.advance(50);
+    check(transport.phy.error == static_cast<std::uint32_t>(h755::ethernet::PhyError::transport)
+          && transport.boot.mdio_errors == 1 && transport.board.red_led, "management timeout preserves explicit MDIO fault");
 }
 void startup_errors()
 {
@@ -189,5 +238,5 @@ void stop_tick() noexcept { tick_stops += 1U; }
 }
 int main()
 {
-    happy_path(); startup_errors(); runtime_errors_and_rollover(); timebase_and_diagnostics(); gpio_policy();
+    happy_path(); phy_management(); startup_errors(); runtime_errors_and_rollover(); timebase_and_diagnostics(); gpio_policy();
 }

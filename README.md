@@ -77,7 +77,7 @@ ARM attributes, символы contract handler и assert, а также лин�
 - Host-тест не проверяет native contracts GCC и поведение ARM runtime на устройстве.
 - Действие обработчика при нарушении контракта, безопасные выходы, старт обоих ядер,
   кеш/DMA и физическое поведение платы ещё не проверены.
-- Ни production-готовность, ни полноценная прошивка этим каркасом не заявляются.
+- Минимальная прошивка M7 и управление PHY проверены на плате; полный Ethernet-стек и production-готовность ещё не заявляются.
 
 ## Дальше
 
@@ -94,3 +94,9 @@ ARM attributes, символы contract handler и assert, а также лин�
 - [AN5617: межъядерное взаимодействие](https://www.st.com/resource/en/application_note/an5617-introduction-to-interprocessor-communications-for-stm32h745755-and-stm32h747757-mcus-stmicroelectronics.pdf)
 
 MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).
+
+Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Результаты: [аппаратные проверки PHY](docs/phy-control-hardware-2026-11-14.json).
+
+USB CDC на Intel async: [архитектура, API, сборка и границы проверки](docs/usb-async.md).
+Кандидат включается отдельными presets `cm7-usb-debug` / `cm7-usb-release`;
+обычный `cm7-release` оставляет USB выключенным. USB на CN13 пока не проверен на плате.

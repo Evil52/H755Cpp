@@ -1,6 +1,10 @@
 {
   "version": 6,
-  "cmakeMinimumRequired": {"major": 3, "minor": 30, "patch": 0},
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 30,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "host-debug",
@@ -15,29 +19,77 @@
       "name": "host-coverage",
       "inherits": "host-debug",
       "binaryDir": "${sourceDir}/build/host-coverage",
-      "cacheVariables": {"H755_HOST_COVERAGE": "ON"}
+      "cacheVariables": {
+        "H755_HOST_COVERAGE": "ON"
+      }
     },
     {
       "name": "cm7-debug",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/cm7-debug",
       "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc16.cmake",
-      "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug"}
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
       "name": "cm7-release",
       "inherits": "cm7-debug",
       "binaryDir": "${sourceDir}/build/cm7-release",
-      "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "cm7-usb-debug",
+      "inherits": "cm7-debug",
+      "binaryDir": "${sourceDir}/build/cm7-usb-debug",
+      "cacheVariables": {
+        "H755_USB_CDC": "ON"
+      }
+    },
+    {
+      "name": "cm7-usb-release",
+      "inherits": "cm7-release",
+      "binaryDir": "${sourceDir}/build/cm7-usb-release",
+      "cacheVariables": {
+        "H755_USB_CDC": "ON"
+      }
     }
   ],
   "buildPresets": [
-    {"name": "host-debug", "configurePreset": "host-debug"},
-    {"name": "host-coverage", "configurePreset": "host-coverage"},
-    {"name": "cm7-debug", "configurePreset": "cm7-debug"},
-    {"name": "cm7-release", "configurePreset": "cm7-release"}
+    {
+      "name": "host-debug",
+      "configurePreset": "host-debug"
+    },
+    {
+      "name": "host-coverage",
+      "configurePreset": "host-coverage"
+    },
+    {
+      "name": "cm7-debug",
+      "configurePreset": "cm7-debug"
+    },
+    {
+      "name": "cm7-release",
+      "configurePreset": "cm7-release"
+    },
+    {
+      "name": "cm7-usb-debug",
+      "configurePreset": "cm7-usb-debug"
+    },
+    {
+      "name": "cm7-usb-release",
+      "configurePreset": "cm7-usb-release"
+    }
   ],
   "testPresets": [
-    {"name": "host-debug", "configurePreset": "host-debug", "output": {"outputOnFailure": true}}
+    {
+      "name": "host-debug",
+      "configurePreset": "host-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
   ]
 }

@@ -1,0 +1,92 @@
+#pragma once
+
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
+#ifndef CONSTINIT
+#ifndef __cpp_constinit
+#ifdef __clang__
+#define CONSTINIT [[clang::require_constant_initialization]]
+#else
+#define CONSTINIT
+#endif
+#else
+#define CONSTINIT constinit
+#endif
+#endif
+
+#ifndef CONSTEVAL
+#ifndef __cpp_consteval
+#define CONSTEVAL constexpr
+#else
+#define CONSTEVAL consteval
+#endif
+#endif
+
+#ifndef CONSTEVAL_UDL
+#ifdef __clang__
+#define CONSTEVAL_UDL constexpr
+#else
+#define CONSTEVAL_UDL CONSTEVAL
+#endif
+#endif
+
+#ifndef USING_ATTR_NS
+#ifdef __clang__
+#define USING_ATTR_NS using clang:
+#else
+#define USING_ATTR_NS using gnu:
+#endif
+#endif
+
+#ifndef ALWAYS_INLINE
+#define ALWAYS_INLINE inline __attribute__((always_inline))
+#endif
+
+#ifndef NEVER_INLINE
+#define NEVER_INLINE __attribute__((noinline))
+#endif
+
+#ifndef FLATTEN
+#define FLATTEN __attribute__((flatten))
+#endif
+
+#ifndef MUSTTAIL
+#ifdef __clang__
+#define MUSTTAIL [[clang::musttail]]
+#else
+#define MUSTTAIL
+#endif
+#endif
+
+#ifndef LIFETIMEBOUND
+#ifdef __clang__
+#define LIFETIMEBOUND [[clang::lifetimebound]]
+#else
+#define LIFETIMEBOUND
+#endif
+#endif
+
+#define STDX_DO_PRAGMA(X) _Pragma(#X)
+#ifdef __clang__
+#define STDX_PRAGMA(X) STDX_DO_PRAGMA(clang X)
+#else
+#define STDX_PRAGMA(X) STDX_DO_PRAGMA(GCC X)
+#endif
+
+#ifndef STDX_DELETED
+#if __cpp_deleted_function >= 202403L
+#ifdef __clang__
+#define STDX_DELETED(R)                                                        \
+    STDX_PRAGMA(diagnostic push)                                               \
+    STDX_PRAGMA(diagnostic ignored "-Wunknown-warning-option")                 \
+    STDX_PRAGMA(diagnostic ignored "-Wc++26-extensions") =                     \
+        delete (R)STDX_PRAGMA(diagnostic pop)
+#else
+#define STDX_DELETED(R) = delete (R)
+#endif
+#else
+#define STDX_DELETED(R) = delete
+#endif
+#endif
+
+// NOLINTEND(cppcoreguidelines-macro-usage)

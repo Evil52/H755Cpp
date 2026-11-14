@@ -1,0 +1,291 @@
+{
+  "date": "2026-11-14",
+  "base_commit": "dc4b155f8e8e1feb776de1d35e163a5b4f277a3c",
+  "runtime_source_sha256": {
+    "include/h755/diagnostics.hpp": "2e85f0186ea2ce9234cf36d45e4bf985f74dc643ff3f8eec66e45174dad2469c",
+    "include/h755/fault.hpp": "655ca28cb36ce84fa4a388d85ac5884b8e06d9b9f0c2d0a8d0b8c1c5e13da7b8",
+    "include/h755/timebase.hpp": "b7df6cf8aad36586546e9d8cb7a1a0978a04ff4b00776b119b38305a84a31cc2",
+    "include/h755/board/gpio.hpp": "8062fb9f6a405a868ae1df0b8f4560ce7aa93d5555f180e2ec2cd4cd580f7d06",
+    "include/h755/platform/processor.hpp": "82c34cc48fb0c62393efb03bfff614b4ef108263a70694bb632eab2495bf043c",
+    "include/h755/ethernet/cmsis_mdio.hpp": "0f2447598857a2a26d27c52d076f374d18d3965b7e4e2b215bebb5103204c7b3",
+    "include/h755/ethernet/mdio.hpp": "7d9433147fc04802a00e58eb077415cd8b2ad457f39158806b25bbd64f7ce854",
+    "include/h755/ethernet/lan8742.hpp": "26ab593e5e7ec287f8b0a4a1d0463a164451da350ac32929cc1bd2251e24b892",
+    "include/h755/ethernet/phy_control.hpp": "caf0cd9313e9262234ff8b2f3d31caf835858ec496b5ec81741a889403da6b5c",
+    "include/h755/application/controller.hpp": "9dc4b900d4c3ae970279d327deab543b191ac5444abbe125db900e85ec612747",
+    "src/timebase.cpp": "ed40c71dfc0ae412580d0d9cbf2e62a7ab4d31f98881cfd97df092bf2a1c057a",
+    "src/diagnostics.cpp": "beb542c897cfcff0e8143d1912aec3c3e990ddfefb30423446a34826b0284748",
+    "src/ethernet/cmsis_mdio.cpp": "6f232a792a2c52a1e72f6a6dee0ccb1d0d585ab7627287a0158128c8a34e1320",
+    "firmware/cm4/park.s": "06fb3fa2a421952b54a9cb6af80ef1a6a4a241cf9b794dcd21ad5f762aac3579",
+    "firmware/cm7/application.hpp": "861822bcc6b4e8a379882c056005c5865ef89c3314d9006349bff7e2716a3746",
+    "firmware/cm7/coverage.cpp": "c724133a3c8577b35e2a21f6a10d9969cc97ffe2729dd116e2d121908e539aab",
+    "firmware/cm7/processor.cpp": "d127c7b5dcf8b3070c29ab87657eef01b4ee80d89db2b1bc46972883d8ded270",
+    "firmware/cm7/board.cpp": "111d574429bbcbfda9f395868ae0a06741ba462c49d52aa4d6ad91aeec137493",
+    "firmware/cm7/fault.cpp": "21d84e4571e35aacbcdbb5a01d0734ab2f66f90ee42d9cb8f72bca3bae4b9f51",
+    "firmware/cm7/board.hpp": "e9bfcc2500d525749aba375dc7c98d6c768f02729559684d76bd429036cfd8e0",
+    "firmware/cm7/application.cpp": "744ebb0dbff00254d0c59bf576262e1843432ad4483e93eb758df72a2cfc24a7",
+    "firmware/cm7/main.cpp": "7c634afb96b52eaa27aabc704b7748187a11fbd9bd924cd9b90b475787808726",
+    "tools/sonar_local.py": "d0eada9a6ded9dbb68986bc57a21c683657dd60b0ec354bf818964623804e037",
+    "tools/check_toolchain.py": "55b7896f40b0677b35b636d5b18580a6d2689e8d6b4f55bdd682456a268b1056",
+    "tools/check_semgrep_result.py": "094daede70ddb4dc4a3e23fefc89f3eb30987017a251676264339eb8bb8ce531",
+    "tools/coverage_report.py": "4c9b0bdc8429b70a7566a4a7b4e094634bc8e9f08a9e89b740053cc7ca64aa13"
+  },
+  "coverage": {
+    "files": {
+      "include/h755/application/controller.hpp": {
+        "kind": "c-cpp",
+        "covered": 131,
+        "total": 143
+      },
+      "include/h755/board/gpio.hpp": {
+        "kind": "c-cpp",
+        "covered": 25,
+        "total": 25
+      },
+      "include/h755/diagnostics.hpp": {
+        "kind": "c-cpp",
+        "covered": 1,
+        "total": 2
+      },
+      "include/h755/ethernet/cmsis_mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 5
+      },
+      "include/h755/ethernet/lan8742.hpp": {
+        "kind": "c-cpp",
+        "covered": 64,
+        "total": 74
+      },
+      "include/h755/ethernet/mdio.hpp": {
+        "kind": "c-cpp",
+        "covered": 76,
+        "total": 88
+      },
+      "include/h755/ethernet/phy_control.hpp": {
+        "kind": "c-cpp",
+        "covered": 120,
+        "total": 134
+      },
+      "include/h755/fault.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/platform/processor.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "include/h755/timebase.hpp": {
+        "kind": "c-cpp",
+        "covered": 2,
+        "total": 2
+      },
+      "src/diagnostics.cpp": {
+        "kind": "c-cpp",
+        "covered": 58,
+        "total": 68
+      },
+      "src/ethernet/cmsis_mdio.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0
+      },
+      "src/timebase.cpp": {
+        "kind": "c-cpp",
+        "covered": 23,
+        "total": 24
+      },
+      "firmware/cm4/park.s": {
+        "kind": "assembly-instructions",
+        "total": 9,
+        "covered": 9,
+        "executed_addresses": [
+          "0x08100040",
+          "0x08100042",
+          "0x08100046",
+          "0x08100048",
+          "0x0810004a",
+          "0x0810004e",
+          "0x08100050",
+          "0x08100054",
+          "0x08100056"
+        ],
+        "method": "OpenOCD hardware single-step; PC checked before each instruction",
+        "evidence": "build/hardware/2026-11-14-link-coverage/flash-coverage.log; identical source and image SHA verified"
+      },
+      "firmware/cm7/application.cpp": {
+        "kind": "c-cpp",
+        "covered": 5,
+        "total": 5
+      },
+      "firmware/cm7/application.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/board.cpp": {
+        "kind": "c-cpp",
+        "covered": 24,
+        "total": 30
+      },
+      "firmware/cm7/board.hpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 0,
+        "zero_executable_reason": "Declarations/types only; no executable statements. Included in successful target compilation."
+      },
+      "firmware/cm7/coverage.cpp": {
+        "kind": "c-cpp",
+        "covered": 15,
+        "total": 21
+      },
+      "firmware/cm7/fault.cpp": {
+        "kind": "c-cpp",
+        "covered": 1,
+        "total": 16
+      },
+      "firmware/cm7/main.cpp": {
+        "kind": "c-cpp",
+        "covered": 0,
+        "total": 9
+      },
+      "firmware/cm7/processor.cpp": {
+        "kind": "c-cpp",
+        "covered": 6,
+        "total": 11
+      },
+      "tools/check_semgrep_result.py": {
+        "kind": "python",
+        "covered": 16,
+        "total": 16
+      },
+      "tools/check_toolchain.py": {
+        "kind": "python",
+        "covered": 47,
+        "total": 47
+      },
+      "tools/coverage_report.py": {
+        "kind": "python",
+        "covered": 96,
+        "total": 96
+      },
+      "tools/sonar_local.py": {
+        "kind": "python",
+        "covered": 104,
+        "total": 104
+      }
+    },
+    "groups": {
+      "c-cpp": {
+        "covered": 551,
+        "total": 657,
+        "percent": 83.86605783866058
+      },
+      "python": {
+        "covered": 263,
+        "total": 263,
+        "percent": 100.0
+      }
+    },
+    "covered": 814,
+    "total": 920,
+    "percent": 88.47826086956522,
+    "unmeasured": [],
+    "passed": true
+  },
+  "coverage_evidence": {
+    "retained_source_sha_identical": [
+      "firmware/cm7/application.cpp",
+      "firmware/cm7/board.cpp",
+      "firmware/cm7/coverage.cpp",
+      "firmware/cm7/fault.cpp",
+      "firmware/cm7/processor.cpp",
+      "include/h755/board/gpio.hpp",
+      "include/h755/timebase.hpp",
+      "src/timebase.cpp",
+      "vendor/cmsis-core/Include/cmsis_gcc.h",
+      "vendor/cmsis-core/Include/core_cm7.h",
+      "vendor/cmsis-core/Include/m-profile/cmsis_gcc_m.h"
+    ],
+    "excluded_changed_or_unreviewed": [
+      ".tools/arm-gcc-16.2.0-cm7/arm-none-eabi/include/c++/16.2.0/bits/move.h",
+      ".tools/arm-gcc-16.2.0-cm7/arm-none-eabi/include/c++/16.2.0/bits/stl_construct.h",
+      ".tools/arm-gcc-16.2.0-cm7/arm-none-eabi/include/c++/16.2.0/expected",
+      ".tools/arm-gcc-16.2.0-cm7/arm-none-eabi/include/c++/16.2.0/new",
+      ".tools/arm-gcc-16.2.0-cm7/arm-none-eabi/include/c++/16.2.0/optional",
+      "firmware/cm7/main.cpp",
+      "include/h755/application/controller.hpp",
+      "include/h755/diagnostics.hpp",
+      "include/h755/ethernet/cmsis_mdio.hpp",
+      "include/h755/ethernet/lan8742.hpp",
+      "include/h755/ethernet/mdio.hpp",
+      "src/diagnostics.cpp"
+    ],
+    "new_code": "fresh host execution plus fresh target zero-hit line inventory; no new hardware execution claimed"
+  },
+  "tests": {
+    "ctest_groups": 7,
+    "python": 31,
+    "host_sanitizers": "ASan/UBSan",
+    "observed_behavioral_red": [
+      "MDIO write starts",
+      "PHY startup begins",
+      "PHY control begins after discovery",
+      "Sonar parser-error gate rejects false-green result"
+    ]
+  },
+  "sonar": {
+    "gate": "OK",
+    "issues": 0,
+    "bugs": 0,
+    "critical_or_blocker": 0,
+    "parser_errors": 0,
+    "new_coverage": 87.6,
+    "preprocessor_include_warnings": 93,
+    "scope": "Community CXX grammar/metrics plus imported Cppcheck and coverage. Missing compiler/standard include context and C++26 semantic blind spots remain; not full semantic/security proof.",
+    "reported_coverage": 88.8
+  },
+  "sast": {
+    "cppcheck": "2.22.0; no unsuppressed findings; two existing exact vendor suppressions",
+    "semgrep": "1.185.0; 25 owned C++ files; no findings or parsing errors",
+    "actionlint": "passed"
+  },
+  "target": {
+    "configuration": "GCC16.2 Release; hard-float M7; H755_TARGET_COVERAGE=OFF; native contracts enforce; GLIBCXX assertions",
+    "m7_bin_bytes": 7076,
+    "symbols": {
+      "g_link": "0x2400002c",
+      "g_phy": "0x24000038",
+      "g_bringup": "0x24000054",
+      "_ZN4h7558Timebase6owner_E": "0x2400007c"
+    },
+    "image_sha256": {
+      "cm7_bringup.bin": "c618cf74d1deb33b013e6c5d535aa6eeb7f18855a73be108733b01ec76149faa",
+      "cm7_bringup.elf": "d1d9236c213b722c955d7d58c3335cdcf95d8eab6ad6eabeb0651bf0239dea81",
+      "cm4_park.bin": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+    },
+    "debug_and_release_builds": "passed",
+    "stack_usage_note": "main .su is a static frame estimate, not measured worst-case stack usage"
+  },
+  "hardware": {
+    "new_phy_firmware_programmed": true,
+    "acceptance": "Required selected HIL scenarios passed; see phy-control-hardware-2026-11-14.json",
+    "prior_verified_release": "a6793cd; local backup build/hardware/2026-11-14-led-3000ms-release",
+    "required_scenarios": [
+      "connected startup: g_phy ready/error0/attempts1/completed1; captured BMCR AN enabled with reset/restart/loopback/powerdown/isolation clear; BMSR live link and AN complete; mode matches current g_link",
+      "heartbeat progresses during startup; normal diagnostics have no faults/MDIO errors",
+      "cable removal reports down; reinsert resolves without repeated PHY reset writes",
+      "start without cable: bounded timeout then passive waiting; later insert recovers",
+      "exact image Flash readback; unchanged M4, option bytes and boot configuration; recovery available"
+    ],
+    "limits": [
+      "No MAC/DMA/lwIP/ping",
+      "Debug-clock/Sleep access had to be temporarily enabled for cold readback and was restored; no CPU reset or programming used for that observation",
+      "No exhaustive hardware fault, power-corner, timing or resource qualification"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+--- a/include/stdx/function_traits.hpp
++++ b/include/stdx/function_traits.hpp
+@@ -30 +30,2 @@
+-    template <auto N> using nth_arg = nth_t<N, Args...>;
++    template <auto N> struct argument_at { using type = nth_t<N, Args...>; };
++    template <auto N> using nth_arg = typename argument_at<N>::type;
