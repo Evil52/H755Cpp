@@ -52,6 +52,35 @@ Initial inspection on 2026-11-14 found this folder empty and an ST-LINK V3 visib
 
 Current milestone: M7 bring-up, PHY identity/link observation and bounded MDIO read/write plus LAN8742 reset/AN have passed the selected hardware scenarios; see docs/phy-control.md and docs/phy-control-hardware-2026-11-14.json. MAC/DMA frames and lwIP are not implemented. The next bounded task is full RMII TX/RX pin verification and MAC/DMA ownership, memory/cache strategy and bounded rings before external packet traffic. Target builds and host checks still do not establish hardware behavior or production readiness.
 
+## Firmware artifact and board deployment gate
+
+For this H755 project, normal board deployment has this order:
+
+1. PR checks pass and the PR merges to `main`.
+2. CI builds the merged commit and uploads an immutable firmware artifact with a
+   manifest and SHA-256 hashes.
+3. Verify the downloaded artifact, then perform an authorized flash.
+4. Verify Flash readback and run HIL before production promotion.
+
+Do not flash an Ethernet/USB development PR candidate as the board's accepted or
+production image.
+A local build folder or a green PR is not a release artifact. Record the source commit,
+exact CMake preset, pinned compiler/runtime and dependency identifiers, image hashes,
+board/core/address scope, required CI run, local Sonar/coverage results and artifact URL.
+Flash only bytes downloaded from that artifact after checking its manifest and hash.
+
+If a hardware test genuinely needs a pre-merge image, treat it as an isolated experiment:
+explicitly authorize the temporary write, keep a full backup and a verified rollback,
+mark its evidence as candidate-only, and do not call it release or deployment. The
+project's normal Ethernet path uses post-merge hardware acceptance. A merged commit
+whose artifact job or required checks are absent remains unflashable; no substitute
+local `.bin` should be silently promoted. HIL then decides whether that artifact may
+be released to production devices. Never publish a production-ready claim before HIL.
+
+The artifact workflow and its pinned toolchain supply must be observed green after
+merge before the next Ethernet flash. See [artifact procedure](docs/firmware-artifacts.md).
+Do not present existing locally built USB/PHY binaries as CI release artifacts.
+
 ## USB async candidate
 
 The user selected USB Device CDC on CN13. Use the explicit `cm7-usb-debug`/`cm7-usb-release`

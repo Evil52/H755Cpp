@@ -99,4 +99,7 @@ MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-p
 
 USB CDC на Intel async: [архитектура, API, сборка и границы проверки](docs/usb-async.md).
 Кандидат включается отдельными presets `cm7-usb-debug` / `cm7-usb-release`;
-обычный `cm7-release` оставляет USB выключенным. USB на CN13 пока не проверен на плате.
+обычный `cm7-release` оставляет USB выключенным. USB CDC на CN13 прошёл
+описанные в [аппаратном отчёте](docs/usb-async-hardware-2026-11-15.json) проверки.
+Для следующих прошивок действует [порядок post-merge артефакта](docs/firmware-artifacts.md):
+успешный PR и локальный `.bin` сами по себе не разрешают запись на плату.
