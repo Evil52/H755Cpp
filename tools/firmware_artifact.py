@@ -57,7 +57,9 @@ def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: st
     cache = read_cache(build / "CMakeCache.txt")
     if Path(cache.get("CMAKE_HOME_DIRECTORY", "/missing")).resolve() != source.resolve():
         raise ValueError("build tree belongs to another source checkout")
-    if cache.get("CMAKE_BUILD_TYPE") != "Release" or cache.get("CMAKE_CXX_COMPILER") != str(compiler):
+    compiler_records = list((build / "CMakeFiles").glob("*/CMakeCXXCompiler.cmake"))
+    if (cache.get("CMAKE_BUILD_TYPE") != "Release" or len(compiler_records) != 1
+            or f'set(CMAKE_CXX_COMPILER "{compiler}")' not in compiler_records[0].read_text()):
         raise ValueError("build configuration or compiler differs from release inputs")
     usb_expected = "ON" if preset == "cm7-usb-release" else "OFF"
     if cache.get("H755_USB_CDC", "OFF") != usb_expected:
