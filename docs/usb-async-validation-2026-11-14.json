@@ -1,7 +1,7 @@
 {
   "date": "2026-11-14",
   "base_commit": "4443314e7e7acaf2a88baf9b5923df7d6acbe5cb",
-  "milestone": "USB Device CDC-ACM binary echo, Intel sender/receiver async, bare metal CMSIS; software candidate only",
+  "milestone": "USB Device CDC-ACM binary echo, Intel sender/receiver async, bare metal CMSIS; tested CDC behaviors verified on NUCLEO-H755ZI-Q with remaining release gates documented",
   "runtime_source_sha256": {
     "include/h755/application/controller.hpp": "9dc4b900d4c3ae970279d327deab543b191ac5444abbe125db900e85ec612747",
     "include/h755/async/context.hpp": "c20f922a0fa6c6475fd83ff9e7bea0365870f2ca6798858c6a9ee2223e0c78b9",
@@ -524,14 +524,20 @@
     "documentation_only_followup": "Implementation/runtime/build inputs and exact Release remain unchanged; final documentation revision reuses implementation CI by source/artifact provenance."
   },
   "hardware": {
-    "usb_firmware_programmed": false,
-    "usb_enumeration_or_COM_exchange_verified": false,
-    "board_write_or_reset_performed_by_this_task": false,
-    "prior_accepted_release_backup": "build/hardware/2026-11-14-phy-control-candidate; preserved",
-    "required_next_gate": "Scoped programming authorization and exact-image CN13 HIL; implementation CI passed. See usb-async.md."
+    "usb_firmware_programmed": true,
+    "usb_enumeration_or_COM_exchange_verified": true,
+    "board_write_or_reset_performed_by_this_task": true,
+    "exact_release_bin_sha256": "a1da89f604a8a86fa7e6727520e9054a0df621dc66e1f329f85c2a8fc9f584d6",
+    "full_flash_readback_sha256": "6cbda6f588f90d6016b16920b8accd3339785ba3c61ed09e442675ba56124aef",
+    "outside_m7_sector0_unchanged": true,
+    "m4_and_option_boot_unchanged": true,
+    "cold_power_on_and_echo_verified": true,
+    "hardware_report": "docs/usb-async-hardware-2026-11-15.json",
+    "remaining": "Resource/timing/conformance evidence and separate MAC/DMA/lwIP milestone; see usb-async.md",
+    "ethernet_phy_link_with_usb": "100 Mbps full duplex after late recovery; no MAC/DMA frames"
   },
   "limits": [
-    "No actual CN13 electrical/clock/USB acceptance yet",
+    "CN13 function verified on one NUCLEO-H755ZI-Q; USB electrical/timing budgets remain pending; PHY link recovered with cable",
     "No USB conformance/fuzz/soak or measured worst-case IRQ/stack/timing campaign",
     "No generic P2300 stop-token propagation; manual operation cancellation only",
     "CXX preprocessor context and Cppcheck USB coverage are limited",

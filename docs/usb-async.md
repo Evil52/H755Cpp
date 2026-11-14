@@ -102,7 +102,8 @@ The user selected Device CDC on the user USB connector CN13, separate from ST-LI
 UM2408 Rev6 section 7.11/table13 maps PA9 to VBUS, PA11 to DM, PA12 to DP, and PD10/JP8
 to the host power switch. Device mode holds PD10 low and never sources host VBUS.
 HSI48 feeds USB; CRS synchronizes to USB2 SOF. Hardware VBUS sensing is enabled.
-The actual solder bridges, electrical levels, clock lock and behavior still need HIL.
+CN13 enumeration and byte exchange validate the functional pin path. Bridge population,
+electrical levels and clock lock have not been measured independently.
 
 **Power the board through CN1/another supported supply before attaching CN13.**
 CN13 cannot power this board; ST documents an IO current-injection risk with the reverse
@@ -147,13 +148,31 @@ CI on implementation commit `5178ef7` passed all seven jobs in
 CodeQL C++, Python and Actions report zero results and no analysis errors on that exact
 commit. Documentation-only follow-up reuses this evidence with unchanged runtime/build
 inputs and exact Release hashes. Host CodeQL extraction does not cover target-only CMSIS
-platform glue. Authorized programming, host USB enumeration and COM-port exchange on the
-real board remain required before hardware acceptance. Test
-connected/no-cable boot, exact release bytes, open/close, unplug/replug, suspend/resume,
-reset/cold power cycle, full binary echo at 0/1/63/64/65/257 and longer lengths, timeout
-and backpressure, continued PHY/LED behavior, clock/CRS/USB register masks and memory/stack
-budgets. Preserve M4/options and the verified prior Release/rollback. Do not confuse the
-existing ST-LINK virtual COM port with the new CN13 CDC device.
+platform glue. The exact 30,472-byte USB Release (SHA-256 `a1da89f604a8a86fa7e6727520e9054a0df621dc66e1f329f85c2a8fc9f584d6`)
+was programmed to M7 and verified by full Flash readback. M4, option status and actual
+FLASH_BOOT7/4 registers were unchanged. The prior accepted PHY Release is preserved for
+rollback. The first programming attempt was aborted by an invalid comparison of the
+clock-gated SYSCFG user shadow after reset; the full Flash rollback matched the backup.
+The second attempt used FLASH_BOOT7/4 readback and passed.
+
+On CN13, macOS enumerated a distinct CAFE:4001 `H755 Async CDC` device and
+`/dev/cu.usbmodem12401`. Binary echo passed 1/63/64/65/257/1024-byte payloads,
+including arbitrary byte values, a DTR close/reopen, software reset and re-enumeration,
+and physical CN13 unplug/replug without reset. After unplug, the host device disappeared
+and the firmware's CDC state was `suspended`; subsequent replug and echo worked. Cold
+power-on was performed without debugger setup: CN13 disconnected before CN1 power-down,
+CN1 restored before CN13. Enumeration and binary echo passed before SWD attachment.
+Non-halting SWD then showed USB startup `running`, error 0, heartbeat counter and green
+LED advancing, red LED off, M4 parking marker present, and option/boot registers unchanged.
+See [USB HIL record](usb-async-hardware-2026-11-15.json) for exact observations and limits.
+
+PHY was `waiting_link` during the cold observation. With the Ethernet cable connected,
+it later reached `ready` and the link monitor reported 100 Mbps full duplex, increasing
+sample count and zero errors while USB remained running. This verifies PHY link recovery,
+not MAC frames or IP traffic. Electrical clock/CRS margins, worst-case ISR latency, stack
+budget and broader USB conformance/fuzz/soak still need separate evidence. The tested
+CDC behaviors are hardware-verified on this exact image; they do not establish a full
+product release acceptance.
 
 This is not complete USB conformance, a fuzz/soak campaign, measured WCET, full MISRA
 compliance, automotive certification or proof of absence of UB/security issues.
