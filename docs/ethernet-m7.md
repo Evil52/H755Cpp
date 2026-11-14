@@ -56,6 +56,14 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
 5. Validate external ARP/ping, then bounded UDP/TCP behavior, load, cable loss/reconnect and reset.
    E2E must observe actual external traffic/results from the exact identified firmware image.
 
+For this project's next Ethernet milestone, complete PR checks and merge first,
+then build a traceable immutable firmware artifact from the merged `main` commit.
+Download and verify that artifact before flashing the board; perform Flash readback
+and MAC/DMA HIL against those exact bytes. The current CI does not yet produce that
+artifact, so the next MAC/DMA image is not flashable under this policy until the
+artifact job exists and succeeds. Pre-merge programming is reserved for an explicitly
+authorized, backed-up experiment and never counts as release deployment.
+
 Public source publication and hardware flashing are separate authorized operations.
 Host CI proves neither target compilation nor hardware operation. See the dated hardware
 report and link/coverage guide for local evidence; MAC/DMA, fuzzing and full-network HIL
