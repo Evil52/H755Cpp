@@ -352,7 +352,7 @@
     "cppcheck": {
       "supported_portable_scope": "passed,0findings",
       "usb_scope": "not established: parser rejects Intel stdx constructs; failed experimental logs retained, no blanket parser suppression",
-      "usb_compensation": "real compiler checks,Clang Static Analyzer,Semgrep,host tests; CI CodeQL pending"
+      "usb_compensation": "Real compiler checks,Clang Static Analyzer,Semgrep,host tests and successful CodeQL compiler-extracted host USB path. Target-only CMSIS platform glue is outside host CodeQL extraction."
     },
     "gitleaks": "full prospective Git payload passed; no secret allowlist",
     "actionlint": "passed",
@@ -455,16 +455,80 @@
   },
   "publication": {
     "local_branch": "work/usb-async",
-    "github_ci": "not run for USB candidate",
-    "codeql": "pending candidate CI",
-    "prior_phy_pr": "#7 remains open; no automatic merge performed"
+    "github_ci": {
+      "run_id": 43611665262,
+      "url": "https://github.com/Evil52/H755Cpp/actions/runs/43611665262",
+      "event": "workflow_dispatch",
+      "head_sha": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "CodeQL (c-cpp)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "CodeQL (actions)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Workflow and secrets",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "CodeQL (python)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Semgrep",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Host tests and analysis",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Quality gate",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "codeql": [
+      {
+        "category": "/language:c-cpp",
+        "commit_sha": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+        "results_count": 0,
+        "error": ""
+      },
+      {
+        "category": "/language:python",
+        "commit_sha": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+        "results_count": 0,
+        "error": ""
+      },
+      {
+        "category": "/language:actions",
+        "commit_sha": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+        "results_count": 0,
+        "error": ""
+      }
+    ],
+    "prior_phy_pr": "#7 remains open; no automatic merge performed",
+    "implementation_commit": "5178ef7ec1f49cc96f92c0fe50bbce5727c7420c",
+    "documentation_only_followup": "Implementation/runtime/build inputs and exact Release remain unchanged; final documentation revision reuses implementation CI by source/artifact provenance."
   },
   "hardware": {
     "usb_firmware_programmed": false,
     "usb_enumeration_or_COM_exchange_verified": false,
     "board_write_or_reset_performed_by_this_task": false,
     "prior_accepted_release_backup": "build/hardware/2026-11-14-phy-control-candidate; preserved",
-    "required_next_gate": "candidate CI, scoped flash authorization, exact-image HIL; see usb-async.md"
+    "required_next_gate": "Scoped programming authorization and exact-image CN13 HIL; implementation CI passed. See usb-async.md."
   },
   "limits": [
     "No actual CN13 electrical/clock/USB acceptance yet",

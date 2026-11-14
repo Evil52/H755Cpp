@@ -142,8 +142,13 @@ Those rejected experimental runs are retained locally and are not reported as gr
 Cppcheck analysis. Sonar Community CXX is grammar/metrics plus imported findings/coverage;
 missing compiler/standard-header context remains a limitation even with zero parser errors.
 
-CI on the final committed candidate, authorized programming, host USB enumeration and
-COM-port exchange on the real board remain required before hardware acceptance. Test
+CI on implementation commit `5178ef7` passed all seven jobs in
+[run43611665262](https://github.com/Evil52/H755Cpp/actions/runs/43611665262).
+CodeQL C++, Python and Actions report zero results and no analysis errors on that exact
+commit. Documentation-only follow-up reuses this evidence with unchanged runtime/build
+inputs and exact Release hashes. Host CodeQL extraction does not cover target-only CMSIS
+platform glue. Authorized programming, host USB enumeration and COM-port exchange on the
+real board remain required before hardware acceptance. Test
 connected/no-cable boot, exact release bytes, open/close, unplug/replug, suspend/resume,
 reset/cold power cycle, full binary echo at 0/1/63/64/65/257 and longer lengths, timeout
 and backpressure, continued PHY/LED behavior, clock/CRS/USB register masks and memory/stack
