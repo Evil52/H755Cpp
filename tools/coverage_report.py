@@ -52,6 +52,11 @@ def inventory(root):
                 yield path
 
 
+def source_digests(root):
+    return {path.relative_to(root).as_posix():hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in inventory(root)}
+
+
 def measure_source(root,path,lines,assembly,declarations=None):
     name=path.relative_to(root).as_posix()
     if path.suffix=='.s':
@@ -83,7 +88,7 @@ def report(root, lines, assembly, declarations=None):
         if not complete: missing.append(name)
     groups={kind:language_total(files,kind) for kind in ['c-cpp','python']}
     total=sum(g['total'] for g in groups.values());covered=sum(g['covered'] for g in groups.values())
-    return {'files':files,'groups':groups,'covered':covered,'total':total,'percent':100*covered/total if total else 0,'unmeasured':missing,
+    return {'files':files,'source_digests':source_digests(root),'groups':groups,'covered':covered,'total':total,'percent':100*covered/total if total else 0,'unmeasured':missing,
             'passed':not missing and total>0 and all(g['percent']>80 for g in groups.values())}
 
 

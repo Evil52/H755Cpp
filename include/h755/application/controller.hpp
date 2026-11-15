@@ -59,6 +59,8 @@ public:
             diagnostics_.heartbeat();
         }
     }
+    [[nodiscard]] ethernet::LinkState link_mode() const noexcept { return link_mode_; }
+    [[nodiscard]] std::uint32_t uptime_ms() const noexcept { return clock_.now(); }
 private:
     enum class Lifecycle { cold, starting, running, failed };
     enum class PhyLifecycle { absent, configuring, watching, waiting_link, failed };
@@ -124,6 +126,7 @@ private:
             phy_lifecycle_ = PhyLifecycle::watching;
             diagnostics_.phy_ready();
             diagnostics_.link_state(**result);
+            link_mode_ = **result;
             last_link_ = now;
             board_.red(false);
         }
@@ -151,6 +154,7 @@ private:
         } else if (result->has_value()) {
             active_ = false;
             diagnostics_.link_state(**result);
+            link_mode_ = **result;
             if (phy_lifecycle_ == PhyLifecycle::waiting_link && **result != ethernet::LinkState::down
                 && **result != ethernet::LinkState::negotiating) {
                 phy_lifecycle_ = PhyLifecycle::watching;
@@ -162,6 +166,7 @@ private:
     void link_failure() noexcept
     {
         active_ = false;
+        link_mode_ = ethernet::LinkState::down;
         diagnostics_.link_error();
         (void)mdio_.recover_after_idle();
     }
@@ -178,5 +183,6 @@ private:
     Lifecycle lifecycle_{Lifecycle::cold};
     bool active_{};
     bool lit_{};
+    ethernet::LinkState link_mode_{ethernet::LinkState::down};
 };
 }

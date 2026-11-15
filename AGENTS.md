@@ -50,7 +50,7 @@ Use ST AN5557 for dual-core architecture, AN5617 for communication, and AN4839 f
 
 Initial inspection on 2026-11-14 found this folder empty and an ST-LINK V3 visible on USB. This does not identify the target MCU/revision or prove SWD communication, firmware build, flashing, or physical behavior. The user identifies the board as Nucleo H755ZI; confirm exact board suffix/revision and MCU marking before selecting startup, power/clock, and pin configuration.
 
-Current milestone: M7 bring-up, PHY identity/link observation and bounded MDIO read/write plus LAN8742 reset/AN have passed the selected hardware scenarios; see docs/phy-control.md and docs/phy-control-hardware-2026-11-14.json. MAC/DMA frames and lwIP are not implemented. The next bounded task is full RMII TX/RX pin verification and MAC/DMA ownership, memory/cache strategy and bounded rings before external packet traffic. Target builds and host checks still do not establish hardware behavior or production readiness.
+Current milestone: M7 bring-up, PHY identity/link observation and bounded MDIO read/write plus LAN8742 reset/AN have passed the selected hardware scenarios; see docs/phy-control.md and docs/phy-control-hardware-2026-11-14.json. The experimental MAC/DMA candidate reached `running` with two RX counters and no error during an isolated, restored coverage HIL; see docs/ethernet-mac-hil-2026-11-15.json. Payload integrity, TX, link loss/reconnect and lwIP remain unverified. The next bounded task is RMII TX/RX hardware verification, ring wrap/error recovery and traceable post-merge artifact acceptance before external packet traffic. Target builds and host checks alone do not establish production readiness. See docs/ethernet-mac-dma.md.
 
 ## Firmware artifact and board deployment gate
 

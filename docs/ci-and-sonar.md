@@ -22,7 +22,7 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
 ## Checks and scope
 
 - Host build, warnings as errors, unit and mocked-register integration, ASan/UBSan.
-- Target GCC 16.2 builds for M7 Debug/Release and USB Debug/Release, using the pinned
+- Target GCC 16.2 builds for M7, USB and Ethernet Debug/Release, using the pinned
   toolchain digest. These are compilation/link checks, not HIL or target execution.
 - Cppcheck and Clang static analysis of portable MDIO code via its host test translation unit.
   Clang 18 uses its own CMake compilation database and libc++ 18: GCC module-scanning
@@ -41,16 +41,16 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
 
 CodeQL's published language support currently lists through C++23, with GNU compiler
 extensions through GCC 16. This does not establish full C++26 contracts support.
-The host extraction covers portable MDIO logic and tests, not the target-only CMSIS
-adapter or native-contract toolchain probe. Cppcheck uses its supported C++23 parser
+The host extraction covers portable MDIO and MAC engine logic and tests, not the target-only CMSIS
+adapters or native-contract toolchain probe. Cppcheck uses its supported C++23 parser
 for the same compatible source subset; compilation remains C++26. No source is
 rewritten or silently compiled under an older requested standard to make analysis green.
 
 Fuzzing, hardware/e2e, runtime stack/deadline measurements and release-image
 acceptance remain separate unmet gates. The [post-merge artifact workflow](firmware-artifacts.md)
 builds the merged M7/M4 Release images and packages ELF/BIN/HEX with a manifest.
-It is a HIL candidate, not an accepted production release. MAC/DMA packet transfer
-and lwIP remain unimplemented.
+It is a HIL candidate, not an accepted production release. The MAC/DMA candidate
+compiles but real packet transfer is unverified; lwIP remains unimplemented.
 
 ## Sonar: manual local workflow only
 
@@ -72,7 +72,21 @@ in GitHub or committed files for this local workflow. The command accepts only a
 server, activates CXX for this project, submits local project `h755cpp` (requiring analysis
 and project-creation permission if it does not exist),
 and runs the pinned official scanner image in the existing Sonar Docker network.
+The helper requires a passing whole-owned-code coverage report whose recorded source
+hashes match the current files. Missing, partial, or stale reports stop before upload;
+source-only diagnostics need a separate, clearly labelled scanner run. The hashes
+detect source changes after aggregation, but do not establish that raw target gcov
+data came from the same image; record the target build and HIL provenance separately.
 The scanner uses https://sonarqube:9443 with a mounted PKCS#12 truststore.
+The CXX plugin has no built-in standard include paths. The helper reads the compiler
+selected by the instrumented M7 CMake build, checks its SHA-256 against
+`docs/toolchain-validation.json` and its GCC 16.2 version, then mounts that
+toolchain read-only at `/opt/h755-arm`. `sonar-project.properties` supplies its
+libstdc++, newlib and GCC internal include directories. A nonzero unresolved
+include count now fails the local scan. The former 726 warnings were all missing
+standard headers, including `<contracts>` and `<gcov.h>`; the corrected scan
+reported zero include-resolution and parser syntax errors. This follows the
+[community CXX include-directory guidance](https://github.com/SonarOpenCommunity/sonar-cxx/wiki/sonar.cxx.includeDirectories).
 The TLS front shares the Sonar container network namespace and proxies only to
 127.0.0.1:9000; it publishes no host port. The helper API remains restricted to host
 loopback 9000. No certificate-verification bypass or insecure fallback is used. Reports

@@ -6,30 +6,65 @@
 #ifdef H755_TARGET_COVERAGE
 void coverage_poll();
 #endif
+#ifdef H755_ETHERNET_DIAGNOSTIC
+extern "C"
+{
+    volatile std::uint32_t g_diagnostic_result{};
+}
+#endif
 namespace h755
 {
-#ifdef H755_USB_CDC
     [[noreturn]] void run_application(FirmwareApplication& application, Board& board,
-                                      usb::Runtime& usb) noexcept
-#else
-    [[noreturn]] void run_application(FirmwareApplication& application, Board& board) noexcept
-#endif
+                                      [[maybe_unused]] FirmwarePeripherals peripherals) noexcept
     {
         if (auto started = application.start(); !started)
         {
             fault::stop(started.error());
         }
 #ifdef H755_USB_CDC
-        if (!usb.start())
+        if (!peripherals.usb.start())
         {
             fault::stop(FaultCode::usb);
+        }
+#endif
+#ifdef H755_ETHERNET_MAC
+        if (!peripherals.mac.start())
+        {
+            fault::stop(FaultCode::ethernet);
         }
 #endif
         for (;;)
         {
             application.poll();
+#ifdef H755_ETHERNET_MAC
+#ifdef H755_ETHERNET_DIAGNOSTIC
+            peripherals.mac.poll(application.uptime_ms(), application.link_mode(),
+                                 [&](std::span<const std::byte> frame) noexcept {
+                                     const auto result = peripherals.diagnostic.on_frame(
+                                         frame, [&](std::span<const std::byte> reply) noexcept {
+                                             return peripherals.mac.send(reply);
+                                         });
+                                     if (result != ethernet::DiagnosticResult::ignored)
+                                     {
+                                         g_diagnostic_result = static_cast<std::uint32_t>(result);
+                                     }
+                                 });
+#else
+            peripherals.mac.poll(application.uptime_ms(), application.link_mode());
+#endif
+            g_mac.state = static_cast<std::uint32_t>(peripherals.mac.state());
+            g_mac.error = static_cast<std::uint32_t>(peripherals.mac.error());
+            g_mac.received = peripherals.mac.received();
+            g_mac.dropped = peripherals.mac.dropped();
+            g_mac.transmitted = peripherals.mac.transmitted();
+            g_mac.transmit_errors = peripherals.mac.transmit_errors();
+            if (peripherals.mac.state() == ethernet::MacState::fault)
+            {
+                fault::stop(FaultCode::ethernet);
+            }
+#endif
 #ifdef H755_USB_CDC
-            usb.poll();
+            peripherals.usb.poll();
 #endif
 #ifdef H755_TARGET_COVERAGE
             coverage_poll();

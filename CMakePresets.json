@@ -55,6 +55,31 @@
       "cacheVariables": {
         "H755_USB_CDC": "ON"
       }
+    },
+    {
+      "name": "cm7-ethernet-debug",
+      "inherits": "cm7-usb-debug",
+      "binaryDir": "${sourceDir}/build/cm7-ethernet-debug",
+      "cacheVariables": {
+        "H755_ETHERNET_MAC": "ON"
+      }
+    },
+    {
+      "name": "cm7-ethernet-release",
+      "inherits": "cm7-usb-release",
+      "binaryDir": "${sourceDir}/build/cm7-ethernet-release",
+      "cacheVariables": {
+        "H755_ETHERNET_MAC": "ON"
+      }
+    },
+    {
+      "name": "cm7-ethernet-coverage",
+      "inherits": "cm7-ethernet-release",
+      "binaryDir": "${sourceDir}/build/cm7-ethernet-coverage",
+      "cacheVariables": {
+        "H755_TARGET_COVERAGE": "ON",
+        "H755_ETHERNET_DIAGNOSTIC": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -81,6 +106,18 @@
     {
       "name": "cm7-usb-release",
       "configurePreset": "cm7-usb-release"
+    },
+    {
+      "name": "cm7-ethernet-debug",
+      "configurePreset": "cm7-ethernet-debug"
+    },
+    {
+      "name": "cm7-ethernet-release",
+      "configurePreset": "cm7-ethernet-release"
+    },
+    {
+      "name": "cm7-ethernet-coverage",
+      "configurePreset": "cm7-ethernet-coverage"
     }
   ],
   "testPresets": [

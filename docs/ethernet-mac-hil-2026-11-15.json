@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-15",
+  "kind": "isolated_pre_merge_ci_candidate_hil",
+  "pull_request": 13,
+  "candidate_commit": "821378f45496f7c5678f42da44e3a3adb93ddb63",
+  "pr_ci_run": 43718833571,
+  "pr_ci_success": true,
+  "instrumented_m7": {
+    "preset": "cm7-ethernet-coverage",
+    "bin_sha256": "c59c3ea8d8a78f6f225fd030ae0877329605b0545593e9a4ab9ea55f7dee6981",
+    "gcov_stream_bytes": 10821,
+    "gcov_stream_sha256": "e74b74f56c3f530da88bbbefaa80885f0c6490f39d8292fe7c3df80c666c52c5",
+    "capture_status": "0x2 0x2a45 0x0",
+    "mac_diagnostics_words": "0x2 0x0 0x2 0x0 0x0 0x0",
+    "mac_state": "running",
+    "mac_error": 0,
+    "received_count": 2,
+    "dropped_count": 0,
+    "transmitted_count": 0,
+    "transmit_error_count": 0,
+    "limit": "RX counters observed; payload integrity, external packet capture, TX, loss/reconnect and load not accepted"
+  },
+  "whole_owned_runtime_coverage": {
+    "c_cpp": {
+      "covered": 1549,
+      "total": 1676,
+      "percent": 92.42243436754177
+    },
+    "python": {
+      "covered": 394,
+      "total": 446,
+      "percent": 88.34080717488789
+    },
+    "unmeasured": [],
+    "gate_passed": true,
+    "summary_sha256": "cee4affe085a683d8fc3e6aceeb766c59e946509bc60118a421e1eaaa55cca2a",
+    "sonar_xml_sha256": "c544a751b4ce3683876031afab84e73e1c819b958179dade18ed18a974a9620b",
+    "assembly": "Earlier nine-instruction M4 SWD step evidence reused; current M4 binary hash and Flash bytes match"
+  },
+  "local_sonar": {
+    "server_version": "26.7.0.124771",
+    "quality_gate": "OK",
+    "new_coverage_percent": "91.0",
+    "overall_coverage_percent": "91.6",
+    "unresolved_issues": 0,
+    "blocking_issues": 0,
+    "include_resolution_warnings": 712,
+    "parser_syntax_errors_reported": false,
+    "limit": "Community sonar-cxx parser and rules do not establish complete C++26 analysis"
+  },
+  "flash_restoration": {
+    "full_flash_bytes": 2097152,
+    "backup_read_twice_identical": true,
+    "before_sha256": "261b1289236b07b5c9bc17bb3137c460d3092d4b269dd3f37be06ba92765379e",
+    "after_sha256": "261b1289236b07b5c9bc17bb3137c460d3092d4b269dd3f37be06ba92765379e",
+    "full_flash_restored_identically": true,
+    "m4_written": false,
+    "option_bytes_written": false,
+    "cm4_bin_sha256": "cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+  },
+  "release_status": "No merge, release artifact, or production deployment from this candidate"
+}

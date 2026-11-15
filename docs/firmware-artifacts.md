@@ -2,16 +2,19 @@
 
 Normal H755 deployment uses the exact image produced by `Firmware artifact` after a
 successful `CI` push run on a two-parent merge commit in `main`. The artifact workflow
-checks that the merge corresponds to a PR whose eight required jobs all passed on the
+checks that the merge corresponds to a PR whose seven prerequisite jobs and final
+`Quality gate` job passed on the
 exact merged head. It does not rerun host tests, Semgrep or CodeQL. The main `CI` run
 contains the already configured CodeQL push checks.
 
 The artifact job runs on the standard GitHub-hosted `macos-15` arm64 runner. It downloads
 the separately packaged, SHA-256-pinned GCC 16.2 CM7 toolchain from the repository's
 toolchain release, verifies the archive and compiler binary, and builds the explicit
-`cm7-usb-release` preset. The binary includes the M7 C++ runtime; Homebrew's standalone
+`cm7-ethernet-release` preset. The binary includes the M7 C++ runtime; Homebrew's standalone
 cross-compiler package is not a substitute. The archive is a build dependency, never
 committed to the source repository. The release notes and source tarballs accompany it.
+The packager rejects a build configured with target coverage or the local raw-frame
+diagnostic responder, even if a caller supplies the Release preset name.
 
 `tools/firmware_artifact.py` copies M7/M4 ELF, BIN, HEX and map files into one artifact.
 `manifest.json` records the merged commit/tree, preset, compiler digest, PR/main CI run
@@ -27,7 +30,7 @@ gh run download ARTIFACT_WORKFLOW_RUN_ID --repo Evil52/H755Cpp \
   --name h755-firmware-MERGE_SHA --dir /path/to/downloaded-artifact
 python3 tools/firmware_artifact.py verify \
   --bundle /path/to/downloaded-artifact \
-  --expected-commit MERGE_SHA --expected-preset cm7-usb-release
+  --expected-commit MERGE_SHA --expected-preset cm7-ethernet-release
 ```
 
 Check the workflow run's successful conclusion, manifest CI run IDs, source commit,

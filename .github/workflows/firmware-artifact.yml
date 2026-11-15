@@ -57,8 +57,8 @@ jobs:
           echo "$RUNNER_TEMP/h755-cmake/bin" >> "$GITHUB_PATH"
       - name: Build merged Release images
         run: |
-          cmake --preset cm7-usb-release
-          cmake --build --preset cm7-usb-release --parallel 2
+          cmake --preset cm7-ethernet-release
+          cmake --build --preset cm7-ethernet-release --parallel 2
       - name: Package and verify exact firmware bytes
         env:
           MERGE_COMMIT: ${{ github.event.workflow_run.head_sha }}
@@ -66,16 +66,16 @@ jobs:
           PR_CI_RUN: ${{ steps.pr_gate.outputs.pr_ci_run_id }}
         run: |
           python3 tools/firmware_artifact.py create \
-            --source . --build build/cm7-usb-release \
+            --source . --build build/cm7-ethernet-release \
             --output build/release-artifact \
-            --preset cm7-usb-release \
+            --preset cm7-ethernet-release \
             --main-ci-run "$MAIN_CI_RUN" --pr-ci-run "$PR_CI_RUN" \
             --toolchain "$H755_ARM_TOOLCHAIN" \
             --expected-commit "$MERGE_COMMIT"
           python3 tools/firmware_artifact.py verify \
             --bundle build/release-artifact \
             --expected-commit "$MERGE_COMMIT" \
-            --expected-preset cm7-usb-release
+            --expected-preset cm7-ethernet-release
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: h755-firmware-${{ github.event.workflow_run.head_sha }}

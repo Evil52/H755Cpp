@@ -84,8 +84,7 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
    linker map, timebase and MDIO/RMII clock bring-up. PHY identifiers and link have been observed on hardware; full TX/RX packet-pin acceptance remains in the MAC/DMA milestone.
 2. Read-only link-state handling and its documented BMSR latch sequence are implemented.
    [PHY reset/write/autonegotiation control](phy-control.md) is implemented and host-tested with bounded deadlines; [selected hardware acceptance](phy-control-hardware-2026-11-14.json) passed, including cable loss, late insertion and standalone cold start.
-3. Verify the configured RMII TX/RX pins on hardware (MDIO/clock bring-up alone does not prove the packet interface). Connect the host-tested ring state model to real DMA descriptors and D2-accessible buffers; specify cache-line alignment,
-   barriers and cache/MPU strategy; test ring wrap, starvation and error recovery before live traffic.
+3. Verify the configured RMII TX/RX pins on hardware (MDIO/clock bring-up alone does not prove the packet interface). An [experimental MAC/DMA candidate](ethernet-mac-dma.md) now supplies descriptors, D2-accessible buffers, barriers and a cache-off policy. Ring wrap, starvation, restart and TX/RX packet transfer still need fake-register and hardware acceptance.
 4. Pin and audit upstream lwIP, add a `NO_SYS=1` port, one main-loop owner, static pools, and a
    bounded netif adapter. `STABLE-2_2_1_RELEASE` is a candidate tag, not yet an integrated dependency.
 5. Validate external ARP/ping, then bounded UDP/TCP behavior, load, cable loss/reconnect and reset.

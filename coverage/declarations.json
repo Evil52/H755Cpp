@@ -1,6 +1,6 @@
 {
   "include/h755/fault.hpp": {
-    "sha256": "d9b22c18b41182fc7804687c6a42a2d41c7fa234c4884d4c52864c50d1607512",
+    "sha256": "3d1b418ee9083ae417b80f45dd30eb177f67256fff063a42a227e941ae7fa8d3",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "include/h755/platform/processor.hpp": {
@@ -8,7 +8,7 @@
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/application.hpp": {
-    "sha256": "68b03cbe3182614bf41dfe814de55c6577ac5741778d9e8f528c6b7840812305",
+    "sha256": "aea6de634a7cebb0066d0f87da8c2fbdf0533ec967227fb29a3356e2715648cd",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/board.hpp": {

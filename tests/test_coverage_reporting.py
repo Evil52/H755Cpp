@@ -24,6 +24,7 @@ class CoverageTests(unittest.TestCase):
             asm=root/'asm.json';asm.write_text(json.dumps({'firmware/cm4/park.s':{'total':9,'covered':9}}))
             with contextlib.redirect_stdout(io.StringIO()):module.main(['--root',str(root),'--lcov',str(lcov),'--gcov',str(gcov),'--python',str(py),'--assembly',str(asm),'--output',str(root/'out')])
             report=json.loads((root/'out/summary.json').read_text());self.assertEqual(report['percent'],100);self.assertTrue(report['passed']);self.assertNotIn('tools/probes/a.cpp',report['files'])
+            self.assertEqual(report['source_digests']['include/a.hpp'],hashlib.sha256((root/'include/a.hpp').read_bytes()).hexdigest())
             self.assertEqual(ET.parse(root/'out/sonar.xml').find('file/lineToCover').attrib['covered'],'true')
     def test_unmeasured_and_exactly_80_fail(self):
         with tempfile.TemporaryDirectory() as directory:

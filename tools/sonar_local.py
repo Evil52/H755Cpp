@@ -1,5 +1,6 @@
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
@@ -9,6 +10,28 @@ import subprocess
 import urllib.parse
 import urllib.request
 import urllib.error
+
+
+def validate_coverage(project):
+    summary=project/'build/coverage/summary.json'
+    xml=project/'build/coverage/sonar.xml'
+    if not summary.is_file() or not xml.is_file():
+        raise RuntimeError('Fresh whole-owned-code coverage report is required before Sonar')
+    report=json.loads(summary.read_text())
+    groups=report.get('groups',{})
+    if (not report.get('passed') or report.get('unmeasured') or
+        any(groups.get(kind,{}).get('percent',0)<=80 for kind in ('c-cpp','python')) or
+        any(item.get('kind')=='assembly-instructions' and
+            (item.get('total',0)<=0 or item.get('covered')!=item.get('total'))
+            for item in report.get('files',{}).values())):
+        raise RuntimeError('Whole-owned-code coverage gate has not passed')
+    expected=report.get('source_digests')
+    actual={path.relative_to(project).as_posix():hashlib.sha256(path.read_bytes()).hexdigest()
+            for directory in ('include','src','firmware','tools')
+            for path in sorted((project/directory).rglob('*'))
+            if path.suffix in {'.hpp','.h','.cpp','.c','.py','.s'} and 'probes' not in path.parts}
+    if expected!=actual:
+        raise RuntimeError('Coverage report is stale for the current owned sources')
 
 
 def validate_host(url):
@@ -53,7 +76,35 @@ def check_server(api):
     return status
 
 
-def scanner_command(project,image,output):
+def target_toolchain(project):
+    files=list((project/'build/cm7-ethernet-coverage/CMakeFiles').glob('*/CMakeCXXCompiler.cmake'))
+    compilers=set()
+    for file in files:
+        match=re.search(r'^set\(CMAKE_CXX_COMPILER "([^"]+)"\)$',file.read_text(),re.M)
+        if match: compilers.add(Path(match.group(1)))
+    if len(compilers)!=1:
+        raise RuntimeError('The instrumented target build must identify exactly one C++ compiler')
+    compiler=compilers.pop()
+    if compiler.name!='arm-none-eabi-g++' or not compiler.is_file():
+        raise RuntimeError('The instrumented target compiler is missing')
+    manifest=json.loads((project/'docs/toolchain-validation.json').read_text())
+    if hashlib.sha256(compiler.read_bytes()).hexdigest()!=manifest['compiler_sha256']:
+        raise RuntimeError('Instrumented target compiler differs from the pinned toolchain')
+    if subprocess.check_output([compiler,'-dumpfullversion'],text=True).strip()!='16.2.0':
+        raise RuntimeError('Local Sonar requires the pinned GCC 16.2 target headers')
+    toolchain=compiler.parent.parent
+    includes=('arm-none-eabi/include/c++/16.2.0',
+              'arm-none-eabi/include/c++/16.2.0/arm-none-eabi',
+              'arm-none-eabi/include/c++/16.2.0/backward',
+              'lib/gcc/arm-none-eabi/16.2.0/include',
+              'lib/gcc/arm-none-eabi/16.2.0/include-fixed',
+              'arm-none-eabi/include')
+    if any(not (toolchain/path).is_dir() for path in includes):
+        raise RuntimeError('Pinned GCC 16.2 target include tree is incomplete')
+    return toolchain
+
+
+def scanner_command(project,image,output,toolchain):
     if not image.startswith('sonarsource/sonar-scanner-cli@sha256:'):
         raise RuntimeError('Pin the official scanner image by digest')
     truststore=project/'build/sonar-trust/truststore.p12'
@@ -62,28 +113,29 @@ def scanner_command(project,image,output):
         '-e','SONAR_TOKEN','-e','SONAR_HOST_URL',
         '--mount',f'type=bind,src={truststore},dst=/tls/truststore.p12,readonly',
         '--mount',f'type=bind,src={project},dst=/usr/src,readonly',
+        '--mount',f'type=bind,src={toolchain},dst=/opt/h755-arm,readonly',
         '--mount',f'type=bind,src={output},dst=/tmp/h755-sonar',image,
         '-Dsonar.working.directory=/tmp/h755-sonar/.scannerwork',
         '-Dsonar.scm.disabled=true','-Dsonar.scm.exclusions.disabled=true',
         '-Dsonar.scanner.truststorePath=/tls/truststore.p12']
-    for report_path,property_name in [('build/coverage/sonar.xml','sonar.coverageReportPaths'),
-            ('build/python-coverage/coverage.xml','sonar.python.coverage.reportPaths'),
-            ('build/cppcheck.xml','sonar.cxx.cppcheck.reportPaths')]:
-        if (project/report_path).is_file(): command.append(f'-D{property_name}={report_path}')
+    command.append('-Dsonar.coverageReportPaths=build/coverage/sonar.xml')
     return command
 
 
 def scan(project,args,token,output):
     image=args.scanner_image or (project/'tools/sonar-scanner-image.txt').read_text().strip()
+    toolchain=target_toolchain(project)
     environment=os.environ.copy()
     environment.update(SONAR_TOKEN=token,SONAR_HOST_URL='https://sonarqube:9443')
-    result=subprocess.run(scanner_command(project,image,output),env=environment,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    result=subprocess.run(scanner_command(project,image,output,toolchain),env=environment,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     log=result.stdout.replace(token,'[redacted]')
     (output/'scanner.log').write_text(log)
     print(log)
     if result.returncode: raise SystemExit(result.returncode)
     if re.search(r'Source code parser:\s*[1-9]\d*\s+syntax error|Unable to parse file:|skip declaration:',log):
         raise RuntimeError('Sonar CXX parser rejected source; analysis incomplete, commit/push is not allowed')
+    if re.search(r'Preprocessor:\s*[1-9]\d* include directive error\(s\)',log):
+        raise RuntimeError('Sonar CXX could not resolve target headers; analysis incomplete')
 
 
 def fetch_issues(api):
@@ -124,6 +176,7 @@ def main(argv=None,project=None):
     validate_host(args.host_url)
     token=load_token(args.env_file)
     try:
+        validate_coverage(project)
         api=LocalApi(args.host_url,token)
         status=check_server(api)
         output=project/'build/sonar';output.mkdir(parents=True,exist_ok=True)
