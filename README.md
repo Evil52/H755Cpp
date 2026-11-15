@@ -7,9 +7,9 @@
 
 Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
 Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
-Выбрана архитектура своего драйвера + lwIP. MAC/DMA, lwIP netif, startup и
-работа с реальными кадрами ещё не реализованы; текущий компонент проходит
-unit/host-integration проверки и компилируется для M7.
+Выбрана архитектура своего драйвера + lwIP. [Кандидат MAC/DMA](docs/ethernet-mac-dma.md)
+уже содержит дескрипторы, буферы D2 SRAM и счётчики приёма, но не прошёл
+аппаратную проверку кадров. lwIP netif ещё не подключён.
 
 Для первого аппаратного запуска добавлены [M7 LED + PHY ID и M4 parking](docs/m7-bringup.md):
 startup, linker scripts и отдельные ELF/BIN/HEX для обоих ядер. Ethernet-кадры пока
@@ -44,11 +44,15 @@ cmake --preset host-debug
 cmake --build --preset host-debug
 ctest --preset host-debug
 
+export H755_ARM_TOOLCHAIN=/path/to/arm-gcc-16.2.0-cm7
 cmake --preset cm7-debug
 cmake --build --preset cm7-debug
 
 cmake --preset cm7-release
 cmake --build --preset cm7-release
+
+cmake --preset cm7-ethernet-release
+cmake --build --preset cm7-ethernet-release
 
 python3 tools/check_toolchain.py
 ```

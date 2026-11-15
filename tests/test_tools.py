@@ -1,4 +1,5 @@
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -18,12 +19,13 @@ sonar=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sonar)
 
 class SonarTests(unittest.TestCase):
-    def execute(self,args=(),overrides=None,scanner_code=0,env=None,http_error=False,scanner_output="fixture-token scanner log"):
+    def execute(self,args=(),overrides=None,scanner_code=0,env=None,http_error=False,scanner_output="fixture-token scanner log",coverage='fresh'):
         overrides=overrides or {}
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
             (root/'tools').mkdir()
             (root/'tools/sonar-scanner-image.txt').write_text('sonarsource/sonar-scanner-cli@sha256:'+'a'*64)
+            (root/'tools/source.py').write_text('print(1)\n')
             (root/'build/sonar-trust').mkdir(parents=True)
             (root/'build/sonar-trust/truststore.p12').write_bytes(b'fixture public truststore')
             (root/'token.env').write_text('IGNORED=value\nexport SONAR_TOKEN="fixture-token" # local\n')
@@ -37,6 +39,13 @@ class SonarTests(unittest.TestCase):
                 return io.BytesIO(json.dumps(values[endpoint]).encode())
             (root/'build/coverage').mkdir(parents=True)
             (root/'build/coverage/sonar.xml').write_text('<coverage version="1"/>')
+            (root/'build/coverage/summary.json').write_text(json.dumps({'passed':True,'unmeasured':[],
+                'groups':{'c-cpp':{'percent':90},'python':{'percent':90}},
+                'source_digests':{'tools/source.py':hashlib.sha256(
+                    (root/'tools/source.py').read_bytes()).hexdigest()}}))
+            if coverage=='stale': (root/'tools/source.py').write_text('print(2)\n')
+            if coverage=='partial':
+                (root/'build/coverage/summary.json').write_text(json.dumps({'passed':False,'unmeasured':['tools/source.py']}))
             output=io.StringIO()
             with patch.dict(os.environ,{'SONAR_TOKEN':'fixture-token'} if env is None else env,clear=True),patch.object(sonar.urllib.request,'urlopen',side_effect=response),patch.object(sonar.subprocess,'run',return_value=subprocess.CompletedProcess([],scanner_code,scanner_output)) as docker,contextlib.redirect_stdout(output):
                 actual=list(args)
@@ -49,6 +58,10 @@ class SonarTests(unittest.TestCase):
                 self.assertEqual(docker.call_args.kwargs['env']['SONAR_TOKEN'],'fixture-token')
                 self.assertNotIn('fixture-token',docker.call_args.args[0])
     def test_success_and_redaction(self): self.execute()
+    def test_stale_coverage_rejected(self):
+        with self.assertRaisesRegex(SystemExit,'stale'):self.execute(coverage='stale')
+    def test_partial_coverage_rejected(self):
+        with self.assertRaisesRegex(SystemExit,'has not passed'):self.execute(coverage='partial')
     def test_authorized_env_file(self): self.execute(['--env-file','token.env'])
     def test_remote_and_credential_urls_rejected(self):
         for url in ['http://example.com:9000','https://127.0.0.1:9000','http://user@127.0.0.1:9000','http://127.0.0.1:9001','http://127.0.0.1:9000/path','http://127.0.0.1:9000/?x=1']:

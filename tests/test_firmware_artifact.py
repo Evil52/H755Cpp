@@ -22,7 +22,7 @@ class FirmwareArtifactTests(unittest.TestCase):
             "kind": "post_merge_hil_candidate",
             "source_commit": self.commit,
             "source_tree": "b" * 40,
-            "build_preset": "cm7-usb-release",
+            "build_preset": "cm7-ethernet-release",
             "compiler_sha256": "c" * 64,
             "main_ci_run_id": 42,
             "pr_ci_run_id": 41,
@@ -41,14 +41,14 @@ class FirmwareArtifactTests(unittest.TestCase):
         (self.root / "manifest.json").write_text(json.dumps(self.manifest))
 
     def test_exact_bundle_passes(self):
-        artifact.verify(self.root, self.commit, "cm7-usb-release")
+        artifact.verify(self.root, self.commit, "cm7-ethernet-release")
 
     def test_changed_firmware_or_commit_is_rejected(self):
         (self.root / "cm7_bringup.bin").write_bytes(b"tampered")
         with self.assertRaisesRegex(ValueError, "content mismatch"):
-            artifact.verify(self.root, self.commit, "cm7-usb-release")
+            artifact.verify(self.root, self.commit, "cm7-ethernet-release")
         with self.assertRaisesRegex(ValueError, "source commit"):
-            artifact.verify(self.root, "d" * 40, "cm7-usb-release")
+            artifact.verify(self.root, "d" * 40, "cm7-ethernet-release")
 
     def test_wrong_profile_and_address_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "release preset"):
@@ -56,14 +56,14 @@ class FirmwareArtifactTests(unittest.TestCase):
         self.manifest["load_addresses"]["cm4_park.bin"] = "0x08000000"
         self.save()
         with self.assertRaisesRegex(ValueError, "load-address"):
-            artifact.verify(self.root, self.commit, "cm7-usb-release")
+            artifact.verify(self.root, self.commit, "cm7-ethernet-release")
 
     def test_symlinked_image_is_rejected(self):
         target = self.root / "cm4_park.bin"
         target.unlink()
         target.symlink_to(self.root / "cm7_bringup.bin")
         with self.assertRaisesRegex(ValueError, "content mismatch"):
-            artifact.verify(self.root, self.commit, "cm7-usb-release")
+            artifact.verify(self.root, self.commit, "cm7-ethernet-release")
 
 
 class FirmwareArtifactCreationTests(unittest.TestCase):
@@ -88,7 +88,8 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
         }))
         (self.build / "CMakeCache.txt").write_text(
             f"CMAKE_HOME_DIRECTORY:INTERNAL={self.source}\n"
-            "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n")
+            "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
+            "H755_ETHERNET_MAC:BOOL=ON\n")
         (self.build / "CMakeFiles/3.31.6/CMakeCXXCompiler.cmake").write_text(
             f'set(CMAKE_CXX_COMPILER "{self.compiler}")\n')
         for name in artifact.FILES:
@@ -106,7 +107,7 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
 
     def create(self, expected_commit=None):
         with mock.patch.object(artifact.subprocess, "check_output", side_effect=self.git_output):
-            artifact.create(self.source, self.build, self.output, "cm7-usb-release",
+            artifact.create(self.source, self.build, self.output, "cm7-ethernet-release",
                             "42", "41", self.toolchain, expected_commit or self.commit)
 
     def test_creates_manifest_from_exact_clean_build(self):
@@ -116,7 +117,15 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
                          (self.commit, self.tree))
         self.assertEqual((manifest["main_ci_run_id"], manifest["pr_ci_run_id"]),
                          (42, 41))
-        artifact.verify(self.output, self.commit, "cm7-usb-release")
+        artifact.verify(self.output, self.commit, "cm7-ethernet-release")
+
+    def test_rejects_disabled_ethernet_in_release_cache(self):
+        (self.build / "CMakeCache.txt").write_text(
+            f"CMAKE_HOME_DIRECTORY:INTERNAL={self.source}\n"
+            "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
+            "H755_ETHERNET_MAC:BOOL=OFF\n")
+        with self.assertRaisesRegex(ValueError, "Ethernet build selection"):
+            self.create()
 
     def test_rejects_wrong_commit_compiler_and_stale_build(self):
         with self.assertRaisesRegex(ValueError, "checkout"):

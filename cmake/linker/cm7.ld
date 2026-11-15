@@ -2,6 +2,7 @@ ENTRY(Reset_Handler)
 MEMORY {
   FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 128K
   RAM (xrw) : ORIGIN = 0x24000000, LENGTH = 512K
+  ETH_RAM (xrw) : ORIGIN = 0x30000000, LENGTH = 128K
 }
 _estack = ORIGIN(RAM) + LENGTH(RAM);
 __stack_limit = _estack - 8192;
@@ -18,8 +19,10 @@ SECTIONS {
   _sidata = LOADADDR(.data);
   .data : { . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; } > RAM AT> FLASH
   .bss (NOLOAD) : { . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; } > RAM
+  .eth_dma (NOLOAD) : { . = ALIGN(32); *(.eth_dma) . = ALIGN(32); } > ETH_RAM
   .heap_forbidden (NOLOAD) : { end = .; _end = .; } > RAM
   /DISCARD/ : { *(.note.GNU-stack) }
   ASSERT(_ebss <= __stack_limit, "CM7 RAM overlaps reserved 8 KiB stack")
   ASSERT(SIZEOF(.isr_vector) >= 64, "CM7 vector table missing")
+  ASSERT(SIZEOF(.eth_dma) <= LENGTH(ETH_RAM), "Ethernet DMA storage exceeds D2 SRAM")
 }

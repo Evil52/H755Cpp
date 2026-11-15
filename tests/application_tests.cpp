@@ -97,6 +97,8 @@ void happy_path()
     f.app.poll();
     check(f.registers.writes == 0 && f.boot.magic == 0, "poll before start has no side effects");
     check(f.app.start().has_value(), "application starts");
+    check(f.app.link_mode() == h755::ethernet::LinkState::down,
+          "MAC sees link down before PHY negotiation");
     check(f.boot.state == 4 && f.boot.phy_address == 3, "actual MDIO reader discovers PHY");
     check(f.boot.phy_id1 == 7 && f.boot.phy_id2 == 0xC131, "actual PHY identifiers recorded");
     check(f.board.configured && !f.board.red_led, "board initialized; success LED policy");
@@ -105,6 +107,8 @@ void happy_path()
     check(!f.app.start(), "cannot initialize running owner twice");
     f.advance(260);
     check(f.link.state == 5 && f.link.samples == 1 && f.link.errors == 0, "link monitor integrates with application");
+    check(f.app.link_mode() == h755::ethernet::LinkState::mb100_full,
+          "MAC sees resolved speed and duplex");
     f.advance(2739);
     check(f.boot.heartbeat == 0 && !f.board.green_led, "LED stays off through 2999ms");
     f.advance(1);
@@ -128,8 +132,12 @@ void phy_management()
     const auto writes = healthy.registers.phy_writes;
     healthy.registers.link_available = false; healthy.advance(260);
     check(healthy.link.state == 0, "cable removal publishes link down");
+    check(healthy.app.link_mode() == h755::ethernet::LinkState::down,
+          "MAC gate follows cable removal");
     healthy.registers.link_available = true; healthy.advance(260);
     check(healthy.link.state == 5 && healthy.registers.phy_writes == writes, "cable reconnect is observed without repeated PHY resets");
+    check(healthy.app.link_mode() == h755::ethernet::LinkState::mb100_full,
+          "MAC gate follows cable reconnect");
     Fixture absent; absent.registers.link_available = false;
     check(absent.app.start().has_value(), "unplugged startup is not a CPU fault"); absent.advance(5300);
     check(absent.phy.state == static_cast<std::uint32_t>(h755::ethernet::PhyState::waiting_link)
@@ -176,6 +184,8 @@ void runtime_errors_and_rollover()
     f.registers.hold_after_write = true;
     f.advance(270);
     check(f.link.state == 0xFFFFFFFFU && f.link.errors == 1, "transport timeout invalidates old link-up");
+    check(f.app.link_mode() == h755::ethernet::LinkState::down,
+          "MAC gate closes on MDIO transport failure");
     Fixture busy; check(busy.app.start().has_value(), "begin-failure probe starts");
     busy.advance(260);
     busy.registers.address = 1U;

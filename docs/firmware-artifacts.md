@@ -9,7 +9,7 @@ contains the already configured CodeQL push checks.
 The artifact job runs on the standard GitHub-hosted `macos-15` arm64 runner. It downloads
 the separately packaged, SHA-256-pinned GCC 16.2 CM7 toolchain from the repository's
 toolchain release, verifies the archive and compiler binary, and builds the explicit
-`cm7-usb-release` preset. The binary includes the M7 C++ runtime; Homebrew's standalone
+`cm7-ethernet-release` preset. The binary includes the M7 C++ runtime; Homebrew's standalone
 cross-compiler package is not a substitute. The archive is a build dependency, never
 committed to the source repository. The release notes and source tarballs accompany it.
 
@@ -27,7 +27,7 @@ gh run download ARTIFACT_WORKFLOW_RUN_ID --repo Evil52/H755Cpp \
   --name h755-firmware-MERGE_SHA --dir /path/to/downloaded-artifact
 python3 tools/firmware_artifact.py verify \
   --bundle /path/to/downloaded-artifact \
-  --expected-commit MERGE_SHA --expected-preset cm7-usb-release
+  --expected-commit MERGE_SHA --expected-preset cm7-ethernet-release
 ```
 
 Check the workflow run's successful conclusion, manifest CI run IDs, source commit,

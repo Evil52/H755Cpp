@@ -1,5 +1,6 @@
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
@@ -9,6 +10,28 @@ import subprocess
 import urllib.parse
 import urllib.request
 import urllib.error
+
+
+def validate_coverage(project):
+    summary=project/'build/coverage/summary.json'
+    xml=project/'build/coverage/sonar.xml'
+    if not summary.is_file() or not xml.is_file():
+        raise RuntimeError('Fresh whole-owned-code coverage report is required before Sonar')
+    report=json.loads(summary.read_text())
+    groups=report.get('groups',{})
+    if (not report.get('passed') or report.get('unmeasured') or
+        any(groups.get(kind,{}).get('percent',0)<=80 for kind in ('c-cpp','python')) or
+        any(item.get('kind')=='assembly-instructions' and
+            (item.get('total',0)<=0 or item.get('covered')!=item.get('total'))
+            for item in report.get('files',{}).values())):
+        raise RuntimeError('Whole-owned-code coverage gate has not passed')
+    expected=report.get('source_digests')
+    actual={path.relative_to(project).as_posix():hashlib.sha256(path.read_bytes()).hexdigest()
+            for directory in ('include','src','firmware','tools')
+            for path in sorted((project/directory).rglob('*'))
+            if path.suffix in {'.hpp','.h','.cpp','.c','.py','.s'} and 'probes' not in path.parts}
+    if expected!=actual:
+        raise RuntimeError('Coverage report is stale for the current owned sources')
 
 
 def validate_host(url):
@@ -66,10 +89,7 @@ def scanner_command(project,image,output):
         '-Dsonar.working.directory=/tmp/h755-sonar/.scannerwork',
         '-Dsonar.scm.disabled=true','-Dsonar.scm.exclusions.disabled=true',
         '-Dsonar.scanner.truststorePath=/tls/truststore.p12']
-    for report_path,property_name in [('build/coverage/sonar.xml','sonar.coverageReportPaths'),
-            ('build/python-coverage/coverage.xml','sonar.python.coverage.reportPaths'),
-            ('build/cppcheck.xml','sonar.cxx.cppcheck.reportPaths')]:
-        if (project/report_path).is_file(): command.append(f'-D{property_name}={report_path}')
+    command.append('-Dsonar.coverageReportPaths=build/coverage/sonar.xml')
     return command
 
 
@@ -124,6 +144,7 @@ def main(argv=None,project=None):
     validate_host(args.host_url)
     token=load_token(args.env_file)
     try:
+        validate_coverage(project)
         api=LocalApi(args.host_url,token)
         status=check_server(api)
         output=project/'build/sonar';output.mkdir(parents=True,exist_ok=True)
