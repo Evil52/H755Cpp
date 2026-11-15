@@ -55,18 +55,27 @@ Debug/Release builds verify the CMSIS register names and linker placement.
 These checks do not prove real RMII packet traffic, DMA cache behavior, or TX
 completion on the board.
 
+## CI-candidate hardware evidence
+
+Draft PR #13 passed its PR CI before an isolated instrumented M7 run. The MAC
+reported `running`, zero errors and two received descriptors; full Flash readback
+after restoration matched both preflight backups. Whole-owned-code line coverage
+was 92.4% C/C++ and 88.3% Python, with no unmeasured files. Local Sonar Quality
+Gate passed with zero unresolved issues, subject to its documented C++ parser
+limits. See [the exact-image HIL record](ethernet-mac-hil-2026-11-15.json).
+The observations do not establish RX payload integrity, external frame capture,
+TX completion, link loss/reconnect, or sustained packet load.
+
 ## Next acceptance steps
 
 1. Review the DMA ring and relevant RM0399/errata details, including RX FCS
    length treatment, tail-pointer behavior and stop/restart timing. The host
    register-port test checks software transitions; only HIL can establish the
    actual STM32 status-bit and timing behavior.
-2. For this explicitly authorized test candidate, pass PR CI first, including
-   the instrumented target build. With a verified backup, collect target coverage
-   from a temporary image and restore the exact previous Flash bytes. Combine
-   fresh host, target and Python coverage, then run the local Sonar gate.
-   The candidate is not a deployable Release image.
-3. Merge only after acceptance. Then verify the immutable
+2. Verify RMII packet payloads, TX completion, ring wrap and cable loss/reconnect
+   on the target with independent host-side observations. Keep the current draft
+   candidate separate from an accepted Release image.
+3. Merge only after acceptance and separate authorization. Then verify the immutable
    `cm7-ethernet-release` artifact and its hashes.
 4. With separate authorization, flash that artifact and read back Flash. On the
    actual board verify D2 addresses, descriptor OWN transitions, RX counters,
