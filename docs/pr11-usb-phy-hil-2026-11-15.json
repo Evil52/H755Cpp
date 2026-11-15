@@ -1,0 +1,126 @@
+{
+  "source_commit": "f815718766eee91c269a3c036d8fd04cdb45fb52",
+  "artifact_run": 43709523146,
+  "artifact_m7_bin_sha256": "fbacedc46f397534e50f785b6c90fc5c6d368dcdeb80b996b31865460382287f",
+  "before_full_flash_sha256": "2f77ca630fee5ace9675509b86fe7f012746d7ac423277036e531ab5e6a3a065",
+  "after_full_flash_sha256": "bb978b572797e522445be94ef5e3f27e13cdd8330fb873bb389bcbb5b29f8f7a",
+  "full_flash_matches_expected_image_and_unchanged_other_sectors": true,
+  "board": "NUCLEO-H755ZI-Q, STLINK 002A00154142500820353451",
+  "scope": "M7 first 128-KiB sector only; M4 and option bytes not written",
+  "observed": {
+    "heartbeat_advances": true,
+    "green_gpio_toggles": true,
+    "red_gpio_off": true,
+    "phy_link": "100 Mbps full duplex, sample count increasing, errors zero",
+    "usb_enumerated": "H755 Async CDC /dev/cu.usbmodem12401",
+    "binary_echo_lengths_passed": [
+      1,
+      63,
+      64,
+      65,
+      257,
+      1024
+    ],
+    "dtr_reopen_echo_cycles_passed": 30,
+    "usb_fatal_error": 0,
+    "cn13_unplug": {
+      "host_cdc_port_disappeared": true,
+      "usb_state": "suspended",
+      "usb_startup": "running",
+      "usb_error": 0,
+      "heartbeat_before_after": [
+        233,
+        234
+      ],
+      "phy_link": "100 Mbps full duplex, samples 2781 to 2796, errors zero",
+      "reset_performed": false
+    },
+    "cn13_replug": {
+      "host_cdc_port_reappeared": true,
+      "port": "/dev/cu.usbmodem12401",
+      "binary_echo_lengths_passed": [
+        1,
+        63,
+        64,
+        65,
+        257,
+        1024
+      ],
+      "heartbeat_before_after_unplug_replug": [
+        234,
+        276,
+        277
+      ],
+      "phy_link": "100 Mbps full duplex, errors zero",
+      "usb_startup": "running",
+      "usb_error": 0,
+      "reset_performed": false
+    },
+    "cold_power_cycle": {
+      "user_confirmed_sequence": "CN13 off, CN1 off, wait 5 s, CN1 on, wait 10 s, CN13 on; Ethernet left connected; no RESET",
+      "user_observed_led": "green LD1 blinking, red LD3 off",
+      "host_cdc_before_swd": "H755 Async CDC /dev/cu.usbmodem12401",
+      "echo_before_swd_lengths_passed": [
+        1,
+        63,
+        64,
+        65,
+        257,
+        1024
+      ],
+      "initial_standard_swd_attach": "failed to examine sleeping M7/M4; no reset or memory write",
+      "ap2_debug_access": "DBGMCU_CR 0x0 -> temporary 0x00600009 -> restored 0x0",
+      "heartbeat_after_swd_read": [
+        29,
+        30
+      ],
+      "gpio_green_after_swd_read": [
+        1,
+        0
+      ],
+      "m4_marker": "0x5041524b",
+      "usb_startup": "running",
+      "usb_error": 0,
+      "phy_state": "ready",
+      "phy_link": "100 Mbps full duplex",
+      "phy_error": 0,
+      "phy_completed": 1,
+      "link_samples_after_swd_read": [
+        344,
+        359
+      ],
+      "link_error": 0,
+      "option_status": "0x1bc6aaf0",
+      "boot_registers": [
+        "0x10001",
+        "0x8000000",
+        "0x8101ff0",
+        "0x1000"
+      ],
+      "echo_after_dbg_restoration_lengths_passed": [
+        1,
+        63,
+        64,
+        65,
+        257,
+        1024
+      ]
+    },
+    "usb_transfer_error_counter_note": "The counter includes expected wait_ready timeouts while CN13 is disconnected or DTR is closed; g_usb_error and firmware fault stayed zero. It is not a zero-error claim for this counter."
+  },
+  "status": "post-merge M7 firmware HIL passed for LED, PHY link and USB CDC; MAC/DMA frames and lwIP remain unimplemented",
+  "date": "2026-11-15",
+  "pr": 11,
+  "pr_ci_run": 43708988278,
+  "main_ci_run": 43709404457,
+  "artifact_url": "https://github.com/Evil52/H755Cpp/actions/runs/43709523146",
+  "artifact_preset": "cm7-usb-release",
+  "artifact_manifest_verified": true,
+  "artifact_m7_bin_bytes": 30852,
+  "acceptance_scope": "Exact post-merge M7 image: LED heartbeat, PHY identity/link observation, USB CDC enumeration/echo/DTR/unplug/replug/cold boot.",
+  "not_accepted": [
+    "Ethernet MAC/DMA TX/RX frames and lwIP are not implemented",
+    "USB electrical conformance, timing/soak/fuzz, and full C++26/MISRA assessment are outside this HIL"
+  ],
+  "source_note": "USB echo and visible LED were verified before SWD was opened after cold boot. AP2 debug access was temporary and DBGMCU_CR restored to 0."
+}
