@@ -1,6 +1,6 @@
 # M7 Ethernet protocol candidate
 
-This is an unmerged, unflashed candidate. The post-merge `cm7-ethernet-release`
+This is an unmerged candidate, not a deployed Release. The post-merge `cm7-ethernet-release`
 artifact and exact-image board acceptance are required before deployment.
 
 ## Scope and ownership
@@ -35,6 +35,15 @@ checks DHCP discover/offer/acknowledgement and ACD, ARP reply, ICMP echo, UDP an
 TCP echo, oversized UDP rejection, TX backpressure, short Ethernet/ARP/IPv4 frame rejection, and
 link loss/recovery. This does not establish real RMII traffic or timing.
 
+An isolated, temporary HIL on candidate commit `96a1560` and instrumented BIN
+SHA-256 `3a3adc6b84fc25e3a222240d07c7fb88f813333c7c45ffb78cc7e30b95610390`
+passed direct Mac-to-board DHCP/ACD (`192.168.77.2`), three ICMP replies, two
+UDP echoes and two TCP echoes. Read-only SWD diagnostics reported MAC running,
+24 RX frames, 20 TX frames, zero MAC errors or drops, and zero echo rejects.
+The original full Flash SHA-256 `6062248b5b56ad4929cfc3fa70a91e9a51c2f681b8bb77b7838a40af1ebc6d14`
+matched after restoration. This proves only those scenarios for that exact
+candidate image. Subsequent source changes require fresh CI and target coverage.
+
 The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
 `etharp_input()` path. This is a local mitigation for the [publicly reported
 short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
@@ -52,7 +61,7 @@ it whenever `MEM_SIZE <= 64,000`. The preceding guard returns if `size` exceeds
 warning is not a reachable overflow in our configuration. This assessment is
 specific to the pinned options and does not waive other vendor findings.
 
-Before board programming, the exact committed candidate needs green PR checks,
+Before normal board deployment, the exact committed candidate needs green PR checks,
 fresh whole-owned-code target coverage above 80%, local Sonar gate, and the
 project's post-merge artifact path. An isolated temporary coverage HIL requires
 its own CI-green candidate and backup/restoration procedure. The delivered

@@ -340,4 +340,26 @@ int main()
     check(!netif_is_link_up(&network.interface()), "link down is forwarded to lwIP");
     network.poll(++now, h755::ethernet::LinkState::mb100_full);
     check(netif_is_link_up(&network.interface()), "link recovery reaches lwIP without restart");
+
+    std::uint32_t seed = 0x4C574950U;
+    for (std::uint32_t iteration = 0U; iteration < 512U; ++iteration)
+    {
+        seed ^= seed << 13U;
+        seed ^= seed >> 17U;
+        seed ^= seed << 5U;
+        const bool arp_packet = (iteration & 1U) == 0U;
+        auto malformed = ethernet(address, host, arp_packet ? 0x0806U : 0x0800U);
+        const auto length = static_cast<std::size_t>(14U + seed % 1523U);
+        while (malformed.size() < length)
+        {
+            seed ^= seed << 13U;
+            seed ^= seed >> 17U;
+            seed ^= seed << 5U;
+            malformed.push_back(static_cast<std::uint8_t>(seed));
+        }
+        inject(mac, malformed);
+        network.poll(++now, h755::ethernet::LinkState::mb100_full);
+    }
+    check(mac.state() == h755::ethernet::MacState::running,
+          "malformed frame corpus preserves MAC progress");
 }
