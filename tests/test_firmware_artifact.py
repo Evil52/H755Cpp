@@ -89,7 +89,8 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
         (self.build / "CMakeCache.txt").write_text(
             f"CMAKE_HOME_DIRECTORY:INTERNAL={self.source}\n"
             "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
-            "H755_ETHERNET_MAC:BOOL=ON\nH755_TARGET_COVERAGE:BOOL=OFF\n"
+            "H755_ETHERNET_MAC:BOOL=ON\nH755_ETHERNET_LWIP:BOOL=ON\n"
+            "H755_TARGET_COVERAGE:BOOL=OFF\n"
             "H755_ETHERNET_DIAGNOSTIC:BOOL=OFF\n")
         (self.build / "CMakeFiles/3.31.6/CMakeCXXCompiler.cmake").write_text(
             f'set(CMAKE_CXX_COMPILER "{self.compiler}")\n')
@@ -126,6 +127,13 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
             "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
             "H755_ETHERNET_MAC:BOOL=OFF\n")
         with self.assertRaisesRegex(ValueError, "Ethernet build selection"):
+            self.create()
+
+    def test_rejects_disabled_lwip_in_ethernet_release(self):
+        cache = self.build / "CMakeCache.txt"
+        cache.write_text(cache.read_text().replace("H755_ETHERNET_LWIP:BOOL=ON",
+                                                  "H755_ETHERNET_LWIP:BOOL=OFF"))
+        with self.assertRaisesRegex(ValueError, "lwIP build selection"):
             self.create()
 
     def test_rejects_instrumented_or_diagnostic_release(self):

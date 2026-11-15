@@ -1,0 +1,8 @@
+# Exact false positives from the unchanged upstream lwIP import at 7429bff.
+# The manifest entries are SHA-256 source digests; snmpv3.h:84 is a function declaration.
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip-manifest.json:generic-api-key:34
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip-manifest.json:generic-api-key:84
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip-manifest.json:generic-api-key:106
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip-manifest.json:generic-api-key:110
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip-manifest.json:generic-api-key:179
+7429bffa5a0d5aff0f593e005752de3cf50c772e:vendor/lwip/src/include/lwip/apps/snmpv3.h:generic-api-key:84

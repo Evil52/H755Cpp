@@ -47,6 +47,21 @@ def validated_checkout(source: Path, expected_commit: str) -> str:
     return commit
 
 
+def validate_release_profile(cache: dict[str, str], preset: str) -> None:
+    usb_expected = "ON" if preset in ("cm7-usb-release", "cm7-ethernet-release") else "OFF"
+    if cache.get("H755_USB_CDC", "OFF") != usb_expected:
+        raise ValueError("USB build selection differs from release preset")
+    ethernet_expected = "ON" if preset == "cm7-ethernet-release" else "OFF"
+    if cache.get("H755_ETHERNET_MAC", "OFF") != ethernet_expected:
+        raise ValueError("Ethernet build selection differs from release preset")
+    if cache.get("H755_ETHERNET_LWIP", "OFF") != ethernet_expected:
+        raise ValueError("lwIP build selection differs from release preset")
+    if cache.get("H755_TARGET_COVERAGE", "OFF") != "OFF":
+        raise ValueError("Coverage build cannot be packaged as release")
+    if cache.get("H755_ETHERNET_DIAGNOSTIC", "OFF") != "OFF":
+        raise ValueError("Diagnostic build cannot be packaged as release")
+
+
 def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> Path:
     if preset not in ("cm7-release", "cm7-usb-release", "cm7-ethernet-release"):
         raise ValueError("unsupported release preset")
@@ -57,16 +72,7 @@ def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> P
     if (cache.get("CMAKE_BUILD_TYPE") != "Release" or len(compiler_records) != 1
             or f'set(CMAKE_CXX_COMPILER "{compiler}")' not in compiler_records[0].read_text()):
         raise ValueError("build configuration or compiler differs from release inputs")
-    usb_expected = "ON" if preset in ("cm7-usb-release", "cm7-ethernet-release") else "OFF"
-    if cache.get("H755_USB_CDC", "OFF") != usb_expected:
-        raise ValueError("USB build selection differs from release preset")
-    ethernet_expected = "ON" if preset == "cm7-ethernet-release" else "OFF"
-    if cache.get("H755_ETHERNET_MAC", "OFF") != ethernet_expected:
-        raise ValueError("Ethernet build selection differs from release preset")
-    if cache.get("H755_TARGET_COVERAGE", "OFF") != "OFF":
-        raise ValueError("Coverage build cannot be packaged as release")
-    if cache.get("H755_ETHERNET_DIAGNOSTIC", "OFF") != "OFF":
-        raise ValueError("Diagnostic build cannot be packaged as release")
+    validate_release_profile(cache, preset)
     inputs = build / "firmware"
     for name in FILES:
         if not (inputs / name).is_file():

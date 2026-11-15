@@ -32,6 +32,10 @@ int main()
                                                    static_cast<std::uint8_t>(uid[2U] >> 8U)};
     h755::ethernet::CmsisMacPort mac_port{*ETH};
     h755::ethernet::MacRuntime mac{mac_port, mac_storage, mac_address};
+#ifdef H755_ETHERNET_LWIP
+    h755::ethernet::LwipNetwork<h755::ethernet::MacRuntime> network{mac, mac_address};
+    h755::ethernet::LwipEcho echo;
+#endif
 #ifdef H755_ETHERNET_DIAGNOSTIC
     h755::ethernet::DiagnosticEcho diagnostic{mac_address};
 #endif
@@ -45,6 +49,9 @@ int main()
 #endif
 #ifdef H755_ETHERNET_MAC
         mac,
+#endif
+#ifdef H755_ETHERNET_LWIP
+        network,    echo,
 #endif
 #ifdef H755_ETHERNET_DIAGNOSTIC
         diagnostic,

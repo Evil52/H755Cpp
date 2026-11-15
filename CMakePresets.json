@@ -61,7 +61,8 @@
       "inherits": "cm7-usb-debug",
       "binaryDir": "${sourceDir}/build/cm7-ethernet-debug",
       "cacheVariables": {
-        "H755_ETHERNET_MAC": "ON"
+        "H755_ETHERNET_MAC": "ON",
+        "H755_ETHERNET_LWIP": "ON"
       }
     },
     {
@@ -69,7 +70,8 @@
       "inherits": "cm7-usb-release",
       "binaryDir": "${sourceDir}/build/cm7-ethernet-release",
       "cacheVariables": {
-        "H755_ETHERNET_MAC": "ON"
+        "H755_ETHERNET_MAC": "ON",
+        "H755_ETHERNET_LWIP": "ON"
       }
     },
     {

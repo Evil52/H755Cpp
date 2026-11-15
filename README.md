@@ -8,12 +8,14 @@
 Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
 Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
 Выбрана архитектура своего драйвера + lwIP. [Кандидат MAC/DMA](docs/ethernet-mac-dma.md)
-уже содержит дескрипторы, буферы D2 SRAM и счётчики приёма, но не прошёл
-аппаратную проверку кадров. lwIP netif ещё не подключён.
+содержит дескрипторы и буферы D2 SRAM; его прежняя Release-версия проверена
+на плате. Локально подготовлен [следующий этап с lwIP](docs/ethernet-lwip.md):
+DHCP, ARP, ping и ограниченный UDP/TCP echo. Он ещё не проходил CI, Sonar,
+аппаратную приёмку и выпуск post-merge артефакта.
 
 Для первого аппаратного запуска добавлены [M7 LED + PHY ID и M4 parking](docs/m7-bringup.md):
-startup, linker scripts и отдельные ELF/BIN/HEX для обоих ядер. Ethernet-кадры пока
-не передаются. `build/toolchain-checks/link_only.elf` остаётся техническим тестом
+startup, linker scripts и отдельные ELF/BIN/HEX для обоих ядер.
+`build/toolchain-checks/link_only.elf` остаётся техническим тестом
 линковки runtime; его нельзя записывать на плату.
 
 ## Установленный компилятор

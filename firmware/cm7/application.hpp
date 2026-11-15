@@ -5,6 +5,10 @@
 #include "h755/timebase.hpp"
 #ifdef H755_ETHERNET_MAC
 #include "ethernet/mac_runtime.hpp"
+#ifdef H755_ETHERNET_LWIP
+#include "h755/ethernet/lwip_network.hpp"
+#include "h755/ethernet/lwip_echo.hpp"
+#endif
 #endif
 #ifdef H755_ETHERNET_DIAGNOSTIC
 #include "h755/ethernet/diagnostic_echo.hpp"
@@ -24,6 +28,10 @@ namespace h755
 #endif
 #ifdef H755_ETHERNET_MAC
         ethernet::MacRuntime& mac;
+#endif
+#ifdef H755_ETHERNET_LWIP
+        ethernet::LwipNetwork<ethernet::MacRuntime>& network;
+        ethernet::LwipEcho& echo;
 #endif
 #ifdef H755_ETHERNET_DIAGNOSTIC
         ethernet::DiagnosticEcho& diagnostic;
