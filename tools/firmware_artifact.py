@@ -63,6 +63,8 @@ def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> P
     ethernet_expected = "ON" if preset == "cm7-ethernet-release" else "OFF"
     if cache.get("H755_ETHERNET_MAC", "OFF") != ethernet_expected:
         raise ValueError("Ethernet build selection differs from release preset")
+    if cache.get("H755_ETHERNET_LWIP", "OFF") != ethernet_expected:
+        raise ValueError("lwIP build selection differs from release preset")
     if cache.get("H755_TARGET_COVERAGE", "OFF") != "OFF":
         raise ValueError("Coverage build cannot be packaged as release")
     if cache.get("H755_ETHERNET_DIAGNOSTIC", "OFF") != "OFF":

@@ -8,7 +8,7 @@
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/application.hpp": {
-    "sha256": "aea6de634a7cebb0066d0f87da8c2fbdf0533ec967227fb29a3356e2715648cd",
+    "sha256": "4fa00f535b3fb54697ecc2c0b22a6cfc0bfc85a34fb5f730d796367c5b88e04f",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/board.hpp": {
@@ -22,5 +22,17 @@
   "src/usb/tusb_config.h": {
     "sha256": "32d06ed11c0717771fe5e67491777b32647dd501fbe6f60402eb4acf91445938",
     "reason": "Compile-time configuration macros and C ABI declarations only; no executable statements. Included in successful target compilation."
+  },
+  "include/arch/cc.h": {
+    "sha256": "7655843a2b581edb788ce722e19aa407775b97781ad3a3b290c333b4b70b68e7",
+    "reason": "lwIP compiler/ABI configuration and declarations only; no executable statements."
+  },
+  "include/lwipopts.h": {
+    "sha256": "4a50a1b72b0ea4e38c39cdf49689f26a15aa2cd800f479d1c56e1f688b3481e9",
+    "reason": "lwIP compile-time configuration macros only; no executable statements."
+  },
+  "include/h755/ethernet/lwip_clock.h": {
+    "sha256": "ce57fe46282f29d2489ad52ebb06d22bdd7d9d85812b71760d8749ce6310c692",
+    "reason": "C ABI declarations only; implementation is measured separately."
   }
 }
