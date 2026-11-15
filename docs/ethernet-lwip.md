@@ -52,6 +52,16 @@ matched after both temporary runs. The Mac's test DHCP process and address
 were removed afterward. These results prove only the exercised scenarios for
 the named instrumented images; the post-merge Release needs its own acceptance.
 
+A later isolated run of the same instrumented BIN, after the green CI run for
+documentation commit `7d59fe0`, passed 256 sequential UDP echoes and 16 TCP
+connections with exact payload matches in 0.42 s. This exercised repeated
+descriptor reuse, but is not a throughput or worst-case latency claim. The
+reusable host probe is `tests/hil/lwip_load_probe.py`. A planned cable-loss
+check did not execute because the cable remained connected; no link recovery
+claim follows from this run. The temporary image was restored, and the full
+Flash readback again matched the preflight SHA-256 above. The Mac's temporary
+DHCP process and test address were removed.
+
 The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
 `etharp_input()` path. This is a local mitigation for the [publicly reported
 short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
