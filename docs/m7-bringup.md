@@ -2,6 +2,8 @@
 
 Scope: bare-metal M7 heartbeat on LD1 (PB0) and read-only LAN8742A PHY identification
 through the existing MDIO reader. No MAC/DMA traffic, lwIP, IP address, ping or webserver.
+This records the first bring-up image. Current firmware adds PHY writes/reset and a
+3000 ms LED interval; see [PHY control](phy-control.md) and [Ethernet status](ethernet-m7.md).
 Board source: [UM2408 Rev 6](https://www.st.com/resource/en/user_manual/dm00499171-stm32h7-nucleo144-boards-mb1363-stmicroelectronics.pdf),
 sections 7.4.8, 7.6 and 7.12. Default MB1363 direct-SMPS supply and PB0 LED routing are
 assumed; Ethernet requires JP6/JP7 ON and its standard solder bridges. Physical PCB

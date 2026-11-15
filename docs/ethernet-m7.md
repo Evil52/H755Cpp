@@ -30,6 +30,41 @@ remain alive through the operation. This API is single-context; it is not an ISR
 or multicore synchronization primitive. Existing unrelated MDIO configuration must not
 be shared concurrently: each command writes a complete Clause 22 address register value.
 
+## Packet-pin and ring preparation
+
+The M7 board setup now configures all nine RMII signals as AF11: PA1 clock, PA2 MDIO,
+PC1 MDC, PA7 CRS_DV, PC4/PC5 RXD0/RXD1, PG11 TX_EN, PG13 TXD0 and **PB13 TXD1**.
+PB13 is specific to MB1363's Ethernet route; PG12 is not this board's TXD1. Verify
+JP6/JP7 and the solder bridges from UM2408 Table 14 on the actual board before enabling
+MAC traffic. A target build confirms register definitions, not electrical connection.
+
+`frame_ring.hpp` is a fixed-capacity, main-loop-owned state model. TX transitions
+`free -> producer -> dma -> free`; `cancel` returns only a producer-owned slot to free.
+RX transitions `dma -> consumer -> dma`. Invalid indices, lengths and transitions are
+rejected; exhaustion returns `full` without overwriting an in-flight frame. A MAC adapter
+may call TX `reclaim` only after checking that hardware has cleared descriptor OWN, and RX
+`complete` only after validating descriptor status and frame length. `submit` models the
+ownership handoff; the adapter still must publish descriptor writes with the required
+barriers and cache maintenance before setting hardware OWN. The ring itself contains no
+DMA descriptors, payload buffers, MMIO, interrupt synchronization or packet traffic.
+
+The ring metadata uses 16-bit lengths and a 16-bit TX cursor. Template bounds require
+at most 65535 slots and bytes per slot, and API lengths are checked before narrowing.
+For four 1536-byte slots, `sizeof` with pinned ARM GCC 16.2 decreased from 36 to 18
+bytes for `TxRing` and from 32 to 16 bytes for `RxRing`. This is storage saved in
+the CPU-owned model, not a measured packet-throughput gain; the future DMA payloads
+will dominate RAM use. The host footprint decreased from 72 to 18 and 64 to 16 bytes.
+The [memory-layout case study](https://blog.cloudflare.com/dns-cache-memory-optimization-1111/)
+inspired measuring compactness and locality, but its DNS-cache speedups do not transfer
+to this MCU. Benchmark the real MAC/DMA/lwIP path before choosing zero-copy or another
+layout; retain the exact hardware descriptor format and explicit cache maintenance.
+
+Before enabling MAC/DMA, reserve descriptor and frame storage in DMA-accessible memory,
+choose and verify cache/MPU treatment, align buffers to cache lines, specify descriptor
+layout and register sequence from the exact RM0399 revision, and test recovery after DMA
+errors. M7 main loop will remain the sole ring owner; ISR may only send a bounded
+notification. M4 does not access this state.
+
 ## TDD and current evidence
 
 The initial implementation stubs compiled successfully, then unit and register-adapter
@@ -49,7 +84,7 @@ adds a bounded snapshot state machine. Packets/ping/e2e remain unverified.
    linker map, timebase and MDIO/RMII clock bring-up. PHY identifiers and link have been observed on hardware; full TX/RX packet-pin acceptance remains in the MAC/DMA milestone.
 2. Read-only link-state handling and its documented BMSR latch sequence are implemented.
    [PHY reset/write/autonegotiation control](phy-control.md) is implemented and host-tested with bounded deadlines; [selected hardware acceptance](phy-control-hardware-2026-11-14.json) passed, including cable loss, late insertion and standalone cold start.
-3. Complete and verify the RMII TX/RX pin configuration (MDIO/clock bring-up alone does not prove the packet interface). Specify DMA descriptor ownership and bounded rings, D2-accessible buffers, cache-line alignment,
+3. Verify the configured RMII TX/RX pins on hardware (MDIO/clock bring-up alone does not prove the packet interface). Connect the host-tested ring state model to real DMA descriptors and D2-accessible buffers; specify cache-line alignment,
    barriers and cache/MPU strategy; test ring wrap, starvation and error recovery before live traffic.
 4. Pin and audit upstream lwIP, add a `NO_SYS=1` port, one main-loop owner, static pools, and a
    bounded netif adapter. `STABLE-2_2_1_RELEASE` is a candidate tag, not yet an integrated dependency.

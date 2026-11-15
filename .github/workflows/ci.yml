@@ -47,14 +47,14 @@ jobs:
           cppcheck --version
           cppcheck --std=c++23 --enable=warning,performance,portability \
             --error-exitcode=1 --suppress=missingIncludeSystem \
-            -Iinclude tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp src/diagnostics.cpp src/timebase.cpp
+            -Iinclude tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/frame_ring_tests.cpp src/diagnostics.cpp src/timebase.cpp
       - name: Clang static analysis on portable application logic
         run: |
           clang-tidy-18 --version
           cmake -S . -B build/clang-analysis -G Ninja \
             -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
             -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
-          clang-tidy-18 -p build/clang-analysis firmware/cm7/usb/runtime.cpp tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp src/diagnostics.cpp src/timebase.cpp src/usb/descriptors.cpp src/usb/tinyusb_port.cpp
+          clang-tidy-18 -p build/clang-analysis firmware/cm7/usb/runtime.cpp tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/frame_ring_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp src/diagnostics.cpp src/timebase.cpp src/usb/descriptors.cpp src/usb/tinyusb_port.cpp
 
   semgrep:
     name: Semgrep
@@ -76,7 +76,7 @@ jobs:
           mkdir -p build/security
           semgrep scan --config security/semgrep/embedded.yml --error --strict --metrics=off \
             --disable-version-check --json-output=build/security/semgrep.json \
-            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp
+            include src firmware tests/mdio_tests.cpp tests/link_tests.cpp tests/application_tests.cpp tests/phy_control_tests.cpp tests/frame_ring_tests.cpp tests/usb_async_tests.cpp tests/usb_stack_tests.cpp tests/usb_runtime_tests.cpp tests/usb_host_simulator.cpp
           python tools/check_semgrep_result.py build/security/semgrep.json
 
   repository-security:
@@ -98,6 +98,50 @@ jobs:
         run: actionlint -color
       - name: Scan committed history for secrets
         run: gitleaks git --redact --no-banner .
+
+  target-build:
+    name: Target builds
+    if: github.event_name != 'push'
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Download pinned GCC 16.2 toolchain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download toolchain-gcc-16.2.0-cm7 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern h755-arm-gcc-16.2.0-cm7-macos-arm64.tar.gz \
+            --dir "$RUNNER_TEMP"
+          printf '%s  %s\n' \
+            c6ad25058ac5143dc82d7cf4fc98a1403e305e278109a837ed8c1b4a0b1eb60f \
+            "$RUNNER_TEMP/h755-arm-gcc-16.2.0-cm7-macos-arm64.tar.gz" |
+            shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/h755-toolchain"
+          tar -xzf "$RUNNER_TEMP/h755-arm-gcc-16.2.0-cm7-macos-arm64.tar.gz" \
+            -C "$RUNNER_TEMP/h755-toolchain" --strip-components 1
+          echo "H755_ARM_TOOLCHAIN=$RUNNER_TEMP/h755-toolchain" >> "$GITHUB_ENV"
+      - name: Verify compiler and install pinned CMake
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          compiler = pathlib.Path(os.environ['H755_ARM_TOOLCHAIN']) / 'bin/arm-none-eabi-g++'
+          expected = json.loads(pathlib.Path('docs/toolchain-validation.json').read_text())['compiler_sha256']
+          if hashlib.sha256(compiler.read_bytes()).hexdigest() != expected:
+              raise SystemExit('GCC 16.2 compiler digest differs from pinned validation')
+          PY
+          python3 -m venv "$RUNNER_TEMP/h755-cmake"
+          "$RUNNER_TEMP/h755-cmake/bin/pip" install cmake==3.31.6
+          echo "$RUNNER_TEMP/h755-cmake/bin" >> "$GITHUB_PATH"
+      - name: Build all M7 Debug and Release profiles
+        run: |
+          for preset in cm7-debug cm7-release cm7-usb-debug cm7-usb-release; do
+            cmake --preset "$preset"
+            cmake --build --preset "$preset" --parallel 2
+          done
 
   codeql:
     name: CodeQL (${{ matrix.language }})
@@ -149,7 +193,7 @@ jobs:
   quality-gate:
     name: Quality gate
     if: always() && github.event_name != 'push'
-    needs: [host-tests, semgrep, repository-security, codeql]
+    needs: [host-tests, semgrep, repository-security, target-build, codeql]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

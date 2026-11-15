@@ -9,11 +9,14 @@ import shutil
 import subprocess
 from pathlib import Path
 
+CM7_BIN = "cm7_bringup.bin"
+CM4_BIN = "cm4_park.bin"
+MANIFEST_NAME = "manifest.json"
 FILES = (
-    "cm7_bringup.elf", "cm7_bringup.bin", "cm7_bringup.hex", "cm7_bringup.map",
-    "cm4_park.elf", "cm4_park.bin", "cm4_park.hex", "cm4_park.map",
+    "cm7_bringup.elf", CM7_BIN, "cm7_bringup.hex", "cm7_bringup.map",
+    "cm4_park.elf", CM4_BIN, "cm4_park.hex", "cm4_park.map",
 )
-ADDRESSES = {"cm7_bringup.bin": "0x08000000", "cm4_park.bin": "0x08100000"}
+ADDRESSES = {CM7_BIN: "0x08000000", CM4_BIN: "0x08100000"}
 
 
 def digest(path: Path) -> str:
@@ -33,10 +36,7 @@ def read_cache(path: Path) -> dict[str, str]:
     return entries
 
 
-def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: str,
-           pr_ci_run: str, toolchain: Path, expected_commit: str) -> None:
-    if output.exists():
-        raise ValueError(f"artifact output already exists: {output}")
+def validated_checkout(source: Path, expected_commit: str) -> str:
     commit = subprocess.check_output(
         ["git", "-C", str(source), "rev-parse", "HEAD"], text=True).strip()
     if commit != expected_commit or not re.fullmatch(r"[0-9a-f]{40}", commit):
@@ -44,16 +44,12 @@ def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: st
     if subprocess.check_output(
         ["git", "-C", str(source), "status", "--porcelain"], text=True).strip():
         raise ValueError("source tree has uncommitted changes")
-    expected = json.loads((source / "docs/toolchain-validation.json").read_text())
-    compiler = toolchain / "bin/arm-none-eabi-g++"
-    if digest(compiler) != expected["compiler_sha256"]:
-        raise ValueError("compiler binary differs from pinned GCC 16.2 toolchain")
+    return commit
+
+
+def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> Path:
     if preset not in ("cm7-release", "cm7-usb-release"):
         raise ValueError("unsupported release preset")
-    if not main_ci_run.isdecimal() or int(main_ci_run) <= 0:
-        raise ValueError("main CI run ID must be a positive integer")
-    if not pr_ci_run.isdecimal() or int(pr_ci_run) <= 0:
-        raise ValueError("PR CI run ID must be a positive integer")
     cache = read_cache(build / "CMakeCache.txt")
     if Path(cache.get("CMAKE_HOME_DIRECTORY", "/missing")).resolve() != source.resolve():
         raise ValueError("build tree belongs to another source checkout")
@@ -68,10 +64,27 @@ def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: st
     for name in FILES:
         if not (inputs / name).is_file():
             raise ValueError(f"missing firmware output: {name}")
-    if (inputs / "cm7_bringup.bin").stat().st_size > 128 * 1024:
+    if (inputs / CM7_BIN).stat().st_size > 128 * 1024:
         raise ValueError("M7 image exceeds its Flash sector")
-    if (inputs / "cm4_park.bin").stat().st_size > 128 * 1024:
+    if (inputs / CM4_BIN).stat().st_size > 128 * 1024:
         raise ValueError("M4 image exceeds its Flash sector")
+    return inputs
+
+
+def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: str,
+           pr_ci_run: str, toolchain: Path, expected_commit: str) -> None:
+    if output.exists():
+        raise ValueError(f"artifact output already exists: {output}")
+    if not main_ci_run.isdecimal() or int(main_ci_run) <= 0:
+        raise ValueError("main CI run ID must be a positive integer")
+    if not pr_ci_run.isdecimal() or int(pr_ci_run) <= 0:
+        raise ValueError("PR CI run ID must be a positive integer")
+    commit = validated_checkout(source, expected_commit)
+    expected = json.loads((source / "docs/toolchain-validation.json").read_text())
+    compiler = toolchain / "bin/arm-none-eabi-g++"
+    if digest(compiler) != expected["compiler_sha256"]:
+        raise ValueError("compiler binary differs from pinned GCC 16.2 toolchain")
+    inputs = validated_build(source, build, preset, compiler)
     output.mkdir(parents=True)
     records = {}
     for name in FILES:
@@ -90,14 +103,11 @@ def create(source: Path, build: Path, output: Path, preset: str, main_ci_run: st
         "load_addresses": dict(ADDRESSES),
         "files": records,
     }
-    (output / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    (output / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     verify(output, commit)
 
 
-def verify(bundle: Path, expected_commit: str, expected_preset: str | None = None) -> None:
-    if (bundle / "manifest.json").is_symlink():
-        raise ValueError("manifest must be a regular file")
-    manifest = json.loads((bundle / "manifest.json").read_text())
+def validate_manifest(manifest: dict, expected_commit: str, expected_preset: str | None) -> None:
     if manifest.get("schema") != 1 or manifest.get("kind") != "post_merge_hil_candidate":
         raise ValueError("unsupported artifact manifest")
     if manifest.get("source_commit") != expected_commit:
@@ -113,6 +123,13 @@ def verify(bundle: Path, expected_commit: str, expected_preset: str | None = Non
             raise ValueError(f"artifact {key} is invalid")
     if manifest.get("load_addresses") != ADDRESSES or set(manifest.get("files", {})) != set(FILES):
         raise ValueError("artifact file or load-address set is invalid")
+
+
+def verify(bundle: Path, expected_commit: str, expected_preset: str | None = None) -> None:
+    if (bundle / MANIFEST_NAME).is_symlink():
+        raise ValueError("manifest must be a regular file")
+    manifest = json.loads((bundle / MANIFEST_NAME).read_text())
+    validate_manifest(manifest, expected_commit, expected_preset)
     for name in FILES:
         record = manifest["files"][name]
         path = bundle / name

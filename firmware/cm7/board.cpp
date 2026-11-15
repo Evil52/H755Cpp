@@ -9,13 +9,20 @@ namespace h755
     void Board::configure() noexcept
     {
         RCC->AHB4ENR =
-            RCC->AHB4ENR | RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN;
+            RCC->AHB4ENR | RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN |
+            RCC_AHB4ENR_GPIOGEN;
         RCC->APB4ENR = RCC->APB4ENR | RCC_APB4ENR_SYSCFGEN;
         (void)RCC->APB4ENR;
         gpio::configure_leds(*GPIOB);
         gpio::alternate<1, 11>(*GPIOA);
         gpio::alternate<2, 11>(*GPIOA);
+        gpio::alternate<7, 11>(*GPIOA);
+        gpio::alternate<13, 11>(*GPIOB);
         gpio::alternate<1, 11>(*GPIOC);
+        gpio::alternate<4, 11>(*GPIOC);
+        gpio::alternate<5, 11>(*GPIOC);
+        gpio::alternate<11, 11>(*GPIOG);
+        gpio::alternate<13, 11>(*GPIOG);
         SYSCFG->PMCR = (SYSCFG->PMCR & ~SYSCFG_PMCR_EPIS_SEL) | SYSCFG_PMCR_EPIS_SEL_2;
         RCC->AHB1RSTR = RCC->AHB1RSTR | RCC_AHB1RSTR_ETH1MACRST;
         processor::barrier();

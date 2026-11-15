@@ -1,0 +1,12 @@
+/.github/ @Evil52
+/cmake/linker/ @Evil52
+/cmake/toolchains/ @Evil52
+/firmware/cm7/board.cpp @Evil52
+/firmware/cm7/fault.cpp @Evil52
+/firmware/cm7/usb/ @Evil52
+/include/h755/ethernet/ @Evil52
+/src/usb/ @Evil52
+/src/ethernet/ @Evil52
+/include/h755/usb/ @Evil52
+/tools/verify_release_ci.py @Evil52
+/tools/firmware_artifact.py @Evil52

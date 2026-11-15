@@ -12,6 +12,12 @@
 #include <vector>
 
 using namespace h755::usb;
+static_assert(classify_echo_error(ErrorCode::reset) == EchoErrorAction::retry);
+static_assert(classify_echo_error(ErrorCode::not_ready) == EchoErrorAction::retry);
+static_assert(classify_echo_error(ErrorCode::timeout) == EchoErrorAction::retry);
+static_assert(classify_echo_error(ErrorCode::busy) == EchoErrorAction::fault);
+static_assert(classify_echo_error(ErrorCode::invalid_timeout) == EchoErrorAction::fault);
+static_assert(classify_echo_error(ErrorCode::transport) == EchoErrorAction::fault);
 namespace
 {
     int failures{};
@@ -33,7 +39,13 @@ namespace
     };
     struct Port
     {
-        Status link{true, false, true, 1};
+        mutable Status link{true, false, true, 1};
+        mutable bool reset_after_available{};
+        mutable bool reset_after_write_available{};
+        bool reset_after_read{};
+        bool reset_after_write{};
+        bool event_after_read{};
+        bool event_after_write{};
         std::vector<std::byte> input{};
         std::vector<std::byte> output{};
         std::size_t tx_capacity{64};
@@ -46,15 +58,38 @@ namespace
         }
         std::size_t available() const
         {
+            if (reset_after_available)
+            {
+                ++link.generation;
+                link.pending_events = true;
+                reset_after_available = false;
+            }
             return input.size();
         }
         std::size_t write_available() const
         {
+            if (reset_after_write_available)
+            {
+                ++link.generation;
+                link.pending_events = true;
+                reset_after_write_available = false;
+            }
             return tx_capacity;
         }
         std::size_t read(std::span<std::byte> bytes)
         {
             ++reads;
+            if (reset_after_read)
+            {
+                ++link.generation;
+                link.pending_events = true;
+                reset_after_read = false;
+            }
+            if (event_after_read)
+            {
+                link.pending_events = true;
+                event_after_read = false;
+            }
             if (forced)
             {
                 return *forced;
@@ -70,6 +105,17 @@ namespace
         std::size_t write(std::span<const std::byte> bytes)
         {
             ++writes;
+            if (reset_after_write)
+            {
+                ++link.generation;
+                link.pending_events = true;
+                reset_after_write = false;
+            }
+            if (event_after_write)
+            {
+                link.pending_events = true;
+                event_after_write = false;
+            }
             if (forced)
             {
                 return *forced;
@@ -141,6 +187,78 @@ namespace
               "read at most one64-byte packet and then composition");
         device.poll();
         check(result.calls == 1 && port.reads == 1, "completion is exactly once");
+    }
+    void reset_during_io()
+    {
+        for (unsigned point = 0; point < 4; ++point)
+        {
+            Clock clock;
+            Port port;
+            Cdc device{port, clock};
+            std::array<std::byte, 4> buffer{std::byte{42}};
+            Result result;
+            const bool write = point >= 2;
+            port.input = {std::byte{7}};
+            port.reset_after_available = point == 0;
+            port.reset_after_read = point == 1;
+            port.reset_after_write_available = point == 2;
+            port.reset_after_write = point == 3;
+            if (write)
+            {
+                auto operation = async::connect(device.write_all(buffer, 100), Receiver{result});
+                async::start(operation);
+                device.poll();
+            }
+            else
+            {
+                auto operation = async::connect(device.read_some(buffer, 100), Receiver{result});
+                async::start(operation);
+                device.poll();
+            }
+            check(result.error && result.error->code == ErrorCode::reset,
+                  "reset during FIFO access invalidates the transfer");
+            check(!write || !result.error ||
+                      result.error->transferred == (point == 3 ? buffer.size() : 0U),
+                  "reset reports any TX bytes already copied to the FIFO");
+        }
+    }
+    void queued_event_defers_completion()
+    {
+        for (bool write : {false, true})
+        {
+            Clock clock;
+            Port port;
+            Cdc device{port, clock};
+            std::array<std::byte, 1> buffer{std::byte{42}};
+            Result result;
+            port.input = {std::byte{7}};
+            port.event_after_read = !write;
+            port.event_after_write = write;
+            if (write)
+            {
+                auto operation = async::connect(device.write_all(buffer, 100), Receiver{result});
+                async::start(operation);
+                device.poll();
+                check(result.calls == 0 && port.writes == 1,
+                      "queued event defers TX completion after copying bytes");
+                port.link.pending_events = false;
+                device.poll();
+                check(result.calls == 1 && result.count == 1 && port.writes == 1,
+                      "TX completes after event without copying twice");
+            }
+            else
+            {
+                auto operation = async::connect(device.read_some(buffer, 100), Receiver{result});
+                async::start(operation);
+                device.poll();
+                check(result.calls == 0 && port.reads == 1,
+                      "queued event defers RX completion after copying bytes");
+                port.link.pending_events = false;
+                device.poll();
+                check(result.calls == 1 && result.count == 1 && port.reads == 1,
+                      "RX completes after event without consuming twice");
+            }
+        }
     }
     void writes_and_backpressure()
     {
@@ -466,7 +584,13 @@ namespace
         Port port;
         Cdc device{port, clock};
         std::array<std::byte, 64> buffer{};
-        auto operation = async::connect(echo(device, buffer), EndReceiver{});
+        unsigned recoverable{};
+        auto on_error = [&](TransferError error) {
+            check(classify_echo_error(error.code) == EchoErrorAction::retry,
+                  "echo exposes unexpected transfer errors");
+            ++recoverable;
+        };
+        auto operation = async::connect(echo(device, buffer, on_error), EndReceiver{});
         async::start(operation);
         port.input = {std::byte{1}, std::byte{0}, std::byte{0xFF}};
         for (unsigned i = 0; i < 8; ++i)
@@ -492,10 +616,13 @@ namespace
         }
         check(port.output.back() == std::byte{42},
               "echo recovers after disconnect without recursive busy-loop");
+        check(recoverable > 0U, "echo reports recoverable session errors");
     }
 }
 int main()
 {
+    reset_during_io();
+    queued_event_defers_completion();
     reads_and_composition();
     writes_and_backpressure();
     deadline_reset_and_cancel();

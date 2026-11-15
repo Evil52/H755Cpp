@@ -66,6 +66,16 @@ cause bytes from the old FIFO/session to be accepted by a new transfer. A close/
 DTR sequence between two polls still changes the epoch. Repeating the same DTR value
 does not cancel healthy operations.
 
+`Cdc::poll()` rechecks the epoch after querying FIFO availability and after each
+read/write. A reset observed in either window reports `reset`, including any TX prefix
+already copied. RX bytes copied during a reset are invalid and must not be used after
+an error. If another controller event arrives during IO, completion waits until the
+event queue is serviced; the next poll either rejects the old session or completes
+without repeating the FIFO access. Successful IO is ordered at the final epoch check:
+an interrupt published after that checkpoint belongs to the next session transition.
+Host injection tests cover each availability/IO boundary, but target reset timing and
+IRQ latency still require stress HIL.
+
 ## API semantics and resource bounds
 
 `wait_ready(timeout)`, `read_some(span, timeout)` and `write_all(span, timeout)` return
@@ -83,6 +93,11 @@ Write success means all bytes were copied into the bounded USB transmit path. It
 not mean that the host application received/processed them. An error includes the
 already queued prefix length. Cancellation cannot retract an already queued prefix;
 do not blindly resend a whole command after a partial write.
+
+Echo passes every transfer error to an injected handler. The firmware records a
+saturating count and last error; `reset`, `not_ready` and idle `timeout` retry, while
+`busy`, `invalid_timeout` and `transport` enter the USB fault path. Recovery remains
+bounded by the 1000 ms operation deadlines and one application completion per poll.
 
 The TinyUSB event queue has 16 entries, its main-loop task processes at most four events
 per call, and the local DWC2 patch drains at most four RX packets per IRQ. Reset, FIFO

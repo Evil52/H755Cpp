@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-15",
+  "analyzed_source_commit": "ceb66796562d336250185f21472dd3e1b313d470",
+  "analyzed_source_tree": "87c7e0dfc1e3a8d51fd5f05fe6bf75027eb90201",
+  "pr": 11,
+  "pr_ci_run": 43707477537,
+  "pr_ci_success": true,
+  "coverage": {
+    "scope": "all owned runtime C/C++ and Python under include, src, firmware, and tools; vendor, tests, probes, build outputs, and declarative configuration excluded",
+    "c_cpp": {
+      "covered": 1226,
+      "total": 1339,
+      "percent": 91.56086631814787
+    },
+    "python": {
+      "covered": 376,
+      "total": 427,
+      "percent": 88.05620608899298
+    },
+    "unmeasured_owned_sources": [],
+    "strictly_above_80_percent_per_language": true,
+    "host_tests_executed": 11,
+    "python_tests_executed": 42,
+    "report_sha256": "9d8b48164e232a0f887174630b6bbc1850e37c8f076da84b0203ebe11b99ce0a",
+    "sonar_xml_sha256": "7c1d2d65881694ae0a537815e3f207cea55860aae6998e1f429f160ad7553cd9",
+    "python_json_sha256": "5ed1a21b9b6e462780afd60a6efaa7479696fdbc851db26b1a938009c7cb91d0"
+  },
+  "target_coverage": {
+    "build": "Release with H755_TARGET_COVERAGE=ON and H755_USB_CDC=ON; test image only",
+    "temporary_m7_bin_sha256": "95895dff4f21c10bfbbaae353ecd6c796dd5bf362cc470763263324df088316c",
+    "gcov_stream_bytes": 8960,
+    "gcov_stream_sha256": "e8629e7e6d62c9995cdbd1aa8897221fb9b0334bb175a901d0ee74af53c95deb",
+    "gcov_capture_status": "complete, no error",
+    "m4_instruction_evidence": "Earlier SWD step evidence reused only because the M4 binary SHA-256 remained cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
+  },
+  "hardware_restoration": {
+    "full_flash_bytes": 2097152,
+    "preflight_read_twice_identical": true,
+    "before_flash_sha256": "2f77ca630fee5ace9675509b86fe7f012746d7ac423277036e531ab5e6a3a065",
+    "after_restore_sha256": "2f77ca630fee5ace9675509b86fe7f012746d7ac423277036e531ab5e6a3a065",
+    "full_flash_restored_identically": true,
+    "m4_or_option_bytes_written": false,
+    "original_m7_provenance": "Current board bytes differed from two saved Release images; restored the exact in-situ backup rather than substituting another image",
+    "temporary_image_is_deployed_release": false
+  },
+  "local_sonarqube": {
+    "server_version": "26.7.0.124771",
+    "quality_gate": "OK",
+    "overall_coverage_percent": 89.9,
+    "new_code_coverage_percent": null,
+    "unresolved_issues": 0,
+    "new_violations": null,
+    "generic_coverage_files_imported": 39,
+    "limitation": "Community CXX reported 670 include-resolution warnings; no parser syntax errors were reported. Full C++26 semantic analysis is not established."
+  },
+  "remaining": [
+    "MAC/DMA frame transmission and reception are not implemented or accepted on hardware",
+    "USB race handling and error classification have host tests and target builds, but the resulting Release image has not passed board HIL",
+    "Normal board deployment requires merge and verified post-merge firmware artifact"
+  ]
+}
