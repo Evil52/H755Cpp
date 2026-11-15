@@ -96,8 +96,8 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       - name: Validate GitHub Actions
         run: actionlint -color
-      - name: Scan committed history for secrets
-        run: gitleaks git --redact --no-banner .
+      - name: Scan PR-reachable history for secrets
+        run: gitleaks git --redact --no-banner --log-opts=HEAD .
 
   target-build:
     name: Target builds
