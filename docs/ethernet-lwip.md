@@ -1,7 +1,9 @@
 # M7 Ethernet protocol candidate
 
-This is an unmerged candidate, not a deployed Release. The post-merge `cm7-ethernet-release`
-artifact and exact-image board acceptance are required before deployment.
+The post-merge `cm7-ethernet-release` artifact and exact-image board acceptance
+are required before deployment. The limited development-board decision and
+unresolved lwIP security risk are recorded in
+[the security review](lwip-security-review-2026-11-16.md).
 
 ## Scope and ownership
 
