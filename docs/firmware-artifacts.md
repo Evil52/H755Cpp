@@ -2,7 +2,7 @@
 
 Normal H755 deployment uses the exact image produced by `Firmware artifact` after a
 successful `CI` push run on a two-parent merge commit in `main`. The artifact workflow
-checks that the merge corresponds to a PR whose eight required jobs all passed on the
+checks that the merge corresponds to a PR whose seven required jobs all passed on the
 exact merged head. It does not rerun host tests, Semgrep or CodeQL. The main `CI` run
 contains the already configured CodeQL push checks.
 
