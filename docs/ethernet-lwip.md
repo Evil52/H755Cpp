@@ -1,8 +1,9 @@
 # M7 Ethernet protocol candidate
 
-The post-merge `cm7-ethernet-release` artifact and exact-image board acceptance
-are required before deployment. The limited development-board decision and
-unresolved lwIP security risk are recorded in
+The post-merge `cm7-ethernet-release` artifact was flashed and checked on an
+isolated development board on 16 November 2026. The exact image and observed
+limits are recorded in the [Release HIL record](ethernet-release-hil-2026-11-16.md).
+The limited development-board decision and unresolved lwIP security risk are recorded in
 [the security review](lwip-security-review-2026-11-16.md).
 
 ## Scope and ownership
@@ -52,7 +53,7 @@ unmeasured source. Local Sonar passed with zero issues and 88.9% coverage.
 The original full Flash SHA-256 `6062248b5b56ad4929cfc3fa70a91e9a51c2f681b8bb77b7838a40af1ebc6d14`
 matched after both temporary runs. The Mac's test DHCP process and address
 were removed afterward. These results prove only the exercised scenarios for
-the named instrumented images; the post-merge Release needs its own acceptance.
+the named instrumented images. The later post-merge Release run is recorded separately.
 
 A later isolated run of the same instrumented BIN, after the green CI run for
 documentation commit `7d59fe0`, passed 256 sequential UDP echoes and 16 TCP
@@ -110,11 +111,9 @@ it whenever `MEM_SIZE <= 64,000`. The preceding guard returns if `size` exceeds
 warning is not a reachable overflow in our configuration. This assessment is
 specific to the pinned options and does not waive other vendor findings.
 
-Before normal board deployment, the exact committed candidate needs green PR checks,
-fresh whole-owned-code target coverage above 80%, local Sonar gate, and the
-project's post-merge artifact path. An isolated temporary coverage HIL requires
-its own CI-green candidate and backup/restoration procedure. The delivered
-Release artifact then needs Flash readback and external-host checks for DHCP,
-ARP, ping, UDP/TCP echo, link loss/recovery, cold power-on, ring wrap, pressure,
-USB coexistence, and fault/timeout behavior. Record the exact image hash and
-observed limits. Do not call a successful host simulation production acceptance.
+The post-merge artifact has Flash readback and bounded external-host checks for
+DHCP, ping and UDP/TCP echo. Link loss/recovery was checked on an instrumented
+candidate, not on the exact Release image; cold power-on, long-duration load,
+ring pressure, USB coexistence and fault/timeout behavior still need Release
+acceptance. The open lwIP security review also prevents a production-ready
+claim. See the [Release HIL record](ethernet-release-hil-2026-11-16.md).
