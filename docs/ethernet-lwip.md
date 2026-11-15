@@ -40,9 +40,17 @@ SHA-256 `3a3adc6b84fc25e3a222240d07c7fb88f813333c7c45ffb78cc7e30b95610390`
 passed direct Mac-to-board DHCP/ACD (`192.168.77.2`), three ICMP replies, two
 UDP echoes and two TCP echoes. Read-only SWD diagnostics reported MAC running,
 24 RX frames, 20 TX frames, zero MAC errors or drops, and zero echo rejects.
+The same isolated scenarios passed again for the updated source commit
+`36cefb4`, after all eight PR CI checks passed (run `43748095333`). Its
+instrumented BIN SHA-256 was
+`ca052df6d2348875a7f9c0ef4ee7a377b6e96ab4ae0eae6f4e3df1597d519c77`.
+The M7 coverage stream was 12,827 bytes with no collection error; fresh host,
+target and Python results gave 88.92% whole-owned-code line coverage with no
+unmeasured source. Local Sonar passed with zero issues and 88.9% coverage.
 The original full Flash SHA-256 `6062248b5b56ad4929cfc3fa70a91e9a51c2f681b8bb77b7838a40af1ebc6d14`
-matched after restoration. This proves only those scenarios for that exact
-candidate image. Subsequent source changes require fresh CI and target coverage.
+matched after both temporary runs. The Mac's test DHCP process and address
+were removed afterward. These results prove only the exercised scenarios for
+the named instrumented images; the post-merge Release needs its own acceptance.
 
 The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
 `etharp_input()` path. This is a local mitigation for the [publicly reported
