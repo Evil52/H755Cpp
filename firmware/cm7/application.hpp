@@ -6,6 +6,9 @@
 #ifdef H755_ETHERNET_MAC
 #include "ethernet/mac_runtime.hpp"
 #endif
+#ifdef H755_ETHERNET_DIAGNOSTIC
+#include "h755/ethernet/diagnostic_echo.hpp"
+#endif
 namespace h755::usb
 {
     class Runtime;
@@ -21,6 +24,9 @@ namespace h755
 #endif
 #ifdef H755_ETHERNET_MAC
         ethernet::MacRuntime& mac;
+#endif
+#ifdef H755_ETHERNET_DIAGNOSTIC
+        ethernet::DiagnosticEcho& diagnostic;
 #endif
     };
     [[noreturn]] void run_application(FirmwareApplication& application, Board& board,

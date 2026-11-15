@@ -77,7 +77,8 @@
       "inherits": "cm7-ethernet-release",
       "binaryDir": "${sourceDir}/build/cm7-ethernet-coverage",
       "cacheVariables": {
-        "H755_TARGET_COVERAGE": "ON"
+        "H755_TARGET_COVERAGE": "ON",
+        "H755_ETHERNET_DIAGNOSTIC": "ON"
       }
     }
   ],

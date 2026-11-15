@@ -4,8 +4,9 @@ The `cm7-ethernet-debug` and `cm7-ethernet-release` presets add an owned CMSIS
 MAC/DMA driver to the existing USB CDC and PHY firmware. Ordinary M7 and USB
 presets remain unchanged. The post-merge firmware artifact now selects the
 Ethernet Release preset and verifies that both USB and Ethernet were enabled.
-The separate `cm7-ethernet-coverage` preset builds a temporary instrumented image;
-the PR CI compiles it but does not program a board.
+The separate `cm7-ethernet-coverage` preset builds a temporary instrumented image
+with the one-shot diagnostic responder; the PR CI compiles it but does not program
+a board.
 
 ## Ownership and memory
 
@@ -37,9 +38,11 @@ resolved PHY link. Link loss enters `stopping` and waits up to 50 ms for both
 DMA process states in `DMADSR` to report stopped before returning to `ready`;
 `DMACSR.TPS/RPS` are event flags and are not used as a state probe. A later link
 result restarts the rings with its selected speed and duplex. The main loop
-polls at most four RX and four TX descriptors per pass. RX currently validates
-single-descriptor frame status and length, counts it, then recycles the buffer;
-there is no packet consumer yet. `send` copies one bounded frame to a TX buffer,
+polls at most four RX and four TX descriptors per pass. RX validates
+single-descriptor frame status and length, counts it, then passes the borrowed
+frame to a synchronous callback before recycling the buffer.
+It must not retain the `span` after the callback returns. There is no lwIP
+packet consumer yet. `send` copies one bounded frame to a TX buffer,
 rejects queue exhaustion, and publishes OWN only after a memory barrier. A
 fatal DMA status or enabled D-cache latches `fault` and enters the board's
 stopping fault path. This is an experimental state machine until live cable
@@ -55,16 +58,35 @@ Debug/Release builds verify the CMSIS register names and linker placement.
 These checks do not prove real RMII packet traffic, DMA cache behavior, or TX
 completion on the board.
 
+## Isolated raw-frame probe
+
+Only `cm7-ethernet-coverage` enables `H755_ETHERNET_DIAGNOSTIC`. It recognizes a
+60-byte or longer untagged Ethernet frame addressed to the board or broadcast,
+with local experimental EtherType `0x88B5`, payload bytes 14–21 `H755PING`, and
+four sequence bytes at 22–25. After validating a unicast nonzero source address,
+it makes at most one response attempt per boot: 60 bytes addressed to the
+requester, sourced from the board MAC, with `H755PONG` and the same sequence.
+No other traffic is echoed. The normal Release preset excludes this responder,
+and the artifact packager rejects coverage or diagnostic builds. `0x88B5` is
+[reserved for local experiments](https://www.iana.org/assignments/ieee-802-numbers);
+this probe must remain on a network under the operator's control and must never
+be treated as a product protocol. The target MAC sets automatic pad/CRC
+stripping before the borrowed frame reaches the callback, following the
+[ST Ethernet driver configuration](https://github.com/STMicroelectronics/stm32h7xx-hal-driver/blob/master/Src/stm32h7xx_hal_eth.c).
+
 ## CI-candidate hardware evidence
 
-Draft PR #13 passed its PR CI before an isolated instrumented M7 run. The MAC
-reported `running`, zero errors and two received descriptors; full Flash readback
+The earlier draft PR #13 revision passed its PR CI before an isolated
+instrumented M7 run. The MAC reported `running`, zero errors and two received
+descriptors; full Flash readback
 after restoration matched both preflight backups. Whole-owned-code line coverage
 was 92.4% C/C++ and 88.3% Python, with no unmeasured files. Local Sonar Quality
 Gate passed with zero unresolved issues, subject to its documented C++ parser
 limits. See [the exact-image HIL record](ethernet-mac-hil-2026-11-15.json).
-The observations do not establish RX payload integrity, external frame capture,
-TX completion, link loss/reconnect, or sustained packet load.
+Those results predate the RX callback and diagnostic responder in this revision;
+fresh coverage, Sonar, CI and HIL are pending. The observations do not establish
+RX payload integrity, external frame capture, TX completion, link loss/reconnect,
+or sustained packet load.
 
 ## Next acceptance steps
 

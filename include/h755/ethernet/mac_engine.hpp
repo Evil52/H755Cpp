@@ -91,6 +91,12 @@ namespace h755::ethernet
 
         void poll(std::uint32_t now, LinkState link) noexcept
         {
+            poll(now, link, [](std::span<const std::byte>) noexcept {});
+        }
+
+        template <class Receive>
+        void poll(std::uint32_t now, LinkState link, Receive&& receive) noexcept
+        {
             if (state_ == MacState::stopping)
             {
                 if (port_.channels_stopped())
@@ -131,7 +137,7 @@ namespace h755::ethernet
             }
             if (state_ == MacState::running)
             {
-                poll_frames();
+                poll_frames(receive);
             }
             if (active_link(link) && state_ == MacState::ready)
             {
@@ -249,7 +255,7 @@ namespace h755::ethernet
             state_ = MacState::stopping;
         }
 
-        void poll_frames() noexcept
+        template <class Receive> void poll_frames(Receive& receive) noexcept
         {
             for (std::size_t index = 0U; index < mac_slots; ++index)
             {
@@ -274,9 +280,11 @@ namespace h755::ethernet
                     break;
                 }
                 port_.barrier();
-                if (received_length(descriptor, mac_buffer_size))
+                if (const auto length = received_length(descriptor, mac_buffer_size))
                 {
                     ++received_;
+                    receive(
+                        std::span<const std::byte>{storage_.rx_bytes[rx_next_].data(), *length});
                 }
                 else
                 {

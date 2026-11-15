@@ -89,7 +89,8 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
         (self.build / "CMakeCache.txt").write_text(
             f"CMAKE_HOME_DIRECTORY:INTERNAL={self.source}\n"
             "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
-            "H755_ETHERNET_MAC:BOOL=ON\n")
+            "H755_ETHERNET_MAC:BOOL=ON\nH755_TARGET_COVERAGE:BOOL=OFF\n"
+            "H755_ETHERNET_DIAGNOSTIC:BOOL=OFF\n")
         (self.build / "CMakeFiles/3.31.6/CMakeCXXCompiler.cmake").write_text(
             f'set(CMAKE_CXX_COMPILER "{self.compiler}")\n')
         for name in artifact.FILES:
@@ -125,6 +126,18 @@ class FirmwareArtifactCreationTests(unittest.TestCase):
             "CMAKE_BUILD_TYPE:STRING=Release\nH755_USB_CDC:BOOL=ON\n"
             "H755_ETHERNET_MAC:BOOL=OFF\n")
         with self.assertRaisesRegex(ValueError, "Ethernet build selection"):
+            self.create()
+
+    def test_rejects_instrumented_or_diagnostic_release(self):
+        cache = self.build / "CMakeCache.txt"
+        original = cache.read_text()
+        cache.write_text(original.replace("H755_TARGET_COVERAGE:BOOL=OFF",
+                                          "H755_TARGET_COVERAGE:BOOL=ON"))
+        with self.assertRaisesRegex(ValueError, "Coverage build"):
+            self.create()
+        cache.write_text(original.replace("H755_ETHERNET_DIAGNOSTIC:BOOL=OFF",
+                                          "H755_ETHERNET_DIAGNOSTIC:BOOL=ON"))
+        with self.assertRaisesRegex(ValueError, "Diagnostic build"):
             self.create()
 
     def test_rejects_wrong_commit_compiler_and_stale_build(self):

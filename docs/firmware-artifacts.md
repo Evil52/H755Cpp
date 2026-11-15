@@ -13,6 +13,8 @@ toolchain release, verifies the archive and compiler binary, and builds the expl
 `cm7-ethernet-release` preset. The binary includes the M7 C++ runtime; Homebrew's standalone
 cross-compiler package is not a substitute. The archive is a build dependency, never
 committed to the source repository. The release notes and source tarballs accompany it.
+The packager rejects a build configured with target coverage or the local raw-frame
+diagnostic responder, even if a caller supplies the Release preset name.
 
 `tools/firmware_artifact.py` copies M7/M4 ELF, BIN, HEX and map files into one artifact.
 `manifest.json` records the merged commit/tree, preset, compiler digest, PR/main CI run

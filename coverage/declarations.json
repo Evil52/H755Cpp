@@ -8,7 +8,7 @@
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/application.hpp": {
-    "sha256": "4b10aa3237c079da30df116d34cb54c30c825e97750a3efc66f53ee5464f1860",
+    "sha256": "aea6de634a7cebb0066d0f87da8c2fbdf0533ec967227fb29a3356e2715648cd",
     "reason": "Declarations/types only; no executable statements. Included in successful target compilation."
   },
   "firmware/cm7/board.hpp": {

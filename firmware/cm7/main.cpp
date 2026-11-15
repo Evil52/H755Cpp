@@ -32,6 +32,9 @@ int main()
                                                    static_cast<std::uint8_t>(uid[2U] >> 8U)};
     h755::ethernet::CmsisMacPort mac_port{*ETH};
     h755::ethernet::MacRuntime mac{mac_port, mac_storage, mac_address};
+#ifdef H755_ETHERNET_DIAGNOSTIC
+    h755::ethernet::DiagnosticEcho diagnostic{mac_address};
+#endif
 #endif
 #ifdef H755_USB_CDC
     h755::usb::Runtime usb{timebase};
@@ -42,6 +45,9 @@ int main()
 #endif
 #ifdef H755_ETHERNET_MAC
         mac,
+#endif
+#ifdef H755_ETHERNET_DIAGNOSTIC
+        diagnostic,
 #endif
     };
     h755::run_application(application, board, peripherals);

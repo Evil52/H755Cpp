@@ -1,4 +1,4 @@
-#include "h755/ethernet/mac_engine.hpp"
+#include "h755/ethernet/diagnostic_echo.hpp"
 #include <array>
 #include <bit>
 #include <cstdio>
@@ -242,10 +242,162 @@ namespace
         check(!storage.mac.start() && storage.mac.error() == MacError::invalid_storage,
               "DMA storage must be accessible");
     }
+
+    void received_frame_borrow()
+    {
+        Fixture f;
+        f.running();
+        for (std::size_t index = 0U; index < 60U; ++index)
+        {
+            f.storage.rx_bytes[0U][index] = static_cast<std::byte>(index);
+        }
+        f.storage.rx[0U].word3 = descriptor_first | descriptor_last | 60U;
+        unsigned delivered{};
+        f.mac.poll(2U, LinkState::mb100_full,
+                   [&](std::span<const std::byte> frame) noexcept
+                   {
+                       ++delivered;
+                       check(frame.size() == 60U, "RX length reaches consumer");
+                       check(frame[0U] == std::byte{0U} && frame[59U] == std::byte{59U},
+                             "RX bytes reach consumer intact");
+                       check((f.storage.rx[0U].word3 & descriptor_own) == 0U,
+                             "RX buffer remains CPU-owned during consumer call");
+                   });
+        check(delivered == 1U && f.mac.received() == 1U, "valid frame delivered once");
+        check((f.storage.rx[0U].word3 & descriptor_own) != 0U,
+              "RX buffer returned to DMA after consumer call");
+        f.storage.rx[1U].word3 = descriptor_first | descriptor_last | descriptor_error | 60U;
+        f.mac.poll(3U, LinkState::mb100_full,
+                   [&](std::span<const std::byte>) noexcept { ++delivered; });
+        check(delivered == 1U && f.mac.dropped() == 1U,
+              "invalid frame is not delivered to consumer");
+    }
+
+    void diagnostic_echo()
+    {
+        constexpr std::array<std::uint8_t, 6U> own{2U, 1U, 2U, 3U, 4U, 5U};
+        DiagnosticEcho echo{own};
+        std::array<std::byte, 60U> request{};
+        for (std::size_t index = 0U; index < 6U; ++index)
+        {
+            request[index] = std::byte{0xFFU};
+            request[6U + index] = static_cast<std::byte>(0x10U + index * 2U);
+        }
+        request[12U] = std::byte{0x88U};
+        request[13U] = std::byte{0xB5U};
+        constexpr char magic[] = "H755PING";
+        for (std::size_t index = 0U; index < 8U; ++index)
+        {
+            request[14U + index] = static_cast<std::byte>(magic[index]);
+        }
+        request[22U] = std::byte{0x12U};
+        request[23U] = std::byte{0x34U};
+        request[24U] = std::byte{0x56U};
+        request[25U] = std::byte{0x78U};
+        std::array<std::byte, 60U> response{};
+        unsigned sends{};
+        auto sender = [&](std::span<const std::byte> bytes) noexcept
+        {
+            ++sends;
+            check(bytes.size() == response.size(), "fixed diagnostic reply length");
+            for (std::size_t index = 0U; index < response.size(); ++index)
+            {
+                response[index] = bytes[index];
+            }
+            return MacError::none;
+        };
+        check(echo.on_frame({request.data(), 10U}, sender) == DiagnosticResult::ignored,
+              "short diagnostic frame ignored");
+        request[13U] = std::byte{0x06U};
+        check(echo.on_frame(request, sender) == DiagnosticResult::ignored,
+              "unrelated EtherType ignored");
+        request[13U] = std::byte{0xB5U};
+        request[14U] = std::byte{0U};
+        check(echo.on_frame(request, sender) == DiagnosticResult::ignored, "wrong magic ignored");
+        request[14U] = std::byte{'H'};
+        request[0U] = std::byte{0x02U};
+        check(echo.on_frame(request, sender) == DiagnosticResult::ignored,
+              "other destination ignored");
+        request[0U] = std::byte{0xFFU};
+        request[6U] = std::byte{0x11U};
+        check(echo.on_frame(request, sender) == DiagnosticResult::ignored,
+              "multicast source ignored");
+        request[6U] = std::byte{0x10U};
+        check(echo.on_frame(request, sender) == DiagnosticResult::sent,
+              "one valid diagnostic request answered");
+        check(echo.attempted() && echo.result() == DiagnosticResult::sent && sends == 1U,
+              "response is bounded to one attempt");
+        for (std::size_t index = 0U; index < own.size(); ++index)
+        {
+            check(response[index] == request[6U + index], "reply destination is requester");
+            check(response[6U + index] == static_cast<std::byte>(own[index]),
+                  "reply source is board");
+        }
+        constexpr char pong[] = "H755PONG";
+        for (std::size_t index = 0U; index < 8U; ++index)
+        {
+            check(response[14U + index] == static_cast<std::byte>(pong[index]),
+                  "reply marker is PONG");
+        }
+        for (std::size_t index = 0U; index < 4U; ++index)
+        {
+            check(response[22U + index] == request[22U + index], "sequence is echoed");
+        }
+        check(echo.on_frame(request, sender) == DiagnosticResult::ignored && sends == 1U,
+              "repeat request cannot amplify traffic");
+        DiagnosticEcho failed{own};
+        check(failed.on_frame(request, [](std::span<const std::byte>) noexcept
+                              { return MacError::queue_full; }) == DiagnosticResult::send_failed &&
+                  failed.attempted(),
+              "failed send is recorded without retrying");
+    }
+
+    void diagnostic_rx_to_tx()
+    {
+        Fixture f;
+        f.running();
+        DiagnosticEcho echo{f.address};
+        auto& frame = f.storage.rx_bytes[0U];
+        for (std::size_t index = 0U; index < 6U; ++index)
+        {
+            frame[index] = std::byte{0xFFU};
+            frame[6U + index] = static_cast<std::byte>(0x20U + index * 2U);
+        }
+        frame[12U] = std::byte{0x88U};
+        frame[13U] = std::byte{0xB5U};
+        constexpr char magic[] = "H755PING";
+        for (std::size_t index = 0U; index < 8U; ++index)
+        {
+            frame[14U + index] = static_cast<std::byte>(magic[index]);
+        }
+        frame[22U] = std::byte{0xABU};
+        f.storage.rx[0U].word3 = descriptor_first | descriptor_last | 60U;
+        f.mac.poll(2U, LinkState::mb100_full,
+                   [&](std::span<const std::byte> received) noexcept
+                   {
+                       check(echo.on_frame(received, [&](std::span<const std::byte> reply) noexcept
+                                           { return f.mac.send(reply); }) == DiagnosticResult::sent,
+                             "diagnostic RX request enqueued for TX");
+                   });
+        check(f.mac.received() == 1U &&
+                  f.storage.tx[0U].word3 ==
+                      (descriptor_own | descriptor_first | descriptor_last | 60U),
+              "received request copied into owned TX descriptor");
+        check(f.storage.tx_bytes[0U][22U] == std::byte{0xABU} &&
+                  f.storage.tx_bytes[0U][14U] == std::byte{'H'} &&
+                  f.storage.tx_bytes[0U][18U] == std::byte{'P'},
+              "TX buffer retains reply after RX descriptor recycled");
+        f.storage.tx[0U].word3 &= ~descriptor_own;
+        f.mac.poll(3U, LinkState::mb100_full);
+        check(f.mac.transmitted() == 1U, "TX completion counted after diagnostic reply");
+    }
 }
 
 int main()
 {
     startup_and_ring();
     transitions_and_faults();
+    received_frame_borrow();
+    diagnostic_echo();
+    diagnostic_rx_to_tx();
 }

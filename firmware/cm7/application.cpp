@@ -6,6 +6,12 @@
 #ifdef H755_TARGET_COVERAGE
 void coverage_poll();
 #endif
+#ifdef H755_ETHERNET_DIAGNOSTIC
+extern "C"
+{
+    volatile std::uint32_t g_diagnostic_result{};
+}
+#endif
 namespace h755
 {
     [[noreturn]] void run_application(FirmwareApplication& application, Board& board,
@@ -31,7 +37,21 @@ namespace h755
         {
             application.poll();
 #ifdef H755_ETHERNET_MAC
+#ifdef H755_ETHERNET_DIAGNOSTIC
+            peripherals.mac.poll(application.uptime_ms(), application.link_mode(),
+                                 [&](std::span<const std::byte> frame) noexcept {
+                                     const auto result = peripherals.diagnostic.on_frame(
+                                         frame, [&](std::span<const std::byte> reply) noexcept {
+                                             return peripherals.mac.send(reply);
+                                         });
+                                     if (result != ethernet::DiagnosticResult::ignored)
+                                     {
+                                         g_diagnostic_result = static_cast<std::uint32_t>(result);
+                                     }
+                                 });
+#else
             peripherals.mac.poll(application.uptime_ms(), application.link_mode());
+#endif
             g_mac.state = static_cast<std::uint32_t>(peripherals.mac.state());
             g_mac.error = static_cast<std::uint32_t>(peripherals.mac.error());
             g_mac.received = peripherals.mac.received();

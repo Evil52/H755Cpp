@@ -66,7 +66,7 @@ namespace h755::ethernet
         registers_.MACCR =
             (link == LinkState::mb100_half || link == LinkState::mb100_full ? ETH_MACCR_FES : 0U) |
             (link == LinkState::mb10_full || link == LinkState::mb100_full ? ETH_MACCR_DM : 0U) |
-            ETH_MACCR_TE | ETH_MACCR_RE;
+            ETH_MACCR_CST | ETH_MACCR_ACS | ETH_MACCR_TE | ETH_MACCR_RE;
         registers_.MTLTQOMR = registers_.MTLTQOMR | ETH_MTLTQOMR_FTQ;
         registers_.DMACTCR = registers_.DMACTCR | ETH_DMACTCR_ST;
         registers_.DMACRCR = registers_.DMACRCR | ETH_DMACRCR_SR;
