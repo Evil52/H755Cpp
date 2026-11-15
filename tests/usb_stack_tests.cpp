@@ -60,7 +60,11 @@ int main()
     Clock clock;
     h755::usb::Cdc session{port, clock};
     std::array<std::byte, 64> buffer{};
-    auto operation = async::connect(h755::usb::echo(session, buffer), Receiver{});
+    auto on_error = [](h755::usb::TransferError error) {
+        check(h755::usb::classify_echo_error(error.code) == h755::usb::EchoErrorAction::retry,
+              "USB echo reports unexpected backend errors");
+    };
+    auto operation = async::connect(h755::usb::echo(session, buffer, on_error), Receiver{});
     async::start(operation);
     for (auto count : {1U, 63U, 64U, 65U, 257U})
     {

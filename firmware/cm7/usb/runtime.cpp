@@ -3,6 +3,7 @@
 #include "tusb.h"
 #include <async/start.hpp>
 #include <stdx/functional.hpp>
+#include <limits>
 namespace
 {
     h755::Timebase* clock_owner{};
@@ -13,6 +14,8 @@ extern "C"
     volatile std::uint32_t g_usb_startup{};
     volatile std::uint32_t g_usb_state{};
     volatile std::uint32_t g_usb_error{};
+    volatile std::uint32_t g_usb_transfer_errors{};
+    volatile std::uint32_t g_usb_last_transfer_error{};
 }
 namespace h755::usb
 {
@@ -55,7 +58,7 @@ namespace h755::usb
         if (!operation_)
         {
             operation_.emplace(stdx::with_result_of{
-                [this] { return async::connect(echo(device_, buffer_), Receiver{}); }});
+                [this] { return async::connect(echo(device_, buffer_, errors_), Receiver{}); }});
             async::start(*operation_);
         }
         port_.service();
@@ -65,6 +68,18 @@ namespace h755::usb
     void Runtime::Receiver::set_error(TransferError) &&
     {
         fault::stop(FaultCode::usb);
+    }
+    void Runtime::ErrorHandler::operator()(TransferError error) const
+    {
+        g_usb_last_transfer_error = static_cast<std::uint32_t>(error.code) + 1U;
+        if (g_usb_transfer_errors != std::numeric_limits<std::uint32_t>::max())
+        {
+            g_usb_transfer_errors = g_usb_transfer_errors + 1U;
+        }
+        if (classify_echo_error(error.code) == EchoErrorAction::fault)
+        {
+            fault::stop(FaultCode::usb);
+        }
     }
     void Runtime::Receiver::set_stopped() &&
     {

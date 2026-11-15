@@ -7,7 +7,30 @@
 
 namespace h755::usb
 {
-    template <class Device> auto echo(Device& device, std::span<std::byte> buffer)
+    enum class EchoErrorAction
+    {
+        retry,
+        fault
+    };
+
+    constexpr EchoErrorAction classify_echo_error(ErrorCode code) noexcept
+    {
+        switch (code)
+        {
+        case ErrorCode::reset:
+        case ErrorCode::not_ready:
+        case ErrorCode::timeout:
+            return EchoErrorAction::retry;
+        case ErrorCode::busy:
+        case ErrorCode::invalid_timeout:
+        case ErrorCode::transport:
+            return EchoErrorAction::fault;
+        }
+        return EchoErrorAction::fault;
+    }
+
+    template <class Device, class ErrorHandler>
+    auto echo(Device& device, std::span<std::byte> buffer, ErrorHandler& on_error)
     {
         return device.wait_ready(1000) |
                async::let_value([&device, buffer](std::size_t)
@@ -17,7 +40,10 @@ namespace h755::usb
                        return device.write_all(std::span<const std::byte>{buffer.first(count)},
                                                1000);
                    }) |
-               async::let_error([](TransferError) { return async::just(std::size_t{0}); }) |
+               async::let_error([&on_error](TransferError error) {
+                   on_error(error);
+                   return async::just(std::size_t{0});
+               }) |
                async::repeat();
     }
 }

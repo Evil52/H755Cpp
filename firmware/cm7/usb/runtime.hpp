@@ -28,7 +28,12 @@ namespace h755::usb
             void set_error(TransferError) &&;
             void set_stopped() &&;
         };
-        using Flow = decltype(echo(std::declval<Device&>(), std::declval<std::span<std::byte>>()));
+        struct ErrorHandler
+        {
+            void operator()(TransferError error) const;
+        };
+        using Flow = decltype(echo(std::declval<Device&>(), std::declval<std::span<std::byte>>(),
+                                   std::declval<ErrorHandler&>()));
         using Operation = async::connect_result_t<Flow, Receiver>;
 
       public:
@@ -48,6 +53,7 @@ namespace h755::usb
         TinyUsbPort port_{};
         Device device_;
         std::array<std::byte, 64> buffer_{};
+        ErrorHandler errors_{};
         std::optional<Operation> operation_{};
         Startup<Platform, Timebase, TinyUsbPort> startup_;
     };

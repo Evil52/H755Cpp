@@ -240,6 +240,11 @@ namespace h755::usb
                 }
                 if (node->kind == Kind::read)
                 {
+                    if (node->transferred != 0U)
+                    {
+                        finish(*node, Completion::value, ErrorCode::not_ready);
+                        return;
+                    }
                     if (node->input.empty())
                     {
                         finish(*node, Completion::value, ErrorCode::not_ready);
@@ -249,12 +254,28 @@ namespace h755::usb
                     {
                         continue;
                     }
+                    const auto before_io = port_.status();
+                    if (before_io.generation != node->generation)
+                    {
+                        finish(*node, Completion::error, ErrorCode::reset);
+                        return;
+                    }
+                    if (before_io.pending_events)
+                    {
+                        continue;
+                    }
                     const auto capacity =
                         node->input.size() < packet_size ? node->input.size() : packet_size;
                     const auto count = port_.read(node->input.first(capacity));
+                    const auto after_io = port_.status();
                     if (count > capacity)
                     {
                         finish(*node, Completion::error, ErrorCode::transport);
+                        return;
+                    }
+                    if (after_io.generation != node->generation)
+                    {
+                        finish(*node, Completion::error, ErrorCode::reset);
                         return;
                     }
                     if (count == 0U)
@@ -262,6 +283,10 @@ namespace h755::usb
                         continue;
                     }
                     node->transferred = count;
+                    if (after_io.pending_events)
+                    {
+                        continue;
+                    }
                     finish(*node, Completion::value, ErrorCode::not_ready);
                     return;
                 }
@@ -279,13 +304,33 @@ namespace h755::usb
                 {
                     continue;
                 }
+                const auto before_io = port_.status();
+                if (before_io.generation != node->generation)
+                {
+                    finish(*node, Completion::error, ErrorCode::reset);
+                    return;
+                }
+                if (before_io.pending_events)
+                {
+                    continue;
+                }
                 const auto count = port_.write(node->output.subspan(node->transferred, capacity));
+                const auto after_io = port_.status();
                 if (count > capacity)
                 {
                     finish(*node, Completion::error, ErrorCode::transport);
                     return;
                 }
                 node->transferred += count;
+                if (after_io.generation != node->generation)
+                {
+                    finish(*node, Completion::error, ErrorCode::reset);
+                    return;
+                }
+                if (after_io.pending_events)
+                {
+                    return;
+                }
                 if (node->transferred == node->output.size())
                 {
                     finish(*node, Completion::value, ErrorCode::not_ready);
