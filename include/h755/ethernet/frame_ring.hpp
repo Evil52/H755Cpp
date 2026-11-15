@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <expected>
+#include <limits>
 #include <optional>
 
 namespace h755::ethernet
@@ -26,7 +27,8 @@ enum class TxOwner : std::uint8_t
 template <std::size_t Capacity, std::size_t BufferSize>
 class TxRing final
 {
-    static_assert(Capacity > 0U && BufferSize > 0U);
+    static_assert(Capacity > 0U && Capacity <= std::numeric_limits<std::uint16_t>::max());
+    static_assert(BufferSize > 0U && BufferSize <= std::numeric_limits<std::uint16_t>::max());
 
 public:
     std::expected<std::size_t, RingError> acquire() noexcept
@@ -60,7 +62,7 @@ public:
         {
             return std::unexpected{RingError::invalid_length};
         }
-        slot.length = length;
+        slot.length = static_cast<std::uint16_t>(length);
         slot.owner = TxOwner::dma;
         return {};
     }
@@ -85,9 +87,9 @@ public:
     }
 
 private:
-    static constexpr std::size_t advance(std::size_t index) noexcept
+    static constexpr std::uint16_t advance(std::uint16_t index) noexcept
     {
-        return index + 1U == Capacity ? 0U : index + 1U;
+        return static_cast<std::uint16_t>(index + 1U == Capacity ? 0U : index + 1U);
     }
 
     std::expected<void, RingError> release(std::size_t index, TxOwner expected) noexcept
@@ -108,10 +110,10 @@ private:
     struct Slot
     {
         TxOwner owner{TxOwner::free};
-        std::size_t length{};
+        std::uint16_t length{};
     };
     std::array<Slot, Capacity> slots_{};
-    std::size_t next_{};
+    std::uint16_t next_{};
 };
 
 enum class RxOwner : std::uint8_t
@@ -123,7 +125,8 @@ enum class RxOwner : std::uint8_t
 template <std::size_t Capacity, std::size_t BufferSize>
 class RxRing final
 {
-    static_assert(Capacity > 0U && BufferSize > 0U);
+    static_assert(Capacity > 0U && Capacity <= std::numeric_limits<std::uint16_t>::max());
+    static_assert(BufferSize > 0U && BufferSize <= std::numeric_limits<std::uint16_t>::max());
 
 public:
     std::expected<void, RingError> complete(std::size_t index, std::size_t length) noexcept
@@ -141,7 +144,7 @@ public:
         {
             return std::unexpected{RingError::invalid_length};
         }
-        slot.length = length;
+        slot.length = static_cast<std::uint16_t>(length);
         slot.owner = RxOwner::consumer;
         return {};
     }
@@ -186,7 +189,7 @@ private:
     struct Slot
     {
         RxOwner owner{RxOwner::dma};
-        std::size_t length{};
+        std::uint16_t length{};
     };
     std::array<Slot, Capacity> slots_{};
 };

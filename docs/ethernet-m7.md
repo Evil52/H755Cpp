@@ -48,6 +48,17 @@ ownership handoff; the adapter still must publish descriptor writes with the req
 barriers and cache maintenance before setting hardware OWN. The ring itself contains no
 DMA descriptors, payload buffers, MMIO, interrupt synchronization or packet traffic.
 
+The ring metadata uses 16-bit lengths and a 16-bit TX cursor. Template bounds require
+at most 65535 slots and bytes per slot, and API lengths are checked before narrowing.
+For four 1536-byte slots, `sizeof` with pinned ARM GCC 16.2 decreased from 36 to 18
+bytes for `TxRing` and from 32 to 16 bytes for `RxRing`. This is storage saved in
+the CPU-owned model, not a measured packet-throughput gain; the future DMA payloads
+will dominate RAM use. The host footprint decreased from 72 to 18 and 64 to 16 bytes.
+The [memory-layout case study](https://blog.cloudflare.com/dns-cache-memory-optimization-1111/)
+inspired measuring compactness and locality, but its DNS-cache speedups do not transfer
+to this MCU. Benchmark the real MAC/DMA/lwIP path before choosing zero-copy or another
+layout; retain the exact hardware descriptor format and explicit cache maintenance.
+
 Before enabling MAC/DMA, reserve descriptor and frame storage in DMA-accessible memory,
 choose and verify cache/MPU treatment, align buffers to cache lines, specify descriptor
 layout and register sequence from the exact RM0399 revision, and test recovery after DMA

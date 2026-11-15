@@ -8,6 +8,9 @@ using h755::ethernet::RxRing;
 using h755::ethernet::TxOwner;
 using h755::ethernet::TxRing;
 
+static_assert(sizeof(TxRing<4U, 1536U>) <= 24U);
+static_assert(sizeof(RxRing<4U, 1536U>) <= 16U);
+
 int main()
 {
     TxRing<2U, 1536U> tx;
