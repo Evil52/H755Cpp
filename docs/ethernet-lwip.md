@@ -62,6 +62,18 @@ claim follows from this run. The temporary image was restored, and the full
 Flash readback again matched the preflight SHA-256 above. The Mac's temporary
 DHCP process and test address were removed.
 
+On 16 November 2026 a later link-recovery HIL stopped before any Flash write:
+OpenOCD could read the ST-LINK and SWD DPIDR but reported Cortex-M `PARTNO 0x0`
+for both cores, even at 50 kHz and after one manual board RESET. STM32CubeProgrammer
+v2.20.0 in HOTPLUG mode likewise could not identify the device. One separately
+authorized connect-under-reset read identified NUCLEO-H755ZI-Q, device `0x450`,
+revision V, `DBGMCU_IDC 0x20036450`; normal SWD access still failed afterward.
+The user observed the normal green heartbeat and red LED off. The test DHCP/IP
+were removed. The cause of running-target SWD failure remains unknown, and no
+link-loss or recovery evidence was collected in this attempt. Diagnose debug
+access before another candidate flash; do not treat under-reset identification
+as proof of normal live-debug access.
+
 The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
 `etharp_input()` path. This is a local mitigation for the [publicly reported
 short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
