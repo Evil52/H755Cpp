@@ -8,7 +8,8 @@ from pathlib import Path
 
 REQUIRED = {
     "Host tests and analysis", "Semgrep", "Workflow and secrets",
-    "CodeQL (c-cpp)", "CodeQL (python)", "CodeQL (actions)", "Quality gate",
+    "CodeQL (c-cpp)", "CodeQL (python)", "CodeQL (actions)", "Target builds",
+    "Quality gate",
 }
 
 

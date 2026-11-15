@@ -9,8 +9,9 @@ New PR runs cancel obsolete PR runs; main runs are not cancelled by subsequent p
 
 A main push after merge runs only the three CodeQL analyses to update the
 default-branch security baseline. Host tests/sanitizers, Cppcheck, Clang analysis,
-Semgrep, Actionlint and Gitleaks run in PRs or an explicit manual dispatch only;
-they do not repeat after merge. CodeQL still compiles the portable C++ under tracing,
+target builds, Semgrep, Actionlint and Gitleaks run in PRs or an explicit manual dispatch only;
+these CI jobs do not repeat after merge. The artifact workflow rebuilds the selected
+Release image from the merged commit to bind the deliverable to its source. CodeQL still compiles the portable C++ under tracing,
 but does not execute its tests. The aggregate Quality gate also runs only in PRs
 and manual dispatches, where every dependency must succeed; on main each CodeQL job
 reports its own result. Skipped PR-only jobs on main are expected, not test results.
@@ -21,6 +22,8 @@ second Sonar/cloud workflow or automatic local Sonar schedule.
 ## Checks and scope
 
 - Host build, warnings as errors, unit and mocked-register integration, ASan/UBSan.
+- Target GCC 16.2 builds for M7 Debug/Release and USB Debug/Release, using the pinned
+  toolchain digest. These are compilation/link checks, not HIL or target execution.
 - Cppcheck and Clang static analysis of portable MDIO code via its host test translation unit.
   Clang 18 uses its own CMake compilation database and libc++ 18: GCC module-scanning
   flags and GCC 14's standard-library feature gates are incompatible with this analyzer.
@@ -43,11 +46,11 @@ adapter or native-contract toolchain probe. Cppcheck uses its supported C++23 pa
 for the same compatible source subset; compilation remains C++26. No source is
 rewritten or silently compiled under an older requested standard to make analysis green.
 
-M7 GCC 16.2 Debug/Release checks are currently local. Target CI, fuzzing, hardware/e2e,
-runtime stack/deadline measurements and release-image verification remain separate
-unmet gates. No firmware deployment or release workflow is enabled: there is no complete
-firmware image yet. Future CD must consume verified immutable CI artifacts rather than
-rebuild the same release independently.
+Fuzzing, hardware/e2e, runtime stack/deadline measurements and release-image
+acceptance remain separate unmet gates. The [post-merge artifact workflow](firmware-artifacts.md)
+builds the merged M7/M4 Release images and packages ELF/BIN/HEX with a manifest.
+It is a HIL candidate, not an accepted production release. MAC/DMA packet transfer
+and lwIP remain unimplemented.
 
 ## Sonar: manual local workflow only
 

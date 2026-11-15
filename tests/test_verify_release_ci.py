@@ -71,6 +71,13 @@ class ReleaseCiGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no successful full PR CI"):
             self.verify()
 
+    def test_rejects_missing_target_build(self):
+        self.jobs["jobs"] = [
+            job for job in self.jobs["jobs"] if job["name"] != "Target builds"
+        ]
+        with self.assertRaisesRegex(ValueError, "no successful full PR CI"):
+            self.verify()
+
 
 if __name__ == "__main__":
     unittest.main()
