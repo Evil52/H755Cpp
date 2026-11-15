@@ -1,5 +1,12 @@
 {
   "commit": "77dcd25a72509eb83f72b033d219b1d40cd8eb95",
+  "local_patches": {
+    "src/core/ipv4/etharp.c": {
+      "reason": "Reject short first pbuf before reading etharp_hdr (upstream PR #108)",
+      "upstream": "https://github.com/lwip-tcpip/lwip/pull/108",
+      "base_sha256": "8ee2c65e26eacf265ef34798aefd39aa9678296a64154d3d049b10f32e658f5d"
+    }
+  },
   "files": {
     "COPYING": "ef4aac92e05e87cd1cdc140870ed52206ba03d4a7fe46c1e11d7ffa6c87d252b",
     "src/core/def.c": "a12f3ef6c087efb6d4ec524cf332ff438d2504c17d60c263d0bb1b82b79eb2cd",
@@ -8,7 +15,7 @@
     "src/core/ip.c": "82d0fc6b45c6d1af88bdece3229fc9821274263c261369de4f81b8d6c80751e7",
     "src/core/ipv4/acd.c": "40132cfec33d8efa2b645754b6d5c1bf6ecb6341fb5dbf72cd51448b11ec8bd2",
     "src/core/ipv4/dhcp.c": "f89cf1aacbd9a04dcb47a03c81a1a231331f4edb323d2e0cf26e640ca78c3453",
-    "src/core/ipv4/etharp.c": "8ee2c65e26eacf265ef34798aefd39aa9678296a64154d3d049b10f32e658f5d",
+    "src/core/ipv4/etharp.c": "26ad6753296efda8fe7f40fea8774e5d8e2560dca8a23c3c39a837f948e633da",
     "src/core/ipv4/icmp.c": "d53c96e7ce02514d6c88b41df7c2e37d8e0212a297466f50590305c5e3504285",
     "src/core/ipv4/ip4.c": "d4973142adede3b868036d5404df9a258ed632788d98969539dc21470b748ae6",
     "src/core/ipv4/ip4_addr.c": "b440b85c9e49e60510cfa61d40e24b0e2ad480e23a821a94017e42df09dcf8be",

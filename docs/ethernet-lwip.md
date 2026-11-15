@@ -9,8 +9,8 @@ artifact and exact-image board acceptance are required before deployment.
   endpoints. No Ethernet ISR, RTOS task or M4 code calls lwIP. The synchronous RX
   callback copies the borrowed DMA frame into a lwIP pbuf before the descriptor
   returns to the ring. TX copies the pbuf chain into one bounded MAC frame.
-- The vendored upstream lwIP revision and individual source hashes are pinned in
-  `vendor/lwip-manifest.json`; CMake checks those hashes. The C implementation is
+- The vendored upstream lwIP revision, local ARP backport and individual source hashes are
+  recorded in `vendor/lwip-manifest.json`; CMake checks those hashes. The C implementation is
   kept separate from owned C++ adapters and is excluded from owned-code coverage.
 - `NO_SYS=1` enables only the raw API. IPv4, DHCP/ACD, ARP, ICMP, UDP and TCP are
   compiled; DNS, sockets, netconn, IPv6, IP fragmentation/reassembly, forwarding
@@ -89,10 +89,11 @@ observed the normal green heartbeat and red LED off, and the temporary Mac
 DHCP process and address were removed. Normal live SWD access remains
 unavailable. See [the exact HIL record](ethernet-lwip-link-hil-2026-11-16.json).
 
-The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
-`etharp_input()` path. This is a local mitigation for the [publicly reported
-short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
-does not establish that other lwIP parser vulnerabilities are absent. The
+The adapter rejects ARP frames shorter than 42 bytes, and a local backport in
+`etharp_input()` checks the first pbuf length before reading its header. The direct
+guard-page regression failed before and passed after this backport. These are local
+mitigations for the [publicly reported short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108);
+they do not establish that other lwIP parser vulnerabilities are absent. The
 [2026 upstream audit](https://github.com/xchglabs/lwip-2026-pocs) also reports
 unresolved findings involving DHCP and the core IP stack, whose details are not
 yet public. Treat the network-exposed Release security review as open; see the

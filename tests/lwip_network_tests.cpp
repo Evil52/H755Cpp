@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <span>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <vector>
 
 extern "C" void h755_lwip_assert(const char*)
@@ -214,6 +216,19 @@ int main()
     check(echo.start(), "bounded UDP/TCP echo binds");
     check(!network.start(0), "network refuses duplicate start");
     check(!network.address_ready(), "no DHCP lease before exchange");
+    const auto page_size = sysconf(_SC_PAGESIZE);
+    check(page_size > 0, "page size available");
+    const auto page = static_cast<std::size_t>(page_size);
+    auto* guarded = static_cast<std::uint8_t*>(
+        mmap(nullptr, 2U * page, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0));
+    check(guarded != MAP_FAILED && mprotect(guarded + page, page, PROT_NONE) == 0,
+          "guarded ARP payload allocated");
+    guarded[page - 1U] = 0U;
+    auto* truncated_arp = pbuf_alloc(PBUF_RAW, 1U, PBUF_REF);
+    check(truncated_arp != nullptr, "truncated ARP packet allocated");
+    truncated_arp->payload = guarded + page - 1U;
+    etharp_input(truncated_arp, &network.interface());
+    check(munmap(guarded, 2U * page) == 0, "guarded ARP payload released");
     network.poll(1, h755::ethernet::LinkState::mb100_full);
     check(network.interface().mtu == 1500, "Ethernet MTU");
     check(network.interface().hwaddr_len == 6, "Ethernet MAC length");
