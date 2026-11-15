@@ -78,6 +78,15 @@ source-only diagnostics need a separate, clearly labelled scanner run. The hashe
 detect source changes after aggregation, but do not establish that raw target gcov
 data came from the same image; record the target build and HIL provenance separately.
 The scanner uses https://sonarqube:9443 with a mounted PKCS#12 truststore.
+The CXX plugin has no built-in standard include paths. The helper reads the compiler
+selected by the instrumented M7 CMake build, checks its SHA-256 against
+`docs/toolchain-validation.json` and its GCC 16.2 version, then mounts that
+toolchain read-only at `/opt/h755-arm`. `sonar-project.properties` supplies its
+libstdc++, newlib and GCC internal include directories. A nonzero unresolved
+include count now fails the local scan. The former 726 warnings were all missing
+standard headers, including `<contracts>` and `<gcov.h>`; the corrected scan
+reported zero include-resolution and parser syntax errors. This follows the
+[community CXX include-directory guidance](https://github.com/SonarOpenCommunity/sonar-cxx/wiki/sonar.cxx.includeDirectories).
 The TLS front shares the Sonar container network namespace and proxies only to
 127.0.0.1:9000; it publishes no host port. The helper API remains restricted to host
 loopback 9000. No certificate-verification bypass or insecure fallback is used. Reports

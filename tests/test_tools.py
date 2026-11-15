@@ -47,7 +47,7 @@ class SonarTests(unittest.TestCase):
             if coverage=='partial':
                 (root/'build/coverage/summary.json').write_text(json.dumps({'passed':False,'unmeasured':['tools/source.py']}))
             output=io.StringIO()
-            with patch.dict(os.environ,{'SONAR_TOKEN':'fixture-token'} if env is None else env,clear=True),patch.object(sonar.urllib.request,'urlopen',side_effect=response),patch.object(sonar.subprocess,'run',return_value=subprocess.CompletedProcess([],scanner_code,scanner_output)) as docker,contextlib.redirect_stdout(output):
+            with patch.dict(os.environ,{'SONAR_TOKEN':'fixture-token'} if env is None else env,clear=True),patch.object(sonar.urllib.request,'urlopen',side_effect=response),patch.object(sonar,'target_toolchain',return_value=root/'test-target-toolchain'),patch.object(sonar.subprocess,'run',return_value=subprocess.CompletedProcess([],scanner_code,scanner_output)) as docker,contextlib.redirect_stdout(output):
                 actual=list(args)
                 if "--env-file" in actual:
                     index=actual.index("--env-file")+1

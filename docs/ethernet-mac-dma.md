@@ -98,7 +98,11 @@ completed TX, zero errors and diagnostic result `sent`. Both full-Flash
 restorations matched the original readback. Whole-owned-code line coverage from
 the second run was 93.1% C/C++ and 84.9% Python, with no
 unmeasured files; local Sonar Quality Gate passed with zero unresolved issues.
-The community CXX analyzer still reported 726 include-resolution warnings.
+The first community CXX run reported 726 missing standard-header includes;
+the corrected scan with the pinned GCC 16.2 headers reported zero include
+resolution and parser syntax errors. Its rules still do not establish full
+C++26 semantic coverage. The scanner-helper change was retested at 85.2%
+Python coverage; the M7 and host C++ execution reports were unchanged.
 See [the current candidate HIL record](ethernet-rx-candidate-hil-2026-11-15.json).
 This proves one bounded payload exchange and TX completion on the test image.
 Ring wrap, link loss/reconnect and sustained packet load remain unverified.

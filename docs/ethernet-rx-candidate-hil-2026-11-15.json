@@ -68,6 +68,21 @@
     "include_resolution_warnings": 726,
     "limit": "Community sonar-cxx parsing does not establish complete C++26 analysis"
   },
+  "local_sonar_reanalysis": {
+    "reason": "Resolve standard headers using read-only pinned GCC 16.2 toolchain",
+    "include_resolution_warnings": 0,
+    "parser_syntax_errors": 0,
+    "quality_gate": "OK",
+    "new_coverage_percent": 91.5,
+    "overall_coverage_percent": 91.4,
+    "unresolved_issues": 0,
+    "owned_runtime_coverage": {
+      "c_cpp_percent": 93.05239179954442,
+      "python_percent": 85.23206751054852,
+      "unmeasured": []
+    },
+    "provenance": "Firmware unchanged; target and host execution reports reused, Python tests rerun after scanner-helper edit"
+  },
   "flash_restoration": {
     "isolated_runs": 2,
     "full_flash_bytes": 2097152,
