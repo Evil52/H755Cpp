@@ -73,6 +73,11 @@ this probe must remain on a network under the operator's control and must never
 be treated as a product protocol. The target MAC sets automatic pad/CRC
 stripping before the borrowed frame reaches the callback, following the
 [ST Ethernet driver configuration](https://github.com/STMicroelectronics/stm32h7xx-hal-driver/blob/master/Src/stm32h7xx_hal_eth.c).
+The host probe is [ethernet_raw_probe.py](../tests/hil/ethernet_raw_probe.py):
+it sends one bounded broadcast request through macOS libpcap and waits for a
+matching unicast response. It requires access to a BPF device; the HIL run used
+an identical SHA-256 copy under `/private/tmp` because the elevated process
+could not read the project under macOS Documents privacy controls.
 
 ## CI-candidate hardware evidence
 
@@ -86,14 +91,17 @@ limits. See [the exact-image HIL record](ethernet-mac-hil-2026-11-15.json).
 Those results predate the RX callback and diagnostic responder in this revision;
 the current revision `ea3530d` passed all eight PR checks, including target
 builds, CodeQL and Semgrep. In a separate restored coverage run, the MAC stayed
-`running` with zero error, 135 ambient RX frames and zero drops. The one-shot
-diagnostic responder was not exercised: its result and TX count remained zero.
-Whole-owned-code line coverage was 92.7% C/C++ and 84.9% Python, with no
+`running` with zero error, 135 ambient RX frames and zero drops. A second run
+with the same image sent one broadcast `H755PING` from the Mac. The host captured
+a matching unicast `H755PONG` with the same sequence; M7 recorded one RX, one
+completed TX, zero errors and diagnostic result `sent`. Both full-Flash
+restorations matched the original readback. Whole-owned-code line coverage from
+the second run was 93.1% C/C++ and 84.9% Python, with no
 unmeasured files; local Sonar Quality Gate passed with zero unresolved issues.
 The community CXX analyzer still reported 726 include-resolution warnings.
 See [the current candidate HIL record](ethernet-rx-candidate-hil-2026-11-15.json).
-RX payload integrity, external frame capture, TX completion, link
-loss/reconnect and sustained packet load remain unverified.
+This proves one bounded payload exchange and TX completion on the test image.
+Ring wrap, link loss/reconnect and sustained packet load remain unverified.
 
 ## Next acceptance steps
 
@@ -101,14 +109,14 @@ loss/reconnect and sustained packet load remain unverified.
    length treatment, tail-pointer behavior and stop/restart timing. The host
    register-port test checks software transitions; only HIL can establish the
    actual STM32 status-bit and timing behavior.
-2. Verify RMII packet payloads, TX completion, ring wrap and cable loss/reconnect
-   on the target with independent host-side observations. Keep the current draft
-   candidate separate from an accepted Release image.
+2. Extend the single-frame RMII test to ring wrap, queue pressure and cable
+   loss/reconnect with independent host-side observations. Keep the current
+   draft candidate separate from an accepted Release image.
 3. Merge only after acceptance and separate authorization. Then verify the immutable
    `cm7-ethernet-release` artifact and its hashes.
 4. With separate authorization, flash that artifact and read back Flash. On the
    actual board verify D2 addresses, descriptor OWN transitions, RX counters,
-   link loss/reconnect, USB CDC and heartbeat. TX needs a controlled frame
-   producer and independent capture before acceptance.
+   link loss/reconnect, USB CDC and heartbeat. Repeat affected packet checks
+   against the delivered Release image; the diagnostic responder is absent there.
 5. Add the bounded `NO_SYS=1` lwIP adapter after MAC/DMA HIL; then verify ARP,
    ICMP, UDP/TCP and load against a real host.

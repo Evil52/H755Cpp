@@ -2,10 +2,18 @@
   "date": "2026-11-15",
   "kind": "isolated_pre_merge_ci_candidate_hil",
   "pull_request": 13,
+  "hardware": {
+    "board": "NUCLEO-H755ZI-Q",
+    "mcu_idcode": "0x20036450",
+    "option_status": "0x1bc6aaf0",
+    "boot_config_words": ["0x10001", "0x8000000", "0x8101ff0", "0x1000"],
+    "programmed_core": "Cortex-M7",
+    "flash_scope": "M7 bank-0 first 128 KiB sector; full 2 MiB read before and after"
+  },
   "candidate_commit": "ea3530d668e030b91418b66cf5167a83a917d3e4",
   "pr_ci_run": 43721383488,
   "pr_ci_success": true,
-  "instrumented_m7": {
+  "initial_coverage_run": {
     "preset": "cm7-ethernet-coverage",
     "bin_sha256": "66176d4b4d8640acc86172307bccc623bf940dbd7c839d23e07c4ea1ebcb716d",
     "mac_state": "running",
@@ -20,8 +28,31 @@
     "external_ping_pong": "not_run",
     "limit": "Ambient RX descriptors observed; payload integrity, diagnostic echo and external TX capture remain unverified"
   },
+  "external_probe_run": {
+    "candidate_commit": "e59231c4f1722d403203c860b7c75c72f6804742",
+    "source_change_from_previous_run": "Documentation only; instrumented M7 binary SHA-256 unchanged",
+    "pr_ci_run": 43725344796,
+    "pr_ci_success": true,
+    "instrumented_bin_sha256": "66176d4b4d8640acc86172307bccc623bf940dbd7c839d23e07c4ea1ebcb716d",
+    "host_interface": "en1",
+    "host_probe_source": "tests/hil/ethernet_raw_probe.py",
+    "host_probe_sha256": "b63d445aa4d19f2f161eade1eceb3c46c78c72c2a711f76c771ec5d5347fde9c",
+    "host_probe_execution": "Matching source copy under /private/tmp with macOS libpcap and administrator authorization",
+    "request": "One broadcast EtherType 0x88B5 frame with H755PING and sequence acd4c3d2",
+    "independent_response": "Matching unicast H755PONG with sequence acd4c3d2 captured by host libpcap",
+    "mac_state": "running",
+    "mac_error": 0,
+    "received_count": 1,
+    "dropped_count": 0,
+    "transmitted_count": 1,
+    "transmit_error_count": 0,
+    "diagnostic_result": 1,
+    "gcov_stream_bytes": 11249,
+    "gcov_capture_complete": true,
+    "limit": "One successful frame exchange; ring wrap, load and link-loss recovery were not exercised"
+  },
   "whole_owned_runtime_coverage": {
-    "c_cpp": {"covered": 1628, "total": 1756, "percent": 92.71070615034168},
+    "c_cpp": {"covered": 1634, "total": 1756, "percent": 93.05239179954442},
     "python": {"covered": 382, "total": 450, "percent": 84.88888888888889},
     "unmeasured": [],
     "gate_passed": true,
@@ -30,14 +61,15 @@
   "local_sonar": {
     "server_version": "26.7.0.124771",
     "quality_gate": "OK",
-    "new_coverage_percent": 91.3,
-    "overall_coverage_percent": 91.1,
+    "new_coverage_percent": 91.5,
+    "overall_coverage_percent": 91.4,
     "unresolved_issues": 0,
     "blocking_issues": 0,
     "include_resolution_warnings": 726,
     "limit": "Community sonar-cxx parsing does not establish complete C++26 analysis"
   },
   "flash_restoration": {
+    "isolated_runs": 2,
     "full_flash_bytes": 2097152,
     "backup_read_twice_identical": true,
     "before_sha256": "261b1289236b07b5c9bc17bb3137c460d3092d4b269dd3f37be06ba92765379e",
