@@ -95,7 +95,8 @@ short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
 does not establish that other lwIP parser vulnerabilities are absent. The
 [2026 upstream audit](https://github.com/xchglabs/lwip-2026-pocs) also reports
 unresolved findings involving DHCP and the core IP stack, whose details are not
-yet public. Treat the network-exposed Release security review as open.
+yet public. Treat the network-exposed Release security review as open; see the
+[exact-source security assessment](lwip-security-review-2026-11-16.md).
 
 CodeQL reported `cpp/comparison-with-wider-type` at unchanged upstream
 `src/core/mem.c:857`. In this build `MEM_SIZE` is 16,384 and alignment is 8,
