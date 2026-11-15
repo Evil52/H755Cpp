@@ -47,16 +47,7 @@ def validated_checkout(source: Path, expected_commit: str) -> str:
     return commit
 
 
-def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> Path:
-    if preset not in ("cm7-release", "cm7-usb-release", "cm7-ethernet-release"):
-        raise ValueError("unsupported release preset")
-    cache = read_cache(build / "CMakeCache.txt")
-    if Path(cache.get("CMAKE_HOME_DIRECTORY", "/missing")).resolve() != source.resolve():
-        raise ValueError("build tree belongs to another source checkout")
-    compiler_records = list((build / "CMakeFiles").glob("*/CMakeCXXCompiler.cmake"))
-    if (cache.get("CMAKE_BUILD_TYPE") != "Release" or len(compiler_records) != 1
-            or f'set(CMAKE_CXX_COMPILER "{compiler}")' not in compiler_records[0].read_text()):
-        raise ValueError("build configuration or compiler differs from release inputs")
+def validate_release_profile(cache: dict[str, str], preset: str) -> None:
     usb_expected = "ON" if preset in ("cm7-usb-release", "cm7-ethernet-release") else "OFF"
     if cache.get("H755_USB_CDC", "OFF") != usb_expected:
         raise ValueError("USB build selection differs from release preset")
@@ -69,6 +60,19 @@ def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> P
         raise ValueError("Coverage build cannot be packaged as release")
     if cache.get("H755_ETHERNET_DIAGNOSTIC", "OFF") != "OFF":
         raise ValueError("Diagnostic build cannot be packaged as release")
+
+
+def validated_build(source: Path, build: Path, preset: str, compiler: Path) -> Path:
+    if preset not in ("cm7-release", "cm7-usb-release", "cm7-ethernet-release"):
+        raise ValueError("unsupported release preset")
+    cache = read_cache(build / "CMakeCache.txt")
+    if Path(cache.get("CMAKE_HOME_DIRECTORY", "/missing")).resolve() != source.resolve():
+        raise ValueError("build tree belongs to another source checkout")
+    compiler_records = list((build / "CMakeFiles").glob("*/CMakeCXXCompiler.cmake"))
+    if (cache.get("CMAKE_BUILD_TYPE") != "Release" or len(compiler_records) != 1
+            or f'set(CMAKE_CXX_COMPILER "{compiler}")' not in compiler_records[0].read_text()):
+        raise ValueError("build configuration or compiler differs from release inputs")
+    validate_release_profile(cache, preset)
     inputs = build / "firmware"
     for name in FILES:
         if not (inputs / name).is_file():

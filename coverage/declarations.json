@@ -24,7 +24,7 @@
     "reason": "Compile-time configuration macros and C ABI declarations only; no executable statements. Included in successful target compilation."
   },
   "include/arch/cc.h": {
-    "sha256": "7655843a2b581edb788ce722e19aa407775b97781ad3a3b290c333b4b70b68e7",
+    "sha256": "ddcbed727e7a99e24f9d2f948d52052fdd14ddac0fc2c3784e93f97f5e2ecea5",
     "reason": "lwIP compiler/ABI configuration and declarations only; no executable statements."
   },
   "include/lwipopts.h": {

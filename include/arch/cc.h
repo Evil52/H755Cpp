@@ -14,7 +14,11 @@
 extern "C"
 {
 #endif
-    __attribute__((noreturn)) void h755_lwip_assert(const char* message);
+#ifdef __cplusplus
+    [[noreturn]] void h755_lwip_assert(const char* message);
+#else
+_Noreturn void h755_lwip_assert(const char* message);
+#endif
     uint32_t h755_lwip_random(void);
 #ifdef __cplusplus
 }
