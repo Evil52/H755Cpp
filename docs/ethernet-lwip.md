@@ -43,6 +43,15 @@ does not establish that other lwIP parser vulnerabilities are absent. The
 unresolved findings involving DHCP and the core IP stack, whose details are not
 yet public. Treat the network-exposed Release security review as open.
 
+CodeQL reported `cpp/comparison-with-wider-type` at unchanged upstream
+`src/core/mem.c:857`. In this build `MEM_SIZE` is 16,384 and alignment is 8,
+so `MEM_SIZE_ALIGNED` is 16,384. `mem_size_t` is 16-bit because upstream selects
+it whenever `MEM_SIZE <= 64,000`. The preceding guard returns if `size` exceeds
+`MEM_SIZE_ALIGNED`, hence the loop bound `MEM_SIZE_ALIGNED - size` is in
+`[0, 16384]`, representable in `mem_size_t`; this particular width-comparison
+warning is not a reachable overflow in our configuration. This assessment is
+specific to the pinned options and does not waive other vendor findings.
+
 Before board programming, the exact committed candidate needs green PR checks,
 fresh whole-owned-code target coverage above 80%, local Sonar gate, and the
 project's post-merge artifact path. An isolated temporary coverage HIL requires
