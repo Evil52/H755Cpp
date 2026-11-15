@@ -1,27 +1,35 @@
 {
   "date": "2026-11-15",
-  "analyzed_source_commit": "a9b1c3078efff3d94c5b43666f42e957c45c3104",
-  "analyzed_source_tree": "0302fea4703db1a90c80a158c1fcc5825296a4a8",
+  "analyzed_source_commit": "ceb66796562d336250185f21472dd3e1b313d470",
+  "analyzed_source_tree": "87c7e0dfc1e3a8d51fd5f05fe6bf75027eb90201",
   "pr": 11,
-  "pr_ci_run": 43702654708,
+  "pr_ci_run": 43707477537,
   "pr_ci_success": true,
   "coverage": {
     "scope": "all owned runtime C/C++ and Python under include, src, firmware, and tools; vendor, tests, probes, build outputs, and declarative configuration excluded",
-    "c_cpp": { "covered": 1170, "total": 1265, "percent": 92.49 },
-    "python": { "covered": 376, "total": 427, "percent": 88.06 },
+    "c_cpp": {
+      "covered": 1226,
+      "total": 1339,
+      "percent": 91.56086631814787
+    },
+    "python": {
+      "covered": 376,
+      "total": 427,
+      "percent": 88.05620608899298
+    },
     "unmeasured_owned_sources": [],
     "strictly_above_80_percent_per_language": true,
-    "host_tests_executed": 10,
-    "python_tests_executed": 41,
-    "report_sha256": "c31ab386f9dcbfa49ae440a9b8a27371cb0eb071f56bbdd363abc532eff1364b",
-    "sonar_xml_sha256": "0e215a5843b59cf340ae1f405613883a8c4b207d3065f9bb95024ca7fe222b52",
-    "python_json_sha256": "24651852496e3ec4b74b6401e85926020e1ea97df06e01d648dbe6b54f070670"
+    "host_tests_executed": 11,
+    "python_tests_executed": 42,
+    "report_sha256": "9d8b48164e232a0f887174630b6bbc1850e37c8f076da84b0203ebe11b99ce0a",
+    "sonar_xml_sha256": "7c1d2d65881694ae0a537815e3f207cea55860aae6998e1f429f160ad7553cd9",
+    "python_json_sha256": "5ed1a21b9b6e462780afd60a6efaa7479696fdbc851db26b1a938009c7cb91d0"
   },
   "target_coverage": {
     "build": "Release with H755_TARGET_COVERAGE=ON and H755_USB_CDC=ON; test image only",
-    "temporary_m7_bin_sha256": "3e71e7578a74d3d743950a9c8e0a5b91d7b6147e9cabdbdf83138d7fdd6b0f6d",
-    "gcov_stream_bytes": 8616,
-    "gcov_stream_sha256": "9bda80bafe22284cf8519d197eca8d1d88aa84b54080e53a54efb986ec4c4238",
+    "temporary_m7_bin_sha256": "95895dff4f21c10bfbbaae353ecd6c796dd5bf362cc470763263324df088316c",
+    "gcov_stream_bytes": 8960,
+    "gcov_stream_sha256": "e8629e7e6d62c9995cdbd1aa8897221fb9b0334bb175a901d0ee74af53c95deb",
     "gcov_capture_status": "complete, no error",
     "m4_instruction_evidence": "Earlier SWD step evidence reused only because the M4 binary SHA-256 remained cd5eb4502a6e172d26654fc86ef4f3e40104ce052807022709f07f02689756cd"
   },
@@ -38,15 +46,16 @@
   "local_sonarqube": {
     "server_version": "26.7.0.124771",
     "quality_gate": "OK",
-    "overall_coverage_percent": 90.5,
-    "new_code_coverage_percent": 89.6,
+    "overall_coverage_percent": 89.9,
+    "new_code_coverage_percent": null,
     "unresolved_issues": 0,
-    "new_violations": 0,
+    "new_violations": null,
     "generic_coverage_files_imported": 39,
-    "limitation": "Community CXX reported 668 include-resolution warnings and is not complete C++26 semantic analysis"
+    "limitation": "Community CXX reported 670 include-resolution warnings; no parser syntax errors were reported. Full C++26 semantic analysis is not established."
   },
   "remaining": [
     "MAC/DMA frame transmission and reception are not implemented or accepted on hardware",
+    "USB race handling and error classification have host tests and target builds, but the resulting Release image has not passed board HIL",
     "Normal board deployment requires merge and verified post-merge firmware artifact"
   ]
 }
