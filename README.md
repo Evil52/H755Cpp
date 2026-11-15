@@ -1,111 +1,54 @@
 # H755Cpp
 
-Начальный проект проверки инструментария для Nucleo STM32H755:
-**CMake + bare metal + CMSIS**, C++26, без HAL/LL и RTOS.
+Прошивка для NUCLEO-H755ZI-Q на STM32H755. Собираем через CMake: bare metal, CMSIS, C++26. HAL, LL и RTOS здесь нет. Основной код работает на Cortex-M7; Cortex-M4 пока выполняет маленькую парковочную программу.
 
-[Модули CM7 и владение зависимостями](docs/cm7-architecture.md).
+## Что уже есть
 
-Первый компонент Ethernet на M7: [неблокирующее MDIO-чтение и CMSIS-адаптер](docs/ethernet-m7.md).
-Добавлен [read-only link monitor и сбор покрытия host/MCU/Python](docs/link-monitor-and-coverage.md).
-Выбрана архитектура своего драйвера + lwIP. [Кандидат MAC/DMA](docs/ethernet-mac-dma.md)
-содержит дескрипторы и буферы D2 SRAM; его прежняя Release-версия проверена
-на плате. Локально подготовлен [следующий этап с lwIP](docs/ethernet-lwip.md):
-DHCP, ARP, ping и ограниченный UDP/TCP echo. Он ещё не проходил CI, Sonar,
-аппаратную приёмку и выпуск post-merge артефакта.
+- Запуск M7, индикация ошибок и heartbeat на LD1.
+- Свой драйвер Ethernet MAC/DMA, управление PHY LAN8742 через MDIO и обработка потери линка.
+- lwIP 2.2.1 на M7: DHCP-клиент, ARP, ping, UDP и TCP echo на порту `7777`. Используем только нужные части lwIP; короткий ARP-пакет отсекается также внутри библиотеки.
+- USB Device CDC на пользовательском разъёме CN13. Его реализация и отдельная аппаратная проверка описаны в [документе по USB](docs/usb-async.md).
 
-Для первого аппаратного запуска добавлены [M7 LED + PHY ID и M4 parking](docs/m7-bringup.md):
-startup, linker scripts и отдельные ELF/BIN/HEX для обоих ядер.
-`build/toolchain-checks/link_only.elf` остаётся техническим тестом
-линковки runtime; его нельзя записывать на плату.
+16 ноября 2026 года на плату записан M7 BIN из [артефакта merge-коммита `47b8c37`](https://github.com/Evil52/H755Cpp/actions/runs/43763881813). После записи прочитаны и сверены все 2 МБ Flash. На прямом кабеле с Mac прошли DHCP, 3/3 ping, echo по UDP/TCP и проверка 256 UDP-пакетов и 16 TCP-соединений. M4 и option bytes при этой записи не менялись. [Запись проверки](docs/ethernet-release-hil-2026-11-16.md).
 
-## Установленный компилятор
+Это образ для разработки и ревью. Восстановление соединения после вынимания кабеля проверяли на инструментированной сборке, но на этом точном Release-образе повторно не проверяли. Долгую нагрузку и холодный запуск этого образа тоже ещё не принимали. [Обзор безопасности lwIP](docs/lwip-security-review-2026-11-16.md) описывает нераскрытые находки в DHCP и ядре IP; их применимость пока неизвестна. Поэтому не подключаем этот образ к недоверенной сети и не называем его готовым для серийного изделия.
 
-Локальная сборка upstream GCC 16.2.0 для `arm-none-eabi` на macOS arm64:
+## Где что лежит
 
-```sh
-.tools/arm-gcc-16.2.0-cm7/bin/arm-none-eabi-g++ --version
-```
+| Путь | Содержимое |
+| --- | --- |
+| `firmware/cm7/main.cpp` | Сборка объектов M7 и запуск приложения. Начните читать код отсюда. |
+| `firmware/cm7/` и `include/h755/application/` | Плата, цикл приложения, состояние запуска, heartbeat, обработка ошибок. |
+| `include/h755/ethernet/`, `firmware/cm7/ethernet/`, `src/ethernet/` | MDIO, PHY, MAC/DMA, адаптер lwIP и echo. |
+| `include/h755/usb/`, `firmware/cm7/usb/`, `src/usb/` | USB CDC, асинхронные операции и адаптер к TinyUSB. |
+| `firmware/cm4/park.s` | Текущий образ M4 без прикладной логики. |
+| `vendor/` | Зафиксированные CMSIS, TinyUSB и lwIP; версии и хеши проверяются при сборке. |
+| `cmake/`, `CMakePresets.json` | Toolchain, linker scripts, состав сборок и профили CMake. |
+| `tests/`, `tests/hil/` | Host-тесты с ASan/UBSan и сценарии аппаратной проверки. |
+| `tools/`, `.github/workflows/`, `security/` | Проверки, сборка артефакта, CI и правила анализа. |
+| `docs/` | Архитектура, результаты аппаратных проверок и открытые ограничения. |
 
-Этот набор выбран только для проекта. Системный Arm GCC 10.3.1 не изменён.
-Профиль библиотек: Cortex-M7, Thumb, FPv5-D16, hard-float, одна конфигурация.
-Для M4 необходим отдельный проверенный runtime либо multilib toolchain;
-передача `-mcpu=cortex-m4` сама по себе не заменяет библиотеки M7.
+## Как собрать и проверить
 
-Версии и команды сборки: [docs/toolchain-build.json](docs/toolchain-build.json).
-Архивы GCC/Binutils проверены по опубликованным SHA256; зависимости GCC —
-по SHA512 из его релиза. Для Newlib записан SHA256 загрузки с HTTPS upstream.
-Опциональная Info-документация libgloss не собиралась; библиотеки и заголовки установлены.
-
-## Проверки
-
-Нужны CMake 3.30+, Ninja и Python 3. Для host-проверки используется установленный
-Apple Clang; его режим C++26 не означает поддержку всех возможностей стандарта.
+Нужны CMake 3.30+, Ninja и Python 3. Host-тесты собираются системным C++ компилятором. Для M7 нужен закреплённый GCC 16.2 из [toolchain release](https://github.com/Evil52/H755Cpp/releases/tag/toolchain-gcc-16.2.0-cm7); системный Arm GCC вместо него не подставляем.
 
 ```sh
 cmake --preset host-debug
 cmake --build --preset host-debug
-ctest --preset host-debug
+ctest --preset host-debug --no-tests=error
+python3 -m unittest discover -s tests -p 'test_*.py'
 
-export H755_ARM_TOOLCHAIN=/path/to/arm-gcc-16.2.0-cm7
-cmake --preset cm7-debug
-cmake --build --preset cm7-debug
-
-cmake --preset cm7-release
-cmake --build --preset cm7-release
-
+export H755_ARM_TOOLCHAIN=/absolute/path/to/arm-gcc-16.2.0-cm7
 cmake --preset cm7-ethernet-release
 cmake --build --preset cm7-ethernet-release
-
-python3 tools/check_toolchain.py
 ```
 
-Host-проверка выполняется с ASan/UBSan и extensive hardening libc++.
-На GNU host используется libstdc++ с `_GLIBCXX_ASSERTIONS`. Группы MDIO:
-`ctest --preset host-debug -L unit --no-tests=error` и
-`ctest --preset host-debug -L integration --no-tests=error`.
-Подготовленный GitHub Actions workflow выполняет host-проверки; до запуска
-на GitHub его результат остаётся неподтверждённым. Target/HIL/e2e им не заменяются.
-Arm-проверки используют C++26 без standard decay, `-fcontracts`,
-`-fcontract-evaluation-semantic=enforce`, `_GLIBCXX_ASSERTIONS=1` и явные ABI-флаги.
-В Debug и Release проверяется компиляция `pre`, `post`, `contract_assert`, array/span.
-`compile_commands.json` создаётся в соответствующем build-каталоге.
+Локальная сборка создаёт ELF, BIN и HEX в `build/cm7-ethernet-release/firmware/`. Команды сборки ничего не прошивают. Порядок для записи платы: зелёный PR, merge, проверенный [post-merge артефакт](docs/firmware-artifacts.md), резервная копия Flash, запись и readback.
 
-`tools/check_toolchain.py` дополнительно проверяет версию/target, feature macros,
-ARM attributes, символы contract handler и assert, а также линковку C++ runtime.
-Результаты сохраняются в `build/toolchain-checks/`. Проверки ничего не прошивают.
+## С чего начать ревью
 
-## Граница подтверждённого
+1. [Границы модулей M7](docs/cm7-architecture.md) и `firmware/cm7/main.cpp`.
+2. [Драйвер MAC/DMA](docs/ethernet-mac-dma.md), затем `include/h755/ethernet/mac_engine.hpp` и `lwip_network.hpp`.
+3. [Проверки Ethernet](docs/ethernet-lwip.md), [безопасность lwIP](docs/lwip-security-review-2026-11-16.md) и [порядок выпуска артефакта](docs/firmware-artifacts.md).
 
-- Поддержка синтаксиса и заголовка контрактов GCC 16.2 подтверждается отдельными пробами.
-- `_GLIBCXX_ASSERTIONS` включает проверки ряда операций, но не доказывает полное
-  соответствие C++26 library hardening. В этой сборке проверенные feature macros
-  `__cpp_lib_hardened_span`/`__cpp_lib_hardened_array` не объявлены.
-- Host-тест не проверяет native contracts GCC и поведение ARM runtime на устройстве.
-- Действие обработчика при нарушении контракта, безопасные выходы, старт обоих ядер,
-  кеш/DMA и физическое поведение платы ещё не проверены.
-- Минимальная прошивка M7 и управление PHY проверены на плате; полный Ethernet-стек и production-готовность ещё не заявляются.
-
-## Дальше
-
-Подтвердить точную модель/ревизию платы и MCU, питание/boot-состояние M4, затем
-подготовить pinned CMSIS, startup/linker layout и одно наблюдаемое упражнение.
-Новые комментарии в коде нужны только для критичных или неочевидных причин и ограничений.
-
-Документы для следующего этапа:
-
-- [NUCLEO-H755ZI-Q](https://www.st.com/en/evaluation-tools/nucleo-h755zi-q.html)
-- [UM2408: плата MB1363](https://www.st.com/resource/en/user_manual/dm00499171-stm32h7-nucleo144-boards-mb1363-stmicroelectronics.pdf)
-- [RM0399: STM32H745/755/747/757](https://www.st.com/resource/en/reference_manual/dm00176879-stm32h745-755-and-stm32h747-757-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf)
-- [AN5557: архитектура двух ядер](https://www.st.com/resource/en/application_note/dm00733995-stm32h745755-and-stm32h747757-lines-dualcore-architecture-stmicroelectronics.pdf)
-- [AN5617: межъядерное взаимодействие](https://www.st.com/resource/en/application_note/an5617-introduction-to-interprocessor-communications-for-stm32h745755-and-stm32h747757-mcus-stmicroelectronics.pdf)
-
-MISRA C++ policy and current assessment gaps: [project profile](docs/misra-cpp-profile.md).
-
-Управление PHY: [MDIO read/write и запуск LAN8742](docs/phy-control.md). Результаты: [аппаратные проверки PHY](docs/phy-control-hardware-2026-11-14.json).
-
-USB CDC на Intel async: [архитектура, API, сборка и границы проверки](docs/usb-async.md).
-Кандидат включается отдельными presets `cm7-usb-debug` / `cm7-usb-release`;
-обычный `cm7-release` оставляет USB выключенным. USB CDC на CN13 прошёл
-описанные в [аппаратном отчёте](docs/usb-async-hardware-2026-11-15.json) проверки.
-Для следующих прошивок действует [порядок post-merge артефакта](docs/firmware-artifacts.md):
-успешный PR и локальный `.bin` сами по себе не разрешают запись на плату.
+Особенно полезно проверить границы буферов DMA и lwIP, обработку ошибок линка, запуск после сброса и применимость открытых находок lwIP. Текущие проверки и их ограничения описаны в [CI и Sonar](docs/ci-and-sonar.md). Профиль MISRA C++ и его незакрытые пункты — в [отдельном документе](docs/misra-cpp-profile.md).
