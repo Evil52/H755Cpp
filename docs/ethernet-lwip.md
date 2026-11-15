@@ -74,6 +74,21 @@ link-loss or recovery evidence was collected in this attempt. Diagnose debug
 access before another candidate flash; do not treat under-reset identification
 as proof of normal live-debug access.
 
+A separately authorized under-reset HIL on 16 November 2026 used the same
+instrumented M7 BIN after eight green PR checks for commit `9e84bf8`. Two full
+2 MiB Flash backups matched the previously accepted image before programming.
+On the isolated direct Mac link, the candidate passed initial ICMP/UDP/TCP
+echo and 256 UDP plus 16 TCP exchanges. The Mac observed physical link down
+when the cable was unplugged and link up when it was reconnected. Without a
+RESET during that cable sequence, three ICMP replies and bounded UDP/TCP echo
+passed again after reconnect. This proves external IP connectivity recovery;
+it does not prove that DHCP obtained a new lease after reconnection. The
+original first M7 sector was restored and verified, then the full 2 MiB Flash
+readback matched both preflight backups. The restored M7 was started, the user
+observed the normal green heartbeat and red LED off, and the temporary Mac
+DHCP process and address were removed. Normal live SWD access remains
+unavailable. See [the exact HIL record](ethernet-lwip-link-hil-2026-11-16.json).
+
 The adapter rejects ARP frames shorter than 42 bytes before the pinned lwIP
 `etharp_input()` path. This is a local mitigation for the [publicly reported
 short-ARP out-of-bounds read](https://github.com/lwip-tcpip/lwip/pull/108); it
