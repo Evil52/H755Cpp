@@ -84,9 +84,16 @@ was 92.4% C/C++ and 88.3% Python, with no unmeasured files. Local Sonar Quality
 Gate passed with zero unresolved issues, subject to its documented C++ parser
 limits. See [the exact-image HIL record](ethernet-mac-hil-2026-11-15.json).
 Those results predate the RX callback and diagnostic responder in this revision;
-fresh coverage, Sonar, CI and HIL are pending. The observations do not establish
-RX payload integrity, external frame capture, TX completion, link loss/reconnect,
-or sustained packet load.
+the current revision `ea3530d` passed all eight PR checks, including target
+builds, CodeQL and Semgrep. In a separate restored coverage run, the MAC stayed
+`running` with zero error, 135 ambient RX frames and zero drops. The one-shot
+diagnostic responder was not exercised: its result and TX count remained zero.
+Whole-owned-code line coverage was 92.7% C/C++ and 84.9% Python, with no
+unmeasured files; local Sonar Quality Gate passed with zero unresolved issues.
+The community CXX analyzer still reported 726 include-resolution warnings.
+See [the current candidate HIL record](ethernet-rx-candidate-hil-2026-11-15.json).
+RX payload integrity, external frame capture, TX completion, link
+loss/reconnect and sustained packet load remain unverified.
 
 ## Next acceptance steps
 

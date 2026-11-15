@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-15",
+  "kind": "isolated_pre_merge_ci_candidate_hil",
+  "pull_request": 13,
+  "candidate_commit": "ea3530d668e030b91418b66cf5167a83a917d3e4",
+  "pr_ci_run": 43721383488,
+  "pr_ci_success": true,
+  "instrumented_m7": {
+    "preset": "cm7-ethernet-coverage",
+    "bin_sha256": "66176d4b4d8640acc86172307bccc623bf940dbd7c839d23e07c4ea1ebcb716d",
+    "mac_state": "running",
+    "mac_error": 0,
+    "received_count": 135,
+    "dropped_count": 0,
+    "transmitted_count": 0,
+    "transmit_error_count": 0,
+    "diagnostic_result": 0,
+    "gcov_stream_bytes": 11137,
+    "gcov_capture_complete": true,
+    "external_ping_pong": "not_run",
+    "limit": "Ambient RX descriptors observed; payload integrity, diagnostic echo and external TX capture remain unverified"
+  },
+  "whole_owned_runtime_coverage": {
+    "c_cpp": {"covered": 1628, "total": 1756, "percent": 92.71070615034168},
+    "python": {"covered": 382, "total": 450, "percent": 84.88888888888889},
+    "unmeasured": [],
+    "gate_passed": true,
+    "assembly": "Earlier nine-instruction M4 SWD evidence reused; current M4 binary and Flash bytes were not changed"
+  },
+  "local_sonar": {
+    "server_version": "26.7.0.124771",
+    "quality_gate": "OK",
+    "new_coverage_percent": 91.3,
+    "overall_coverage_percent": 91.1,
+    "unresolved_issues": 0,
+    "blocking_issues": 0,
+    "include_resolution_warnings": 726,
+    "limit": "Community sonar-cxx parsing does not establish complete C++26 analysis"
+  },
+  "flash_restoration": {
+    "full_flash_bytes": 2097152,
+    "backup_read_twice_identical": true,
+    "before_sha256": "261b1289236b07b5c9bc17bb3137c460d3092d4b269dd3f37be06ba92765379e",
+    "after_sha256": "261b1289236b07b5c9bc17bb3137c460d3092d4b269dd3f37be06ba92765379e",
+    "full_flash_restored_identically": true,
+    "m4_written": false,
+    "option_bytes_written": false
+  },
+  "release_status": "No merge, release artifact, or production deployment from this candidate"
+}
